@@ -16,6 +16,14 @@ import {
   updateDancer,
 } from "./managers/dancerManager";
 import {
+  addStudio,
+  addStudios,
+  deleteStudio,
+  getStudio,
+  getStudios,
+  updateStudio,
+} from "./managers/studioManager";
+import {
   addTeacher,
   addTeachers,
   deleteTeacher,
@@ -72,163 +80,36 @@ class Api {
   }
 
   async getStudios(): Promise<TReturnDto<StudioModelInstance[]>> {
-    const res: TReturnDto<StudioModelInstance[]> = {
-      data: undefined,
-      error: undefined,
-    };
-
-    try {
-      const studioRes = await this.studioModel.findAll();
-
-      res.data = studioRes;
-    } catch (error) {
-      res.error = error;
-    }
-
-    return res;
+    return await getStudios(this.studioModel);
   }
 
-  async getStudio(studioId: number): Promise<TReturnDto<StudioModelInstance>> {
-    if (!studioId) {
-      return { error: "No studio provided" };
-    }
-
-    const res: TReturnDto<StudioModelInstance> = {
-      data: undefined,
-      error: undefined,
-    };
-
-    try {
-      const studioRes = await this.studioModel.findOne({
-        where: {
-          id: studioId,
-        },
-      });
-
-      if (studioRes) {
-        res.data = studioRes;
-      }
-    } catch (error) {
-      res.error = error;
-    }
-
-    return res;
+  async getStudio(studioId: string): Promise<TReturnDto<StudioModelInstance>> {
+    return await getStudio(this.studioModel, studioId);
   }
 
   async addStudio(
     studioName: string
   ): Promise<TReturnDto<StudioModelInstance>> {
-    if (!studioName) {
-      return { error: "No studio provided" };
-    }
-
-    const res: TReturnDto<StudioModelInstance> = {
-      data: undefined,
-      error: undefined,
-    };
-
-    try {
-      const studioRes = await this.studioModel.create({
-        name: studioName,
-      });
-
-      if (studioRes) {
-        res.data = studioRes;
-      }
-    } catch (error) {
-      res.error = error;
-    }
-
-    return res;
+    return await addStudio(this.studioModel, studioName);
   }
 
   async addStudios(
     studios: string[]
   ): Promise<TReturnDto<StudioModelInstance[]>> {
-    if (studios.length < 1) {
-      return { error: "No studios provided" };
-    }
-
-    const res: TReturnDto<StudioModelInstance[]> = {
-      data: undefined,
-      error: [],
-    };
-
-    const promiseResult = await Promise.all(
-      studios.map(async (studioName) => {
-        try {
-          const studioRes = await this.addStudio(studioName);
-          return studioRes?.data;
-        } catch (error) {
-          res.error.push(error);
-        }
-      })
-    );
-
-    res.data = promiseResult;
-
-    return res;
+    return await addStudios(this.studioModel, studios);
   }
 
-  async updateStudio({
-    studioId,
-    newName,
-  }: {
-    studioId: string;
-    newName: string;
-  }): Promise<TReturnDto<number>> {
-    if (!studioId || !newName) {
-      return { error: "Must provide the studio ID and the new name" };
+  async updateStudio(
+    studioId: string,
+    options: {
+      newStudioName: string;
     }
-
-    const res: TReturnDto<number> = {
-      data: undefined,
-      error: undefined,
-    };
-
-    try {
-      const studioRes = await this.studioModel.update(
-        {
-          name: newName,
-        },
-        {
-          where: {
-            id: studioId,
-          },
-        }
-      );
-
-      res.data = studioRes[0];
-    } catch (error) {
-      res.error = error;
-    }
-
-    return res;
+  ): Promise<TReturnDto<number>> {
+    return await updateStudio(this.studioModel, studioId, options);
   }
 
-  async deleteStudio(studioId: number): Promise<TReturnDto<number>> {
-    if (!studioId) {
-      return { error: "Must provide studio ID" };
-    }
-
-    const res: TReturnDto<number> = {
-      data: undefined,
-      error: undefined,
-    };
-
-    try {
-      const studioRes = await this.studioModel.destroy({
-        where: {
-          id: studioId,
-        },
-      });
-
-      res.data = studioRes;
-    } catch (error) {
-      res.error = error;
-    }
-
-    return res;
+  async deleteStudio(studioId: string): Promise<TReturnDto<number>> {
+    return await deleteStudio(this.studioModel, studioId);
   }
 
   async getDancers(): Promise<TReturnDto<DancerModelInstance[]>> {
