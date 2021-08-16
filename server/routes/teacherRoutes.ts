@@ -1,7 +1,7 @@
 import * as express from "express";
 import Api from "../api";
 
-export function danceRouter(api: Api) {
+export function teacherRouter(api: Api) {
   const router = express.Router();
 
   router.get(
