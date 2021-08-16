@@ -10,6 +10,7 @@ import { ScheduledDanceModel } from "./models/scheduledDanceModel";
 import Api from "./api";
 import { danceRouter } from "./routes/danceRoutes";
 import { teacherRouter } from "./routes/teacherRoutes";
+import { dancerRouter } from "./routes/dancerRoutes";
 
 if (process.env.NODE_ENV !== "production") {
   require("dotenv").config();
@@ -52,6 +53,7 @@ async function start() {
   app.use(express.json());
   app.use("/dances", danceRouter(api));
   app.use("/teachers", teacherRouter(api));
+  app.use("/dancers", dancerRouter(api));
 
   app.listen(port, () => {
     console.log(`Server is running on port ${port}`);

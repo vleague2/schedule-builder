@@ -8,6 +8,14 @@ import {
   updateDance,
 } from "./managers/danceManager";
 import {
+  addDancer,
+  addDancers,
+  deleteDancer,
+  getDancer,
+  getDancers,
+  updateDancer,
+} from "./managers/dancerManager";
+import {
   addTeacher,
   addTeachers,
   deleteTeacher,
@@ -224,159 +232,36 @@ class Api {
   }
 
   async getDancers(): Promise<TReturnDto<DancerModelInstance[]>> {
-    const res: TReturnDto<DancerModelInstance[]> = {
-      data: undefined,
-      error: undefined,
-    };
-
-    try {
-      const dancerRes = await this.dancerModel.findAll();
-
-      if (dancerRes) {
-        res.data = dancerRes;
-      }
-    } catch (error) {
-      res.error = error;
-    }
-
-    return res;
+    return await getDancers(this.dancerModel);
   }
 
-  async getDancer(dancerId: number): Promise<TReturnDto<DancerModelInstance>> {
-    if (!dancerId) {
-      return { error: "No dancer provided" };
-    }
-
-    const res: TReturnDto<DancerModelInstance> = {
-      data: undefined,
-      error: undefined,
-    };
-
-    try {
-      const dancerRes = await this.dancerModel.findOne({
-        where: {
-          id: dancerId,
-        },
-      });
-
-      if (dancerRes) {
-        res.data = dancerRes;
-      }
-    } catch (error) {
-      res.error = error;
-    }
-
-    return res;
+  async getDancer(dancerId: string): Promise<TReturnDto<DancerModelInstance>> {
+    return await getDancer(this.dancerModel, dancerId);
   }
 
   async addDancer(
     dancerName: string
   ): Promise<TReturnDto<DancerModelInstance>> {
-    const res: TReturnDto<DancerModelInstance> = {
-      data: undefined,
-      error: undefined,
-    };
-
-    try {
-      const dancerRes = await this.dancerModel.create({
-        name: dancerName,
-      });
-
-      if (dancerRes) {
-        res.data = dancerRes;
-      }
-    } catch (error) {
-      res.error = error;
-    }
-
-    return res;
+    return await addDancer(this.dancerModel, dancerName);
   }
 
   async addDancers(
     dancers: string[]
   ): Promise<TReturnDto<DancerModelInstance[]>> {
-    const res: TReturnDto<DancerModelInstance[]> = {
-      data: undefined,
-      error: [],
-    };
-
-    if (dancers.length < 1) {
-      return { error: "No dancers provided" };
-    }
-
-    const promiseResult = await Promise.all(
-      dancers.map(async (dancerName) => {
-        try {
-          const dancerRes = await this.addDancer(dancerName);
-          return dancerRes?.data;
-        } catch (error) {
-          res.error.push(error);
-        }
-      })
-    );
-
-    res.data = promiseResult;
+    return await addDancers(this.dancerModel, dancers);
   }
 
-  async updateDancer({
-    dancerId,
-    newName,
-  }: {
-    dancerId: number;
-    newName: string;
-  }): Promise<TReturnDto<number>> {
-    if (!dancerId || !newName) {
-      return { error: "Must provide the dancer ID and the new name" };
+  async updateDancer(
+    dancerId: string,
+    options: {
+      newDancerName: string;
     }
-
-    const res: TReturnDto<number> = {
-      data: undefined,
-      error: undefined,
-    };
-
-    try {
-      const dancerRes = await this.dancerModel.update(
-        {
-          name: newName,
-        },
-        {
-          where: {
-            id: dancerId,
-          },
-        }
-      );
-
-      res.data = dancerRes[0];
-    } catch (error) {
-      res.error = error;
-    }
-
-    return res;
+  ): Promise<TReturnDto<number>> {
+    return await updateDancer(this.dancerModel, dancerId, options);
   }
 
-  async deleteDancer(dancerId: number): Promise<TReturnDto<number>> {
-    if (!dancerId) {
-      return { error: "Must provide dancer ID" };
-    }
-
-    const res: TReturnDto<number> = {
-      data: undefined,
-      error: undefined,
-    };
-
-    try {
-      const dancerRes = await this.dancerModel.destroy({
-        where: {
-          id: dancerId,
-        },
-      });
-
-      res.data = dancerRes;
-    } catch (error) {
-      res.error = error;
-    }
-
-    return res;
+  async deleteDancer(dancerId: string): Promise<TReturnDto<number>> {
+    return await deleteDancer(this.dancerModel, dancerId);
   }
 
   async getTeachers(): Promise<TReturnDto<TeacherModelInstance[]>> {
