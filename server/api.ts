@@ -7,6 +7,14 @@ import {
   getDances,
   updateDance,
 } from "./managers/danceManager";
+import {
+  addTeacher,
+  addTeachers,
+  deleteTeacher,
+  getTeacher,
+  getTeachers,
+  updateTeacher,
+} from "./managers/teacherManager";
 import { DanceModelInstance } from "./models/danceModel";
 import { DancerModelInstance } from "./models/dancerModel";
 import { ScheduledDanceModelInstance } from "./models/scheduledDanceModel";
@@ -372,167 +380,38 @@ class Api {
   }
 
   async getTeachers(): Promise<TReturnDto<TeacherModelInstance[]>> {
-    const res: TReturnDto<TeacherModelInstance[]> = {
-      data: undefined,
-      error: undefined,
-    };
-
-    try {
-      const teacherRes = await this.teacherModel.findAll();
-
-      if (teacherRes) {
-        res.data = teacherRes;
-      }
-    } catch (error) {
-      res.error = error;
-    }
-
-    return res;
+    return await getTeachers(this.teacherModel);
   }
 
   async getTeacher(
-    teacherId: number
+    teacherId: string
   ): Promise<TReturnDto<TeacherModelInstance>> {
-    if (!teacherId) {
-      return { error: "No teacher provided" };
-    }
-
-    const res: TReturnDto<TeacherModelInstance> = {
-      data: undefined,
-      error: undefined,
-    };
-
-    try {
-      const teacherRes = await this.teacherModel.findOne({
-        where: {
-          id: teacherId,
-        },
-      });
-
-      if (teacherRes) {
-        res.data = teacherRes;
-      }
-    } catch (error) {
-      res.error = error;
-    }
-
-    return res;
+    return await getTeacher(this.teacherModel, teacherId);
   }
 
   async addTeacher(
     teacherName: string
   ): Promise<TReturnDto<TeacherModelInstance>> {
-    if (!teacherName) {
-      return { error: "No teacher provided" };
-    }
-
-    const res: TReturnDto<TeacherModelInstance> = {
-      data: undefined,
-      error: undefined,
-    };
-
-    try {
-      const teacherRes = await this.teacherModel.create({
-        name: teacherName,
-      });
-
-      if (teacherRes) {
-        res.data = teacherRes;
-      }
-    } catch (error) {
-      res.error = error;
-    }
-
-    return res;
+    return await addTeacher(this.teacherModel, teacherName);
   }
 
   async addTeachers(
     teachers: string[]
   ): Promise<TReturnDto<TeacherModelInstance[]>> {
-    if (teachers.length < 1) {
-      return { error: "No teachers provided" };
-    }
-
-    const res: TReturnDto<TeacherModelInstance[]> = {
-      data: undefined,
-      error: [],
-    };
-
-    const promiseResult = await Promise.all(
-      teachers.map(async (teacherName) => {
-        try {
-          const teacherRes = await this.addTeacher(teacherName);
-          return teacherRes?.data;
-        } catch (error) {
-          res.error.push(error);
-        }
-      })
-    );
-
-    res.data = promiseResult;
-
-    return res;
+    return await addTeachers(this.teacherModel, teachers);
   }
 
-  async updateTeacher({
-    teacherId,
-    newName,
-  }: {
-    teacherId: number;
-    newName: string;
-  }): Promise<TReturnDto<number>> {
-    if (!teacherId || !newName) {
-      return { error: "Must provide the teacher ID and the new name" };
+  async updateTeacher(
+    teacherId: string,
+    options: {
+      newTeacherName: string;
     }
-
-    const res: TReturnDto<number> = {
-      data: undefined,
-      error: undefined,
-    };
-
-    try {
-      const teacherRes = await this.teacherModel.update(
-        {
-          name: newName,
-        },
-        {
-          where: {
-            id: teacherId,
-          },
-        }
-      );
-
-      res.data = teacherRes[0];
-    } catch (error) {
-      res.error = error;
-    }
-
-    return res;
+  ): Promise<TReturnDto<number>> {
+    return await updateTeacher(this.teacherModel, teacherId, options);
   }
 
-  async deleteTeacher(teacherId: number): Promise<TReturnDto<number>> {
-    if (!teacherId) {
-      return { error: "Must provide teacher ID" };
-    }
-
-    const res: TReturnDto<number> = {
-      data: undefined,
-      error: undefined,
-    };
-
-    try {
-      const teacherRes = await this.teacherModel.destroy({
-        where: {
-          id: teacherId,
-        },
-      });
-
-      res.data = teacherRes;
-    } catch (error) {
-      res.error = error;
-    }
-
-    return res;
+  async deleteTeacher(teacherId: string): Promise<TReturnDto<number>> {
+    return await deleteTeacher(this.teacherModel, teacherId);
   }
 
   async getDances(
