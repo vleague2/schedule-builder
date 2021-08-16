@@ -1,10 +1,13 @@
 import { FindOptions, Model, ModelCtor, Sequelize } from "sequelize";
 import {
   addDance,
+  addDancersToDance,
   addDances,
   deleteDance,
   getDance,
+  getDancersForDance,
   getDances,
+  removeDancerFromDance,
   updateDance,
 } from "./managers/danceManager";
 import {
@@ -13,6 +16,7 @@ import {
   deleteDancer,
   getDancer,
   getDancers,
+  getDancesForDancer,
   updateDancer,
 } from "./managers/dancerManager";
 import {
@@ -32,6 +36,7 @@ import {
   updateTeacher,
 } from "./managers/teacherManager";
 import { DanceModelInstance } from "./models/danceModel";
+import { DancerDancesModelInstance } from "./models/dancerDancesModel";
 import { DancerModelInstance } from "./models/dancerModel";
 import { ScheduledDanceModelInstance } from "./models/scheduledDanceModel";
 import { StudioModelInstance } from "./models/studioModel";
@@ -46,11 +51,6 @@ type TDance = {
   danceName: string;
   teacherId: number;
 };
-
-interface DancerDancesModelInstance extends Model {
-  DancerId: number;
-  DanceId: number;
-}
 
 class Api {
   sequelize: Sequelize;
@@ -221,155 +221,49 @@ class Api {
   }
 
   async getDancersForDance(
-    danceId: number
+    danceId: string
   ): Promise<TReturnDto<DancerModelInstance[]>> {
-    if (!danceId) {
-      return { error: "No dance provided" };
-    }
-
-    const res: TReturnDto<DancerModelInstance[]> = {
-      data: undefined,
-      error: [],
-    };
-
-    const dancerDancesRes = await this.dancerDancesModel.findAll({
-      where: {
-        DanceId: danceId,
-      },
-    });
-
-    const promiseResult = await Promise.all(
-      dancerDancesRes.map(async (dancerDance) => {
-        try {
-          const dancerRes = await this.dancerModel.findOne({
-            where: { id: dancerDance.DancerId },
-          });
-
-          if (dancerRes) {
-            return dancerRes;
-          }
-        } catch (error) {
-          res.error.push(error);
-        }
-      })
+    return await getDancersForDance(
+      this.dancerDancesModel,
+      this.dancerModel,
+      danceId
     );
-
-    res.data = promiseResult;
-
-    return res;
   }
 
   async getDancesForDancer(
-    dancerId: number
+    dancerId: string
   ): Promise<TReturnDto<DanceModelInstance[]>> {
-    if (!dancerId) {
-      return { error: "No dancer provided" };
-    }
-
-    const res: TReturnDto<DanceModelInstance[]> = {
-      data: undefined,
-      error: [],
-    };
-
-    const dancerDancesRes = await this.dancerDancesModel.findAll({
-      where: {
-        DancerId: dancerId,
-      },
-    });
-
-    const promiseResult = await Promise.all(
-      dancerDancesRes.map(async (dancerDance) => {
-        try {
-          const danceRes = await this.danceModel.findOne({
-            where: { id: dancerDance.DanceId },
-          });
-
-          if (danceRes) {
-            return danceRes;
-          }
-        } catch (error) {
-          res.error.push(error);
-        }
-      })
+    return await getDancesForDancer(
+      this.dancerDancesModel,
+      this.danceModel,
+      dancerId
     );
-
-    res.data = promiseResult;
-
-    return res;
   }
 
   async addDancersToDance({
-    dancerIds,
     danceId,
+    dancerIds,
   }: {
-    dancerIds: number[];
-    danceId: number;
+    danceId: string;
+    dancerIds: string[];
   }): Promise<TReturnDto<number>> {
-    if (dancerIds.length < 1) {
-      return { error: "No dancers provided" };
-    }
-
-    if (!danceId) {
-      return { error: "No dance provided" };
-    }
-
-    const res: TReturnDto<number> = {
-      data: undefined,
-      error: [],
-    };
-
-    const addedDancers = await Promise.all(
-      dancerIds.map(async (dancerId) => {
-        try {
-          const addDancerDanceRes = await this.dancerDancesModel.create({
-            DancerId: dancerId,
-            DanceId: danceId,
-          });
-
-          if (addDancerDanceRes) {
-            return addDancerDanceRes;
-          }
-        } catch (error) {
-          res.error.push(error);
-        }
-      })
-    );
-
-    res.data = addedDancers.length;
-
-    return res;
+    return await addDancersToDance(this.dancerDancesModel, {
+      danceId,
+      dancerIds,
+    });
   }
 
   async removeDancerFromDance({
-    dancerId,
     danceId,
+    dancerId,
   }: {
-    dancerId: string;
     danceId: string;
+    dancerId: string;
   }): Promise<TReturnDto<number>> {
-    if (!dancerId || !danceId) {
-      return { error: "Must provide dancer id and dance id" };
-    }
-
-    const res: TReturnDto<number> = {
-      data: undefined,
-      error: undefined,
-    };
-
-    try {
-      const dancerDancesRes = await this.dancerDancesModel.destroy({
-        where: {
-          DancerId: dancerId,
-          DanceId: danceId,
-        },
-      });
-
-      res.data = dancerDancesRes;
-    } catch (error) {
-      res.error = error;
-    }
-
-    return res;
+    return await removeDancerFromDance(this.dancerDancesModel, {
+      danceId,
+      dancerId,
+    });
   }
 
   async addScheduledDance({

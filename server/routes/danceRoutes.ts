@@ -29,11 +29,29 @@ export function danceRouter(api: Api) {
     }
   );
 
+  router.get("/dancers/:danceId", (req, res) => {
+    const { danceId } = req.params;
+
+    api.getDancersForDance(danceId).then((returnVal) => {
+      res.send(returnVal);
+    });
+  });
+
   router.post("/", (req, res) => {
     const { dances }: { dances: { danceName: string; teacherId: string }[] } =
       req.body;
 
     api.addDances(dances).then((returnVal) => {
+      res.send(returnVal);
+    });
+  });
+
+  router.post("/dancers/:danceId", (req, res) => {
+    const { danceId } = req.params;
+
+    const { dancerIds }: { dancerIds: string[] } = req.body;
+
+    api.addDancersToDance({ danceId, dancerIds }).then((returnVal) => {
       res.send(returnVal);
     });
   });
@@ -53,6 +71,14 @@ export function danceRouter(api: Api) {
     const { danceId } = req.params;
 
     api.deleteDance(danceId).then((returnVal) => {
+      res.send(returnVal);
+    });
+  });
+
+  router.delete("/:danceId/dancers/:dancerId", (req, res) => {
+    const { danceId, dancerId } = req.params;
+
+    api.removeDancerFromDance({ danceId, dancerId }).then((returnVal) => {
       res.send(returnVal);
     });
   });

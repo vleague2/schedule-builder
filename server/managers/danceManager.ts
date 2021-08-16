@@ -1,5 +1,7 @@
 import { FindOptions, ModelCtor } from "sequelize/types";
 import { DanceModelInstance } from "../models/danceModel";
+import { DancerDancesModelInstance } from "../models/dancerDancesModel";
+import { DancerModelInstance } from "../models/dancerModel";
 import { TReturnDto } from "../types";
 
 export async function getDances(
@@ -74,6 +76,53 @@ export async function getDance(
   return res;
 }
 
+export async function getDancersForDance(
+  dancerDancesModel: ModelCtor<DancerDancesModelInstance>,
+  dancerModel: ModelCtor<DancerModelInstance>,
+  danceId: string
+): Promise<TReturnDto<DancerModelInstance[]>> {
+  if (!danceId) {
+    return { error: "No dance provided" };
+  }
+
+  const parsedId = parseInt(danceId);
+
+  if (parsedId === NaN) {
+    return { error: "ID must be a number" };
+  }
+
+  const res: TReturnDto<DancerModelInstance[]> = {
+    data: undefined,
+    error: [],
+  };
+
+  const dancerDancesRes = await dancerDancesModel.findAll({
+    where: {
+      DanceId: danceId,
+    },
+  });
+
+  const promiseResult = await Promise.all(
+    dancerDancesRes.map(async (dancerDance) => {
+      try {
+        const dancerRes = await dancerModel.findOne({
+          where: { id: dancerDance.DancerId },
+        });
+
+        if (dancerRes) {
+          return dancerRes;
+        }
+      } catch (error) {
+        res.error.push(error);
+      }
+    })
+  );
+
+  res.data = promiseResult;
+
+  return res;
+}
+
 export async function addDance(
   danceModel: ModelCtor<DanceModelInstance>,
   {
@@ -142,6 +191,65 @@ export async function addDances(
   );
 
   res.data = promiseResult;
+
+  return res;
+}
+
+export async function addDancersToDance(
+  dancerDancesModel: ModelCtor<DancerDancesModelInstance>,
+  {
+    danceId,
+    dancerIds,
+  }: {
+    danceId: string;
+    dancerIds: string[];
+  }
+): Promise<TReturnDto<number>> {
+  if (dancerIds.length < 1) {
+    return { error: "No dancers provided" };
+  }
+
+  if (!danceId) {
+    return { error: "No dance provided" };
+  }
+
+  const parsedDanceId = parseInt(danceId);
+
+  if (parsedDanceId === NaN) {
+    return { error: "Dance ID must be a number" };
+  }
+
+  dancerIds.forEach((dancerId) => {
+    const parsedDancerId = parseInt(dancerId);
+
+    if (parsedDancerId === NaN) {
+      return { error: "Dancer IDs must be numbers" };
+    }
+  });
+
+  const res: TReturnDto<number> = {
+    data: undefined,
+    error: [],
+  };
+
+  const addedDancers = await Promise.all(
+    dancerIds.map(async (dancerId) => {
+      try {
+        const addDancerDanceRes = await dancerDancesModel.create({
+          DancerId: dancerId,
+          DanceId: danceId,
+        });
+
+        if (addDancerDanceRes) {
+          return addDancerDanceRes;
+        }
+      } catch (error) {
+        res.error.push(error);
+      }
+    })
+  );
+
+  res.data = addedDancers.length;
 
   return res;
 }
@@ -241,6 +349,53 @@ export async function deleteDance(
     });
 
     res.data = danceRes;
+  } catch (error) {
+    res.error = error;
+  }
+
+  return res;
+}
+
+export async function removeDancerFromDance(
+  dancerDancesModel: ModelCtor<DancerDancesModelInstance>,
+  {
+    danceId,
+    dancerId,
+  }: {
+    danceId: string;
+    dancerId: string;
+  }
+): Promise<TReturnDto<number>> {
+  if (!dancerId || !danceId) {
+    return { error: "Must provide dancer id and dance id" };
+  }
+
+  const parsedDanceId = parseInt(danceId);
+
+  if (parsedDanceId === NaN) {
+    return { error: "Dance ID must be a number" };
+  }
+
+  const parsedDancer = parseInt(dancerId);
+
+  if (parsedDancer === NaN) {
+    return { error: "Dancer ID must be a number" };
+  }
+
+  const res: TReturnDto<number> = {
+    data: undefined,
+    error: undefined,
+  };
+
+  try {
+    const dancerDancesRes = await dancerDancesModel.destroy({
+      where: {
+        DancerId: dancerId,
+        DanceId: danceId,
+      },
+    });
+
+    res.data = dancerDancesRes;
   } catch (error) {
     res.error = error;
   }

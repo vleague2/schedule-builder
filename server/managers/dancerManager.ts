@@ -1,4 +1,6 @@
 import { ModelCtor } from "sequelize/types";
+import { DanceModelInstance } from "../models/danceModel";
+import { DancerDancesModelInstance } from "../models/dancerDancesModel";
 import { DancerModelInstance } from "../models/dancerModel";
 import { TReturnDto } from "../types";
 
@@ -55,6 +57,53 @@ export async function getDancer(
   } catch (error) {
     res.error = error;
   }
+
+  return res;
+}
+
+export async function getDancesForDancer(
+  dancerDancesModel: ModelCtor<DancerDancesModelInstance>,
+  danceModel: ModelCtor<DanceModelInstance>,
+  dancerId: string
+): Promise<TReturnDto<DanceModelInstance[]>> {
+  if (!dancerId) {
+    return { error: "No dancer provided" };
+  }
+
+  const parsedDancerId = parseInt(dancerId);
+
+  if (parsedDancerId === NaN) {
+    return { error: "Must provide a number for dancer id" };
+  }
+
+  const res: TReturnDto<DanceModelInstance[]> = {
+    data: undefined,
+    error: [],
+  };
+
+  const dancerDancesRes = await dancerDancesModel.findAll({
+    where: {
+      DancerId: dancerId,
+    },
+  });
+
+  const promiseResult = await Promise.all(
+    dancerDancesRes.map(async (dancerDance) => {
+      try {
+        const danceRes = await danceModel.findOne({
+          where: { id: dancerDance.DanceId },
+        });
+
+        if (danceRes) {
+          return danceRes;
+        }
+      } catch (error) {
+        res.error.push(error);
+      }
+    })
+  );
+
+  res.data = promiseResult;
 
   return res;
 }

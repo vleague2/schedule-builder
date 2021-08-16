@@ -27,6 +27,14 @@ export function dancerRouter(api: Api) {
     }
   );
 
+  router.get("/dances/:dancerId", (req, res) => {
+    const { dancerId } = req.params;
+
+    api.getDancesForDancer(dancerId).then((returnVal) => {
+      res.send(returnVal);
+    });
+  });
+
   router.post("/", (req, res) => {
     const { dancers }: { dancers: string[] } = req.body;
 
