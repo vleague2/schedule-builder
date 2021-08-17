@@ -20,6 +20,11 @@ import {
   updateDancer,
 } from "./managers/dancerManager";
 import {
+  addScheduledDance,
+  deleteScheduledDance,
+  updateScheduledDance,
+} from "./managers/scheduledDanceManager";
+import {
   addStudio,
   addStudios,
   deleteStudio,
@@ -272,109 +277,38 @@ class Api {
     danceId,
     studioId,
   }: {
-    startsAt: Date;
-    endsAt: Date;
-    danceId: number;
-    studioId: number;
+    startsAt: string;
+    endsAt: string;
+    danceId: string;
+    studioId: string;
   }): Promise<TReturnDto<ScheduledDanceModelInstance>> {
-    if (!startsAt || !endsAt || !danceId || !studioId) {
-      return {
-        error: "You need a start time, end time, dance id, and studio id",
-      };
-    }
-
-    const res: TReturnDto<ScheduledDanceModelInstance> = {
-      data: undefined,
-      error: undefined,
-    };
-
-    try {
-      const scheduleRes = await this.scheduledDanceModel.create({
-        startsAt,
-        endsAt,
-        StudioId: studioId,
-        DanceId: danceId,
-      });
-
-      if (scheduleRes) {
-        res.data = scheduleRes;
-      }
-    } catch (error) {
-      res.error = error;
-    }
-
-    return res;
+    return await addScheduledDance(this.scheduledDanceModel, {
+      startsAt,
+      endsAt,
+      danceId,
+      studioId,
+    });
   }
 
   async deleteScheduledDance(
-    scheduledDanceId: number
+    scheduledDanceId: string
   ): Promise<TReturnDto<number>> {
-    if (!scheduledDanceId) {
-      return { error: "Must provide the id of the scheduled dance " };
-    }
-
-    const res = {
-      data: undefined,
-      error: undefined,
-    };
-
-    try {
-      const deleteRes = this.scheduledDanceModel.destroy({
-        where: { id: scheduledDanceId },
-      });
-
-      res.data = deleteRes;
-    } catch (error) {
-      res.error = error;
-    }
-
-    return res;
+    return deleteScheduledDance(this.scheduledDanceModel, scheduledDanceId);
   }
 
   async updateScheduledDance(
-    scheduledDanceId: number,
+    scheduledDanceId: string,
     options: {
-      startAt?: Date;
-      endAt?: Date;
-      studioId?: number;
+      startAt?: string;
+      endAt?: string;
+      studioId?: string;
     }
   ): Promise<TReturnDto<number>> {
-    if (!scheduledDanceId) {
-      return { error: "Must provide the id of the scheduled dance" };
-    }
-
-    const { startAt, endAt, studioId } = options;
-
-    const res = {
-      data: undefined,
-      error: undefined,
-    };
-
-    const values: { [key: string]: any } = {};
-
-    if (startAt) {
-      values.startAt = startAt;
-    }
-
-    if (endAt) {
-      values.endAt = endAt;
-    }
-
-    if (studioId) {
-      values.StudioId = studioId;
-    }
-
-    try {
-      const updateRes = this.scheduledDanceModel.update(values, {
-        where: { id: scheduledDanceId },
-      });
-
-      res.data = updateRes;
-    } catch (error) {
-      res.error = error;
-    }
-
-    return res;
+    return await updateScheduledDance(
+      this.scheduledDanceModel,
+      scheduledDanceId,
+      options
+    );
   }
 }
 

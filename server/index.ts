@@ -12,6 +12,7 @@ import { danceRouter } from "./routes/danceRoutes";
 import { teacherRouter } from "./routes/teacherRoutes";
 import { dancerRouter } from "./routes/dancerRoutes";
 import { studioRouter } from "./routes/studioRoutes";
+import { scheduledDanceRouter } from "./routes/scheduledDanceRoutes";
 
 if (process.env.NODE_ENV !== "production") {
   require("dotenv").config();
@@ -56,6 +57,7 @@ async function start() {
   app.use("/teachers", teacherRouter(api));
   app.use("/dancers", dancerRouter(api));
   app.use("/studios", studioRouter(api));
+  app.use("/scheduledDances", scheduledDanceRouter(api));
 
   app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
