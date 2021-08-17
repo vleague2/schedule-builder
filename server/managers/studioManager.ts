@@ -26,14 +26,14 @@ export async function getStudio(
   studioId: string
 ): Promise<TReturnDto<StudioModelInstance>> {
   if (!studioId) {
-    return { error: "No studio provided" };
+    return { error: ["No studio provided"] };
   }
 
   const parsedStudioId = parseInt(studioId);
 
   if (parsedStudioId === NaN) {
     return {
-      error: "Must provide a number as the studio ID",
+      error: ["Must provide a number as the studio ID"],
     };
   }
 
@@ -64,7 +64,7 @@ export async function addStudio(
   studioName: string
 ): Promise<TReturnDto<StudioModelInstance>> {
   if (!studioName) {
-    return { error: "No studio provided" };
+    return { error: ["No studio provided"] };
   }
 
   const res: TReturnDto<StudioModelInstance> = {
@@ -92,7 +92,7 @@ export async function addStudios(
   studios: string[]
 ): Promise<TReturnDto<StudioModelInstance[]>> {
   if (studios.length < 1) {
-    return { error: "No studios provided" };
+    return { error: ["No studios provided"] };
   }
 
   const res: TReturnDto<StudioModelInstance[]> = {
@@ -126,14 +126,14 @@ export async function updateStudio(
   const { newStudioName } = options;
 
   if (!studioId || !newStudioName) {
-    return { error: "Must provide the studio ID and the new name" };
+    return { error: ["Must provide the studio ID and the new name"] };
   }
 
   const parsedStudioId = parseInt(studioId);
 
   if (parsedStudioId === NaN) {
     return {
-      error: "Must provide a number as the teacher ID",
+      error: ["Must provide a number as the teacher ID"],
     };
   }
 
@@ -167,14 +167,14 @@ export async function deleteStudio(
   studioId: string
 ): Promise<TReturnDto<number>> {
   if (!studioId) {
-    return { error: "Must provide studio ID" };
+    return { error: ["Must provide studio ID"] };
   }
 
   const parsedStudioId = parseInt(studioId);
 
   if (parsedStudioId === NaN) {
     return {
-      error: "Must provide a number as the teacher ID",
+      error: ["Must provide a number as the studio ID"],
     };
   }
 

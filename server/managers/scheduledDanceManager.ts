@@ -15,20 +15,20 @@ export async function addScheduledDance(
 
   if (!startsAt || !endsAt || !danceId || !studioId) {
     return {
-      error: "You need a start time, end time, dance id, and studio id",
+      error: ["You need a start time, end time, dance id, and studio id"],
     };
   }
 
   const parsedDanceId = parseInt(danceId);
 
   if (parsedDanceId === NaN) {
-    return { error: "Dance ID must be a number" };
+    return { error: ["Dance ID must be a number"] };
   }
 
   const parsedStudioId = parseInt(studioId);
 
   if (parsedStudioId === NaN) {
-    return { error: "Studio ID must be a number" };
+    return { error: ["Studio ID must be a number"] };
   }
 
   const res: TReturnDto<ScheduledDanceModelInstance> = {
@@ -59,13 +59,13 @@ export async function deleteScheduledDance(
   scheduledDanceId: string
 ): Promise<TReturnDto<number>> {
   if (!scheduledDanceId) {
-    return { error: "Must provide the id of the scheduled dance " };
+    return { error: ["Must provide the id of the scheduled dance"] };
   }
 
   const parsedScheduledDanceId = parseInt(scheduledDanceId);
 
   if (parsedScheduledDanceId === NaN) {
-    return { error: "ID must be a number" };
+    return { error: ["ID must be a number"] };
   }
 
   const res = {
@@ -90,22 +90,22 @@ export async function updateScheduledDance(
   scheduledDanceModel: ModelCtor<ScheduledDanceModelInstance>,
   scheduledDanceId: string,
   options: {
-    startAt?: string;
-    endAt?: string;
+    startsAt?: string;
+    endsAt?: string;
     studioId?: string;
   }
 ): Promise<TReturnDto<number>> {
   if (!scheduledDanceId) {
-    return { error: "Must provide the id of the scheduled dance" };
+    return { error: ["Must provide the id of the scheduled dance"] };
   }
 
   const parsedScheduledDanceId = parseInt(scheduledDanceId);
 
   if (parsedScheduledDanceId === NaN) {
-    return { error: "ID must be a number" };
+    return { error: ["ID must be a number"] };
   }
 
-  const { startAt, endAt, studioId } = options;
+  const { startsAt, endsAt, studioId } = options;
 
   const res = {
     data: undefined,
@@ -114,12 +114,12 @@ export async function updateScheduledDance(
 
   const values: { [key: string]: any } = {};
 
-  if (startAt) {
-    values.startAt = new Date(startAt);
+  if (startsAt) {
+    values.startsAt = new Date(startsAt);
   }
 
-  if (endAt) {
-    values.endAt = new Date(endAt);
+  if (endsAt) {
+    values.endsAt = new Date(endsAt);
   }
 
   if (studioId) {

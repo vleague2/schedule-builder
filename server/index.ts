@@ -1,5 +1,6 @@
 import { Sequelize } from "sequelize";
 import * as express from "express";
+import * as path from "path";
 
 import { StudioModel } from "./models/studioModel";
 import { TeacherModel } from "./models/teacherModel";
@@ -19,7 +20,7 @@ if (process.env.NODE_ENV !== "production") {
 }
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3001;
 
 async function start() {
   const sequelize = new Sequelize(process.env.DATABASE_URL as string);
@@ -59,8 +60,14 @@ async function start() {
   app.use("/studios", studioRouter(api));
   app.use("/scheduledDances", scheduledDanceRouter(api));
 
+  app.use(express.static(path.resolve(__dirname, "../client/build")));
+
   app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
+  });
+
+  app.get("*", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "../client/build", "index.html"));
   });
 }
 

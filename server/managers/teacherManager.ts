@@ -28,13 +28,13 @@ export async function getTeacher(
   teacherId: string
 ): Promise<TReturnDto<TeacherModelInstance>> {
   if (!teacherId) {
-    return { error: "No teacher provided" };
+    return { error: ["No teacher provided"] };
   }
 
   const parsedId = parseInt(teacherId);
 
   if (parsedId === NaN) {
-    return { error: "ID must be a number" };
+    return { error: ["ID must be a number"] };
   }
 
   const res: TReturnDto<TeacherModelInstance> = {
@@ -64,7 +64,7 @@ export async function addTeachers(
   teachers: string[]
 ): Promise<TReturnDto<TeacherModelInstance[]>> {
   if (teachers.length < 1) {
-    return { error: "No teachers provided" };
+    return { error: ["No teachers provided"] };
   }
 
   const res: TReturnDto<TeacherModelInstance[]> = {
@@ -93,7 +93,7 @@ export async function addTeacher(
   teacherName: string
 ): Promise<TReturnDto<TeacherModelInstance>> {
   if (!teacherName) {
-    return { error: "No teacher provided" };
+    return { error: ["No teacher provided"] };
   }
 
   const res: TReturnDto<TeacherModelInstance> = {
@@ -126,14 +126,14 @@ export async function updateTeacher(
   const { newTeacherName } = options;
 
   if (!teacherId || !newTeacherName) {
-    return { error: "Must provide the teacher ID and the new name" };
+    return { error: ["Must provide the teacher ID and the new name"] };
   }
 
   const parsedTeacherId = parseInt(teacherId);
 
   if (parsedTeacherId === NaN) {
     return {
-      error: "Must provide a number as the teacher ID",
+      error: ["Must provide a number as the teacher ID"],
     };
   }
 
@@ -167,14 +167,14 @@ export async function deleteTeacher(
   teacherId: string
 ): Promise<TReturnDto<number>> {
   if (!teacherId) {
-    return { error: "Must provide teacher ID" };
+    return { error: ["Must provide teacher ID"] };
   }
 
   const parsedTeacherId = parseInt(teacherId);
 
   if (parsedTeacherId === NaN) {
     return {
-      error: "Must provide a number as the teacher ID",
+      error: ["Must provide a number as the teacher ID"],
     };
   }
 

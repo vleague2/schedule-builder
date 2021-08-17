@@ -30,7 +30,7 @@ export function studioRouter(api: Api) {
   router.post("/", (req, res) => {
     const { studios }: { studios: string[] } = req.body;
 
-    api.addTeachers(studios).then((returnVal) => {
+    api.addStudios(studios).then((returnVal) => {
       res.send(returnVal);
     });
   });

@@ -29,7 +29,7 @@ export function danceRouter(api: Api) {
     }
   );
 
-  router.get("/dancers/:danceId", (req, res) => {
+  router.get("/:danceId/dancers", (req, res) => {
     const { danceId } = req.params;
 
     api.getDancersForDance(danceId).then((returnVal) => {
@@ -46,7 +46,7 @@ export function danceRouter(api: Api) {
     });
   });
 
-  router.post("/dancers/:danceId", (req, res) => {
+  router.post("/:danceId/dancers", (req, res) => {
     const { danceId } = req.params;
 
     const { dancerIds }: { dancerIds: string[] } = req.body;

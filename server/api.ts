@@ -299,8 +299,8 @@ class Api {
   async updateScheduledDance(
     scheduledDanceId: string,
     options: {
-      startAt?: string;
-      endAt?: string;
+      startsAt?: string;
+      endsAt?: string;
       studioId?: string;
     }
   ): Promise<TReturnDto<number>> {

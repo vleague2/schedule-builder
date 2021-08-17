@@ -30,13 +30,13 @@ export async function getDancer(
   dancerId: string
 ): Promise<TReturnDto<DancerModelInstance>> {
   if (!dancerId) {
-    return { error: "No dancer provided" };
+    return { error: ["No dancer provided"] };
   }
 
   const parsedDancerId = parseInt(dancerId);
 
   if (parsedDancerId === NaN) {
-    return { error: "Must provide a number for dancer id" };
+    return { error: ["Must provide a number for dancer id"] };
   }
 
   const res: TReturnDto<DancerModelInstance> = {
@@ -67,13 +67,13 @@ export async function getDancesForDancer(
   dancerId: string
 ): Promise<TReturnDto<DanceModelInstance[]>> {
   if (!dancerId) {
-    return { error: "No dancer provided" };
+    return { error: ["No dancer provided"] };
   }
 
   const parsedDancerId = parseInt(dancerId);
 
   if (parsedDancerId === NaN) {
-    return { error: "Must provide a number for dancer id" };
+    return { error: ["Must provide a number for dancer id"] };
   }
 
   const res: TReturnDto<DanceModelInstance[]> = {
@@ -142,7 +142,7 @@ export async function addDancers(
   };
 
   if (dancers.length < 1) {
-    return { error: "No dancers provided" };
+    return { error: ["No dancers provided"] };
   }
 
   const promiseResult = await Promise.all(
@@ -171,14 +171,14 @@ export async function updateDancer(
   const { newDancerName } = options;
 
   if (!dancerId || !newDancerName) {
-    return { error: "Must provide the dancer ID and the new name" };
+    return { error: ["Must provide the dancer ID and the new name"] };
   }
 
   const parsedDancerId = parseInt(dancerId);
 
   if (parsedDancerId === NaN) {
     return {
-      error: "Must provide a number as the dance ID",
+      error: ["Must provide a number as the dance ID"],
     };
   }
 
@@ -212,14 +212,14 @@ export async function deleteDancer(
   dancerId: string
 ): Promise<TReturnDto<number>> {
   if (!dancerId) {
-    return { error: "Must provide dancer ID" };
+    return { error: ["Must provide dancer ID"] };
   }
 
   const parsedDancerId = parseInt(dancerId);
 
   if (parsedDancerId === NaN) {
     return {
-      error: "Must provide a number as the dance ID",
+      error: ["Must provide a number as the dance ID"],
     };
   }
 

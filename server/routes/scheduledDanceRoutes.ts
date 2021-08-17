@@ -17,12 +17,12 @@ export function scheduledDanceRouter(api: Api) {
   router.patch("/:scheduledDanceId", (req, res) => {
     const { scheduledDanceId } = req.params;
     const {
-      options: { startAt, endAt, studioId },
-    }: { options: { startAt?: string; endAt?: string; studioId?: string } } =
+      options: { startsAt, endsAt, studioId },
+    }: { options: { startsAt?: string; endsAt?: string; studioId?: string } } =
       req.body;
 
     api
-      .updateScheduledDance(scheduledDanceId, { startAt, endAt, studioId })
+      .updateScheduledDance(scheduledDanceId, { startsAt, endsAt, studioId })
       .then((returnVal) => {
         res.send(returnVal);
       });
