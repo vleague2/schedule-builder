@@ -125,12 +125,6 @@ class Api {
     return await getDancer(this.dancerModel, dancerId);
   }
 
-  async addDancer(
-    dancerName: string
-  ): Promise<TReturnDto<DancerModelInstance>> {
-    return await addDancer(this.dancerModel, dancerName);
-  }
-
   async addDancers(
     dancers: string[]
   ): Promise<TReturnDto<DancerModelInstance[]>> {

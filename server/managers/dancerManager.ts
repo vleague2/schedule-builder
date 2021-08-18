@@ -1,4 +1,8 @@
-import { ModelCtor } from "sequelize/types";
+import {
+  ModelCtor,
+  ValidationError,
+  ValidationErrorItem,
+} from "sequelize/types";
 import { DanceModelInstance } from "../models/danceModel";
 import { DancerDancesModelInstance } from "../models/dancerDancesModel";
 import { DancerModelInstance } from "../models/dancerModel";
@@ -111,25 +115,18 @@ export async function getDancesForDancer(
 export async function addDancer(
   dancerModel: ModelCtor<DancerModelInstance>,
   dancerName: string
-): Promise<TReturnDto<DancerModelInstance>> {
-  const res: TReturnDto<DancerModelInstance> = {
-    data: undefined,
-    error: undefined,
-  };
-
+): Promise<DancerModelInstance> {
   try {
     const dancerRes = await dancerModel.create({
       name: dancerName,
     });
 
     if (dancerRes) {
-      res.data = dancerRes;
+      return dancerRes;
     }
   } catch (error) {
-    res.error = error;
+    throw error;
   }
-
-  return res;
 }
 
 export async function addDancers(
@@ -137,7 +134,7 @@ export async function addDancers(
   dancers: string[]
 ): Promise<TReturnDto<DancerModelInstance[]>> {
   const res: TReturnDto<DancerModelInstance[]> = {
-    data: undefined,
+    data: [],
     error: [],
   };
 
@@ -145,18 +142,18 @@ export async function addDancers(
     return { error: ["No dancers provided"] };
   }
 
-  const promiseResult = await Promise.all(
+  await Promise.all(
     dancers.map(async (dancerName) => {
       try {
         const dancerRes = await addDancer(dancerModel, dancerName);
-        return dancerRes?.data;
+        res.data.push(dancerRes);
       } catch (error) {
-        res.error.push(error);
+        const errorMessage = (error as ValidationError).errors[0].message;
+        const errorValue = (error as ValidationError).errors[0].value;
+        res.error.push(`${errorMessage}: ${errorValue}`);
       }
     })
   );
-
-  res.data = promiseResult;
 
   return res;
 }
