@@ -1,4 +1,4 @@
 export type TReturnDto<Data> = {
-  data?: Data | undefined;
-  error?: string[];
+  data: Data;
+  error: string[];
 };

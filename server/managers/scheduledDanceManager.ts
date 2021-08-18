@@ -10,11 +10,12 @@ export async function addScheduledDance(
     danceId: string;
     studioId: string;
   }
-): Promise<TReturnDto<ScheduledDanceModelInstance>> {
+): Promise<TReturnDto<ScheduledDanceModelInstance[]>> {
   const { startsAt, endsAt, danceId, studioId } = danceData;
 
   if (!startsAt || !endsAt || !danceId || !studioId) {
     return {
+      data: [],
       error: ["You need a start time, end time, dance id, and studio id"],
     };
   }
@@ -22,18 +23,18 @@ export async function addScheduledDance(
   const parsedDanceId = parseInt(danceId);
 
   if (parsedDanceId === NaN) {
-    return { error: ["Dance ID must be a number"] };
+    return { data: [], error: ["Dance ID must be a number"] };
   }
 
   const parsedStudioId = parseInt(studioId);
 
   if (parsedStudioId === NaN) {
-    return { error: ["Studio ID must be a number"] };
+    return { data: [], error: ["Studio ID must be a number"] };
   }
 
-  const res: TReturnDto<ScheduledDanceModelInstance> = {
-    data: undefined,
-    error: undefined,
+  const res: TReturnDto<ScheduledDanceModelInstance[]> = {
+    data: [],
+    error: [],
   };
 
   try {
@@ -45,10 +46,10 @@ export async function addScheduledDance(
     });
 
     if (scheduleRes) {
-      res.data = scheduleRes;
+      res.data.push(scheduleRes);
     }
   } catch (error) {
-    res.error = error;
+    res.error.push(error);
   }
 
   return res;
@@ -59,28 +60,28 @@ export async function deleteScheduledDance(
   scheduledDanceId: string
 ): Promise<TReturnDto<number>> {
   if (!scheduledDanceId) {
-    return { error: ["Must provide the id of the scheduled dance"] };
+    return { data: 0, error: ["Must provide the id of the scheduled dance"] };
   }
 
   const parsedScheduledDanceId = parseInt(scheduledDanceId);
 
   if (parsedScheduledDanceId === NaN) {
-    return { error: ["ID must be a number"] };
+    return { data: 0, error: ["ID must be a number"] };
   }
 
-  const res = {
-    data: undefined,
-    error: undefined,
+  const res: TReturnDto<number> = {
+    data: 0,
+    error: [],
   };
 
   try {
-    const deleteRes = scheduledDanceModel.destroy({
+    const deleteRes = await scheduledDanceModel.destroy({
       where: { id: scheduledDanceId },
     });
 
     res.data = deleteRes;
   } catch (error) {
-    res.error = error;
+    res.error.push(error);
   }
 
   return res;
@@ -96,20 +97,20 @@ export async function updateScheduledDance(
   }
 ): Promise<TReturnDto<number>> {
   if (!scheduledDanceId) {
-    return { error: ["Must provide the id of the scheduled dance"] };
+    return { data: 0, error: ["Must provide the id of the scheduled dance"] };
   }
 
   const parsedScheduledDanceId = parseInt(scheduledDanceId);
 
   if (parsedScheduledDanceId === NaN) {
-    return { error: ["ID must be a number"] };
+    return { data: 0, error: ["ID must be a number"] };
   }
 
   const { startsAt, endsAt, studioId } = options;
 
-  const res = {
-    data: undefined,
-    error: undefined,
+  const res: TReturnDto<number> = {
+    data: 0,
+    error: [],
   };
 
   const values: { [key: string]: any } = {};
@@ -127,13 +128,13 @@ export async function updateScheduledDance(
   }
 
   try {
-    const updateRes = scheduledDanceModel.update(values, {
+    const updateRes = await scheduledDanceModel.update(values, {
       where: { id: scheduledDanceId },
     });
 
-    res.data = updateRes;
+    res.data = updateRes[0];
   } catch (error) {
-    res.error = error;
+    res.error.push(error);
   }
 
   return res;

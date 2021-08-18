@@ -1,4 +1,4 @@
-import { ModelCtor } from "sequelize/types";
+import { ModelCtor, ValidationError } from "sequelize/types";
 import { TeacherModelInstance } from "../models/teacherModel";
 import { TReturnDto } from "../types";
 
@@ -6,8 +6,8 @@ export async function getTeachers(
   teacherModel: ModelCtor<TeacherModelInstance>
 ): Promise<TReturnDto<TeacherModelInstance[]>> {
   const res: TReturnDto<TeacherModelInstance[]> = {
-    data: undefined,
-    error: undefined,
+    data: [],
+    error: [],
   };
 
   try {
@@ -17,7 +17,7 @@ export async function getTeachers(
       res.data = teacherRes;
     }
   } catch (error) {
-    res.error = error;
+    res.error.push(error);
   }
 
   return res;
@@ -26,20 +26,20 @@ export async function getTeachers(
 export async function getTeacher(
   teacherModel: ModelCtor<TeacherModelInstance>,
   teacherId: string
-): Promise<TReturnDto<TeacherModelInstance>> {
+): Promise<TReturnDto<TeacherModelInstance[]>> {
   if (!teacherId) {
-    return { error: ["No teacher provided"] };
+    return { data: [], error: ["No teacher provided"] };
   }
 
   const parsedId = parseInt(teacherId);
 
   if (parsedId === NaN) {
-    return { error: ["ID must be a number"] };
+    return { data: [], error: ["ID must be a number"] };
   }
 
-  const res: TReturnDto<TeacherModelInstance> = {
-    data: undefined,
-    error: undefined,
+  const res: TReturnDto<TeacherModelInstance[]> = {
+    data: [],
+    error: [],
   };
 
   try {
@@ -50,10 +50,10 @@ export async function getTeacher(
     });
 
     if (teacherRes) {
-      res.data = teacherRes;
+      res.data.push(teacherRes);
     }
   } catch (error) {
-    res.error = error;
+    res.error.push(error);
   }
 
   return res;
@@ -64,26 +64,28 @@ export async function addTeachers(
   teachers: string[]
 ): Promise<TReturnDto<TeacherModelInstance[]>> {
   if (teachers.length < 1) {
-    return { error: ["No teachers provided"] };
+    return { data: [], error: ["No teachers provided"] };
   }
 
   const res: TReturnDto<TeacherModelInstance[]> = {
-    data: undefined,
+    data: [],
     error: [],
   };
 
-  const promiseResult = await Promise.all(
+  await Promise.all(
     teachers.map(async (teacherName) => {
       try {
         const teacherRes = await addTeacher(teacherModel, teacherName);
-        return teacherRes?.data;
+        if (teacherRes) {
+          res.data.push(teacherRes);
+        }
       } catch (error) {
-        res.error.push(error);
+        const errorMessage = (error as ValidationError).errors[0].message;
+        const errorValue = (error as ValidationError).errors[0].value;
+        res.error.push(`${errorMessage}: ${errorValue}`);
       }
     })
   );
-
-  res.data = promiseResult;
 
   return res;
 }
@@ -91,15 +93,10 @@ export async function addTeachers(
 export async function addTeacher(
   teacherModel: ModelCtor<TeacherModelInstance>,
   teacherName: string
-): Promise<TReturnDto<TeacherModelInstance>> {
+): Promise<TeacherModelInstance> {
   if (!teacherName) {
-    return { error: ["No teacher provided"] };
+    throw "No teacher provided";
   }
-
-  const res: TReturnDto<TeacherModelInstance> = {
-    data: undefined,
-    error: undefined,
-  };
 
   try {
     const teacherRes = await teacherModel.create({
@@ -107,13 +104,11 @@ export async function addTeacher(
     });
 
     if (teacherRes) {
-      res.data = teacherRes;
+      return teacherRes;
     }
   } catch (error) {
-    res.error = error;
+    throw error;
   }
-
-  return res;
 }
 
 export async function updateTeacher(
@@ -126,20 +121,21 @@ export async function updateTeacher(
   const { newTeacherName } = options;
 
   if (!teacherId || !newTeacherName) {
-    return { error: ["Must provide the teacher ID and the new name"] };
+    return { data: 0, error: ["Must provide the teacher ID and the new name"] };
   }
 
   const parsedTeacherId = parseInt(teacherId);
 
   if (parsedTeacherId === NaN) {
     return {
+      data: 0,
       error: ["Must provide a number as the teacher ID"],
     };
   }
 
   const res: TReturnDto<number> = {
-    data: undefined,
-    error: undefined,
+    data: 0,
+    error: [],
   };
 
   try {
@@ -156,7 +152,7 @@ export async function updateTeacher(
 
     res.data = teacherRes[0];
   } catch (error) {
-    res.error = error;
+    res.error.push(error);
   }
 
   return res;
@@ -167,20 +163,21 @@ export async function deleteTeacher(
   teacherId: string
 ): Promise<TReturnDto<number>> {
   if (!teacherId) {
-    return { error: ["Must provide teacher ID"] };
+    return { data: 0, error: ["Must provide teacher ID"] };
   }
 
   const parsedTeacherId = parseInt(teacherId);
 
   if (parsedTeacherId === NaN) {
     return {
+      data: 0,
       error: ["Must provide a number as the teacher ID"],
     };
   }
 
   const res: TReturnDto<number> = {
-    data: undefined,
-    error: undefined,
+    data: 0,
+    error: [],
   };
 
   try {
@@ -192,7 +189,7 @@ export async function deleteTeacher(
 
     res.data = teacherRes;
   } catch (error) {
-    res.error = error;
+    res.error.push(error);
   }
 
   return res;

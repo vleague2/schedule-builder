@@ -1,4 +1,4 @@
-import { FindOptions, ModelCtor } from "sequelize/types";
+import { FindOptions, ModelCtor, ValidationError } from "sequelize/types";
 import { DanceModelInstance } from "../models/danceModel";
 import { DancerDancesModelInstance } from "../models/dancerDancesModel";
 import { DancerModelInstance } from "../models/dancerModel";
@@ -9,8 +9,8 @@ export async function getDances(
   teacherId?: string
 ): Promise<TReturnDto<DanceModelInstance[]>> {
   const res: TReturnDto<DanceModelInstance[]> = {
-    data: undefined,
-    error: undefined,
+    data: [],
+    error: [],
   };
 
   const options: FindOptions = {};
@@ -19,7 +19,7 @@ export async function getDances(
     const parsedId = parseInt(teacherId);
 
     if (parsedId === NaN) {
-      return { error: ["ID must be a number"] };
+      return { data: [], error: ["ID must be a number"] };
     }
 
     options.where = {
@@ -34,7 +34,7 @@ export async function getDances(
       res.data = danceRes;
     }
   } catch (error) {
-    res.error = error;
+    res.error.push(error);
   }
 
   return res;
@@ -43,20 +43,20 @@ export async function getDances(
 export async function getDance(
   danceModel: ModelCtor<DanceModelInstance>,
   danceId: string
-): Promise<TReturnDto<DanceModelInstance>> {
+): Promise<TReturnDto<DanceModelInstance[]>> {
   if (!danceId) {
-    return { error: ["No dance provided"] };
+    return { data: [], error: ["No dance provided"] };
   }
 
   const parsedId = parseInt(danceId);
 
   if (parsedId === NaN) {
-    return { error: ["ID must be a number"] };
+    return { data: [], error: ["ID must be a number"] };
   }
 
-  const res: TReturnDto<DanceModelInstance> = {
-    data: undefined,
-    error: undefined,
+  const res: TReturnDto<DanceModelInstance[]> = {
+    data: [],
+    error: [],
   };
 
   try {
@@ -67,10 +67,10 @@ export async function getDance(
     });
 
     if (danceRes) {
-      res.data = danceRes;
+      res.data.push(danceRes);
     }
   } catch (error) {
-    res.error = error;
+    res.error.push(error);
   }
 
   return res;
@@ -82,17 +82,17 @@ export async function getDancersForDance(
   danceId: string
 ): Promise<TReturnDto<DancerModelInstance[]>> {
   if (!danceId) {
-    return { error: ["No dance provided"] };
+    return { data: [], error: ["No dance provided"] };
   }
 
   const parsedId = parseInt(danceId);
 
   if (parsedId === NaN) {
-    return { error: ["ID must be a number"] };
+    return { data: [], error: ["ID must be a number"] };
   }
 
   const res: TReturnDto<DancerModelInstance[]> = {
-    data: undefined,
+    data: [],
     error: [],
   };
 
@@ -132,23 +132,18 @@ export async function addDance(
     danceName: string;
     teacherId: string | number;
   }
-): Promise<TReturnDto<DanceModelInstance>> {
+): Promise<DanceModelInstance> {
   if (!danceName || !teacherId) {
-    return { error: ["You must send a dance name and a teacher ID"] };
+    throw "You must send a dance name and a teacher ID";
   }
 
   if (typeof teacherId === "string") {
     const parsedId = parseInt(teacherId);
 
     if (parsedId === NaN) {
-      return { error: ["The teacher ID must be a number"] };
+      throw "The teacher ID must be a number";
     }
   }
-
-  const res: TReturnDto<DanceModelInstance> = {
-    data: undefined,
-    error: undefined,
-  };
 
   try {
     const danceRes = await danceModel.create({
@@ -157,13 +152,11 @@ export async function addDance(
     });
 
     if (danceRes) {
-      res.data = danceRes;
+      return danceRes;
     }
   } catch (error) {
-    res.error = error;
+    throw error;
   }
-
-  return res;
 }
 
 export async function addDances(
@@ -171,26 +164,28 @@ export async function addDances(
   dances: { danceName: string; teacherId: string }[]
 ): Promise<TReturnDto<DanceModelInstance[]>> {
   if (dances.length < 1) {
-    return { error: ["No dances provided"] };
+    return { data: [], error: ["No dances provided"] };
   }
 
   const res: TReturnDto<DanceModelInstance[]> = {
-    data: undefined,
+    data: [],
     error: [],
   };
 
-  const promiseResult = await Promise.all(
+  await Promise.all(
     dances.map(async (dance) => {
       try {
         const addDanceRes = await addDance(danceModel, dance);
-        return addDanceRes?.data;
+        if (addDanceRes) {
+          res.data.push(addDanceRes);
+        }
       } catch (error) {
-        res.error.push(error);
+        const errorMessage = (error as ValidationError).errors[0].message;
+        const errorValue = (error as ValidationError).errors[0].value;
+        res.error.push(`${errorMessage}: ${errorValue}`);
       }
     })
   );
-
-  res.data = promiseResult;
 
   return res;
 }
@@ -206,29 +201,29 @@ export async function addDancersToDance(
   }
 ): Promise<TReturnDto<number>> {
   if (dancerIds.length < 1) {
-    return { error: ["No dancers provided"] };
+    return { data: 0, error: ["No dancers provided"] };
   }
 
   if (!danceId) {
-    return { error: ["No dance provided"] };
+    return { data: 0, error: ["No dance provided"] };
   }
 
   const parsedDanceId = parseInt(danceId);
 
   if (parsedDanceId === NaN) {
-    return { error: ["Dance ID must be a number"] };
+    return { data: 0, error: ["Dance ID must be a number"] };
   }
 
   dancerIds.forEach((dancerId) => {
     const parsedDancerId = parseInt(dancerId);
 
     if (parsedDancerId === NaN) {
-      return { error: ["Dancer IDs must be numbers"] };
+      return { data: 0, error: ["Dancer IDs must be numbers"] };
     }
   });
 
   const res: TReturnDto<number> = {
-    data: undefined,
+    data: 0,
     error: [],
   };
 
@@ -266,6 +261,7 @@ export async function updateDance(
 
   if (!danceId) {
     return {
+      data: 0,
       error: ["Must provide the dance ID"],
     };
   }
@@ -274,12 +270,14 @@ export async function updateDance(
 
   if (parsedDanceId === NaN) {
     return {
+      data: 0,
       error: ["Must provide a number as the dance ID"],
     };
   }
 
   if (!newDanceName && !newTeacherId) {
     return {
+      data: 0,
       error: [
         "Must provide an update to either the dance's name or the teacher ID",
       ],
@@ -297,6 +295,7 @@ export async function updateDance(
 
     if (parsedTeacherId === NaN) {
       return {
+        data: 0,
         error: ["Must provide a number as the teacher ID"],
       };
     }
@@ -304,8 +303,8 @@ export async function updateDance(
   }
 
   const res: TReturnDto<number> = {
-    data: undefined,
-    error: undefined,
+    data: 0,
+    error: [],
   };
 
   try {
@@ -317,7 +316,7 @@ export async function updateDance(
 
     res.data = danceRes[0];
   } catch (error) {
-    res.error = error;
+    res.error.push(error);
   }
 
   return res;
@@ -328,18 +327,18 @@ export async function deleteDance(
   danceId: string
 ): Promise<TReturnDto<number>> {
   if (!danceId) {
-    return { error: ["Must provide dance id"] };
+    return { data: 0, error: ["Must provide dance id"] };
   }
 
   const parsedId = parseInt(danceId);
 
   if (parsedId === NaN) {
-    return { error: ["Must provide a dance id number"] };
+    return { data: 0, error: ["Must provide a dance id number"] };
   }
 
   const res: TReturnDto<number> = {
-    data: undefined,
-    error: undefined,
+    data: 0,
+    error: [],
   };
 
   try {
@@ -351,7 +350,7 @@ export async function deleteDance(
 
     res.data = danceRes;
   } catch (error) {
-    res.error = error;
+    res.error.push(error);
   }
 
   return res;
@@ -368,24 +367,24 @@ export async function removeDancerFromDance(
   }
 ): Promise<TReturnDto<number>> {
   if (!dancerId || !danceId) {
-    return { error: ["Must provide dancer id and dance id"] };
+    return { data: 0, error: ["Must provide dancer id and dance id"] };
   }
 
   const parsedDanceId = parseInt(danceId);
 
   if (parsedDanceId === NaN) {
-    return { error: ["Dance ID must be a number"] };
+    return { data: 0, error: ["Dance ID must be a number"] };
   }
 
   const parsedDancer = parseInt(dancerId);
 
   if (parsedDancer === NaN) {
-    return { error: ["Dancer ID must be a number"] };
+    return { data: 0, error: ["Dancer ID must be a number"] };
   }
 
   const res: TReturnDto<number> = {
-    data: undefined,
-    error: undefined,
+    data: 0,
+    error: [],
   };
 
   try {
@@ -398,7 +397,7 @@ export async function removeDancerFromDance(
 
     res.data = dancerDancesRes;
   } catch (error) {
-    res.error = error;
+    res.error.push(error);
   }
 
   return res;

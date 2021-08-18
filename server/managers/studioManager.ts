@@ -1,4 +1,4 @@
-import { ModelCtor } from "sequelize/types";
+import { ModelCtor, ValidationError } from "sequelize/types";
 import { StudioModelInstance } from "../models/studioModel";
 import { TReturnDto } from "../types";
 
@@ -6,8 +6,8 @@ export async function getStudios(
   studioModel: ModelCtor<StudioModelInstance>
 ): Promise<TReturnDto<StudioModelInstance[]>> {
   const res: TReturnDto<StudioModelInstance[]> = {
-    data: undefined,
-    error: undefined,
+    data: [],
+    error: [],
   };
 
   try {
@@ -15,7 +15,7 @@ export async function getStudios(
 
     res.data = studioRes;
   } catch (error) {
-    res.error = error;
+    res.error.push(error);
   }
 
   return res;
@@ -24,22 +24,23 @@ export async function getStudios(
 export async function getStudio(
   studioModel: ModelCtor<StudioModelInstance>,
   studioId: string
-): Promise<TReturnDto<StudioModelInstance>> {
+): Promise<TReturnDto<StudioModelInstance[]>> {
   if (!studioId) {
-    return { error: ["No studio provided"] };
+    return { data: [], error: ["No studio provided"] };
   }
 
   const parsedStudioId = parseInt(studioId);
 
   if (parsedStudioId === NaN) {
     return {
+      data: [],
       error: ["Must provide a number as the studio ID"],
     };
   }
 
-  const res: TReturnDto<StudioModelInstance> = {
-    data: undefined,
-    error: undefined,
+  const res: TReturnDto<StudioModelInstance[]> = {
+    data: [],
+    error: [],
   };
 
   try {
@@ -50,10 +51,10 @@ export async function getStudio(
     });
 
     if (studioRes) {
-      res.data = studioRes;
+      res.data.push(studioRes);
     }
   } catch (error) {
-    res.error = error;
+    res.error.push(error);
   }
 
   return res;
@@ -62,15 +63,10 @@ export async function getStudio(
 export async function addStudio(
   studioModel: ModelCtor<StudioModelInstance>,
   studioName: string
-): Promise<TReturnDto<StudioModelInstance>> {
+): Promise<StudioModelInstance> {
   if (!studioName) {
-    return { error: ["No studio provided"] };
+    throw "No studio provided";
   }
-
-  const res: TReturnDto<StudioModelInstance> = {
-    data: undefined,
-    error: undefined,
-  };
 
   try {
     const studioRes = await studioModel.create({
@@ -78,13 +74,11 @@ export async function addStudio(
     });
 
     if (studioRes) {
-      res.data = studioRes;
+      return studioRes;
     }
   } catch (error) {
-    res.error = error;
+    throw error;
   }
-
-  return res;
 }
 
 export async function addStudios(
@@ -92,26 +86,28 @@ export async function addStudios(
   studios: string[]
 ): Promise<TReturnDto<StudioModelInstance[]>> {
   if (studios.length < 1) {
-    return { error: ["No studios provided"] };
+    return { data: [], error: ["No studios provided"] };
   }
 
   const res: TReturnDto<StudioModelInstance[]> = {
-    data: undefined,
+    data: [],
     error: [],
   };
 
-  const promiseResult = await Promise.all(
+  await Promise.all(
     studios.map(async (studioName) => {
       try {
         const studioRes = await addStudio(studioModel, studioName);
-        return studioRes?.data;
+        if (studioRes) {
+          res.data.push(studioRes);
+        }
       } catch (error) {
-        res.error.push(error);
+        const errorMessage = (error as ValidationError).errors[0].message;
+        const errorValue = (error as ValidationError).errors[0].value;
+        res.error.push(`${errorMessage}: ${errorValue}`);
       }
     })
   );
-
-  res.data = promiseResult;
 
   return res;
 }
@@ -126,20 +122,21 @@ export async function updateStudio(
   const { newStudioName } = options;
 
   if (!studioId || !newStudioName) {
-    return { error: ["Must provide the studio ID and the new name"] };
+    return { data: 0, error: ["Must provide the studio ID and the new name"] };
   }
 
   const parsedStudioId = parseInt(studioId);
 
   if (parsedStudioId === NaN) {
     return {
+      data: 0,
       error: ["Must provide a number as the teacher ID"],
     };
   }
 
   const res: TReturnDto<number> = {
-    data: undefined,
-    error: undefined,
+    data: 0,
+    error: [],
   };
 
   try {
@@ -156,7 +153,7 @@ export async function updateStudio(
 
     res.data = studioRes[0];
   } catch (error) {
-    res.error = error;
+    res.error.push(error);
   }
 
   return res;
@@ -167,20 +164,21 @@ export async function deleteStudio(
   studioId: string
 ): Promise<TReturnDto<number>> {
   if (!studioId) {
-    return { error: ["Must provide studio ID"] };
+    return { data: 0, error: ["Must provide studio ID"] };
   }
 
   const parsedStudioId = parseInt(studioId);
 
   if (parsedStudioId === NaN) {
     return {
+      data: 0,
       error: ["Must provide a number as the studio ID"],
     };
   }
 
   const res: TReturnDto<number> = {
-    data: undefined,
-    error: undefined,
+    data: 0,
+    error: [],
   };
 
   try {
@@ -192,7 +190,7 @@ export async function deleteStudio(
 
     res.data = studioRes;
   } catch (error) {
-    res.error = error;
+    res.error.push(error);
   }
 
   return res;

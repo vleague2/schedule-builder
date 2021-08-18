@@ -88,14 +88,10 @@ class Api {
     return await getStudios(this.studioModel);
   }
 
-  async getStudio(studioId: string): Promise<TReturnDto<StudioModelInstance>> {
+  async getStudio(
+    studioId: string
+  ): Promise<TReturnDto<StudioModelInstance[]>> {
     return await getStudio(this.studioModel, studioId);
-  }
-
-  async addStudio(
-    studioName: string
-  ): Promise<TReturnDto<StudioModelInstance>> {
-    return await addStudio(this.studioModel, studioName);
   }
 
   async addStudios(
@@ -121,7 +117,9 @@ class Api {
     return await getDancers(this.dancerModel);
   }
 
-  async getDancer(dancerId: string): Promise<TReturnDto<DancerModelInstance>> {
+  async getDancer(
+    dancerId: string
+  ): Promise<TReturnDto<DancerModelInstance[]>> {
     return await getDancer(this.dancerModel, dancerId);
   }
 
@@ -150,14 +148,8 @@ class Api {
 
   async getTeacher(
     teacherId: string
-  ): Promise<TReturnDto<TeacherModelInstance>> {
+  ): Promise<TReturnDto<TeacherModelInstance[]>> {
     return await getTeacher(this.teacherModel, teacherId);
-  }
-
-  async addTeacher(
-    teacherName: string
-  ): Promise<TReturnDto<TeacherModelInstance>> {
-    return await addTeacher(this.teacherModel, teacherName);
   }
 
   async addTeachers(
@@ -185,18 +177,8 @@ class Api {
     return await getDances(this.danceModel, teacherId);
   }
 
-  async getDance(danceId: string): Promise<TReturnDto<DanceModelInstance>> {
+  async getDance(danceId: string): Promise<TReturnDto<DanceModelInstance[]>> {
     return await getDance(this.danceModel, danceId);
-  }
-
-  async addDance({
-    danceName,
-    teacherId,
-  }: {
-    danceName: string;
-    teacherId: string | number;
-  }): Promise<TReturnDto<DanceModelInstance>> {
-    return await addDance(this.danceModel, { danceName, teacherId });
   }
 
   async addDances(
@@ -275,7 +257,7 @@ class Api {
     endsAt: string;
     danceId: string;
     studioId: string;
-  }): Promise<TReturnDto<ScheduledDanceModelInstance>> {
+  }): Promise<TReturnDto<ScheduledDanceModelInstance[]>> {
     return await addScheduledDance(this.scheduledDanceModel, {
       startsAt,
       endsAt,
