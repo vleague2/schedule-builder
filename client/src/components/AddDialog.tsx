@@ -113,7 +113,7 @@ export function AddDialog(props: TAddDialogProps): JSX.Element {
             select
             fullWidth
             variant="outlined"
-            label="Select the teacher of this dance"
+            label="Select the teacher of these dances"
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
               setTeacherSelectValue(parseInt(event.target.value));
             }}
