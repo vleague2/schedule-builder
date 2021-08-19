@@ -9,19 +9,36 @@ import {
 } from "@material-ui/core";
 import MenuIcon from "@material-ui/icons/Menu";
 import CloseIcon from "@material-ui/icons/Close";
-import { MouseEventHandler, useState } from "react";
+import { MouseEventHandler, useState, SyntheticEvent } from "react";
 
-import { AddDancersDialog } from "./AddDancersDialog";
-import { SyntheticEvent } from "react";
+import { AddDialog } from "./AddDialog";
+import { addStudios } from "../services/studiosService";
+import { addTeachers } from "../services/teachersService";
+import { addDancers } from "../services/dancersService";
+
+type TDialogOpenType = "studio" | "teacher" | "dancer" | undefined;
 
 export function AppMenu(): JSX.Element {
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
-  const [addDancersDialogOpen, setAddDancersDialogOpen] =
-    useState<boolean>(false);
   const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
   const [snackbarMessage, setSnackbarMessage] = useState<string | undefined>(
     undefined
   );
+  const [dialogOpenType, setDialogOpenType] =
+    useState<TDialogOpenType>(undefined);
+
+  function deriveDialogResource() {
+    switch (dialogOpenType) {
+      case "studio":
+        return addStudios;
+      case "teacher":
+        return addTeachers;
+      case "dancer":
+        return addDancers;
+      default:
+        return undefined;
+    }
+  }
 
   function handleSnackbarClose(
     event: SyntheticEvent<any, Event> | MouseEventHandler<HTMLButtonElement>,
@@ -60,21 +77,38 @@ export function AppMenu(): JSX.Element {
         <div style={{ padding: 20, display: "flex", flexDirection: "column" }}>
           <Button
             onClick={() => {
-              setAddDancersDialogOpen(true);
+              setDialogOpenType("dancer");
               setMenuOpen(false);
             }}
           >
             Add Dancers
           </Button>
-          <Button>Add Teachers</Button>
+          <Button
+            onClick={() => {
+              setDialogOpenType("teacher");
+              setMenuOpen(false);
+            }}
+          >
+            Add Teachers
+          </Button>
           <Button>Add Dances</Button>
-          <Button>Add Studios</Button>
+          <Button
+            onClick={() => {
+              setDialogOpenType("studio");
+              setMenuOpen(false);
+            }}
+          >
+            Add Studios
+          </Button>
         </div>
       </Drawer>
-      <AddDancersDialog
-        open={addDancersDialogOpen}
-        onClose={() => setAddDancersDialogOpen(false)}
+
+      <AddDialog
+        open={Boolean(dialogOpenType)}
+        onClose={() => setDialogOpenType(undefined)}
         onSuccess={onDialogSuccess}
+        resource={deriveDialogResource()}
+        dialogType={dialogOpenType}
       />
 
       <Snackbar

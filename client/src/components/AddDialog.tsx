@@ -1,23 +1,24 @@
 import { Button, ButtonGroup, DialogTitle, TextField } from "@material-ui/core";
 import { Dialog } from "@material-ui/core";
 import { useState } from "react";
-import { TDancer } from "../models/TDancer";
-import { addDancers } from "../services/dancersService";
+import { TApiResponseDto } from "../models/TApiResponseDto";
 import { MessageBox } from "./MessageBox";
 
-type TAddDancersDialogProps = {
+type TAddDialogProps<T> = {
   open: boolean;
   onClose: () => void;
   onSuccess: (message: string) => void;
+  resource: undefined | ((value: string) => Promise<TApiResponseDto<T[]>>);
+  dialogType: string | undefined;
 };
 
-export function AddDancersDialog(props: TAddDancersDialogProps): JSX.Element {
-  const { open, onClose, onSuccess } = props;
+export function AddDialog<T>(props: TAddDialogProps<T>): JSX.Element {
+  const { open, onClose, onSuccess, resource, dialogType } = props;
 
   const [value, setValue] = useState<string>("");
   const [mixedSuccess, setMixedSuccess] = useState<{
     errors: string[] | undefined;
-    successes: TDancer[] | undefined;
+    successes: T[] | undefined;
   }>({ errors: undefined, successes: undefined });
 
   function onCloseHandler() {
@@ -27,19 +28,21 @@ export function AddDancersDialog(props: TAddDancersDialogProps): JSX.Element {
   }
 
   async function saveData() {
+    if (resource === undefined) {
+      return;
+    }
+
     setMixedSuccess({ errors: undefined, successes: undefined });
 
-    const result = await addDancers(value);
+    const result = await resource(value);
 
-    console.log(result);
-
-    if (result.error && result.error.length > 0) {
+    if (result.error.length > 0) {
       setMixedSuccess({ errors: result.error, successes: result.data });
       return;
     }
 
-    if (result.data) {
-      onSuccess(`Successfully added ${result.data.length} dancers`);
+    if (result.data.length > 0) {
+      onSuccess(`Successfully added ${result.data.length} ${dialogType}(s)`);
       onCloseHandler();
     }
   }
@@ -48,7 +51,7 @@ export function AddDancersDialog(props: TAddDancersDialogProps): JSX.Element {
     <Dialog open={open} onClose={() => onCloseHandler()}>
       <div style={{ padding: 40, width: 600 }}>
         <DialogTitle style={{ marginBottom: 15 }}>
-          Add Dancers to Database
+          Add {dialogType}s to database
         </DialogTitle>
         {mixedSuccess.errors &&
           mixedSuccess.successes &&
@@ -56,7 +59,7 @@ export function AddDancersDialog(props: TAddDancersDialogProps): JSX.Element {
             <MessageBox
               style="success"
               messages={[
-                `Successfully added ${mixedSuccess.successes.length} dancers`,
+                `Successfully added ${mixedSuccess.successes.length} ${dialogType}(s)`,
               ]}
             />
           )}
@@ -70,7 +73,7 @@ export function AddDancersDialog(props: TAddDancersDialogProps): JSX.Element {
           rows={5}
           variant="outlined"
           fullWidth
-          label="Enter dancer names (comma separated)"
+          label={`Enter ${dialogType} names (comma separated)`}
           value={value}
           onChange={(e) => setValue(e.target.value)}
         />
