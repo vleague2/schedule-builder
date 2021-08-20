@@ -153,7 +153,9 @@ export async function updateStudio(
 
     res.data = studioRes[0];
   } catch (error) {
-    res.error.push(error);
+    const errorMessage = (error as ValidationError).errors[0].message;
+    const errorValue = (error as ValidationError).errors[0].value;
+    res.error.push(`${errorMessage}: ${errorValue}`);
   }
 
   return res;

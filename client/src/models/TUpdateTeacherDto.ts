@@ -1,4 +1,4 @@
-export type TAddTeacherDto = {
+export type TUpdateTeacherDto = {
   options: {
     newTeacherName: string;
   };

@@ -34,8 +34,8 @@ export function MessageBox(props: TMessageBox): JSX.Element {
           <Typography>{capitalize(style)}s:</Typography>
           <ul>
             {messages.map((message) => (
-              <li>
-                <Typography key={message}>{message}</Typography>
+              <li key={message}>
+                <Typography>{message}</Typography>
               </li>
             ))}
           </ul>

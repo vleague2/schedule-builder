@@ -1,7 +1,6 @@
 import { Button, ButtonGroup, DialogTitle, TextField } from "@material-ui/core";
 import { Dialog } from "@material-ui/core";
 import { useState } from "react";
-import { TApiResponseDto } from "../models/TApiResponseDto";
 import { TDance } from "../models/TDance";
 import { TDancer } from "../models/TDancer";
 import { TStudio } from "../models/TStudio";
@@ -11,6 +10,7 @@ import { addStudios } from "../services/studiosService";
 import { addTeachers } from "../services/teachersService";
 import { addDancers } from "../services/dancersService";
 import { addDances } from "../services/dancesService";
+import { TApiResponseDto } from "../models/TApiResponseDto";
 
 export type TDialogOpenType =
   | "studio"
@@ -40,6 +40,14 @@ export function AddDialog(props: TAddDialogProps): JSX.Element {
     successes: TResourceReturnType[];
   }>({ errors: [], successes: [] });
 
+  function buttonIsDisabled() {
+    if (dialogType === "dance") {
+      return teacherSelectValue === 0 || value === "";
+    }
+
+    return value === "";
+  }
+
   function onCloseHandler() {
     setValue("");
     setMixedSuccess({ errors: [], successes: [] });
@@ -50,7 +58,7 @@ export function AddDialog(props: TAddDialogProps): JSX.Element {
   async function saveData() {
     setMixedSuccess({ errors: [], successes: [] });
 
-    let result;
+    let result: undefined | TApiResponseDto<TResourceReturnType[]>;
 
     switch (dialogType) {
       case "studio":
@@ -70,10 +78,7 @@ export function AddDialog(props: TAddDialogProps): JSX.Element {
     }
 
     if (result === undefined) {
-      setMixedSuccess({
-        errors: ["You have to select a teacher"],
-        successes: [],
-      });
+      setMixedSuccess({ errors: ["Something went wrong"], successes: [] });
       return;
     }
 
@@ -142,12 +147,13 @@ export function AddDialog(props: TAddDialogProps): JSX.Element {
         <ButtonGroup style={{ marginTop: 30 }}>
           <Button
             color="primary"
+            disabled={buttonIsDisabled()}
             variant="contained"
-            onClick={() => saveData()}
+            onClick={saveData}
           >
             Save
           </Button>
-          <Button onClick={() => onCloseHandler()}>Cancel</Button>
+          <Button onClick={onCloseHandler}>Cancel</Button>
         </ButtonGroup>
       </div>
     </Dialog>

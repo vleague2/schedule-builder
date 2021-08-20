@@ -2,6 +2,10 @@ import { TAddDancersDto } from "../models/TAddDancersDto";
 import { TAddDancesDto } from "../models/TAddDancesDto";
 import { TAddStudiosDto } from "../models/TAddStudiosDto";
 import { TAddTeachersDto } from "../models/TAddTeachersDto";
+import { TUpdateDanceDto } from "../models/TUpdateDanceDto";
+import { TUpdateDancerDto } from "../models/TUpdateDancerDto";
+import { TUpdateStudioDto } from "../models/TUpdateStudioDto";
+import { TUpdateTeacherDto } from "../models/TUpdateTeacherDto";
 
 export function mapToAddDancersDto(value: string): TAddDancersDto {
   return {
@@ -34,5 +38,41 @@ export function mapToAddDancesDto(
 
   return {
     dances: dancesWithTeacherId,
+  };
+}
+
+export function mapToUpdateTeacherDto(value: string): TUpdateTeacherDto {
+  return {
+    options: {
+      newTeacherName: value,
+    },
+  };
+}
+
+export function mapToUpdateStudioDto(value: string): TUpdateStudioDto {
+  return {
+    options: {
+      newStudioName: value,
+    },
+  };
+}
+
+export function mapToUpdateDancerDto(value: string): TUpdateDancerDto {
+  return {
+    options: {
+      newDancerName: value,
+    },
+  };
+}
+
+export function mapToUpdateDanceDto(
+  newDanceName?: string,
+  newTeacherId?: number
+): TUpdateDanceDto {
+  return {
+    options: {
+      newDanceName,
+      newTeacherId,
+    },
   };
 }

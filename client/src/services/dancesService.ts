@@ -1,7 +1,21 @@
 import { TApiResponseDto } from "../models/TApiResponseDto";
 import { TDance } from "../models/TDance";
-import { postDances } from "../resources/dancesResource";
-import { mapToAddDancesDto } from "./mapToDtoService";
+import { getDances, patchDance, postDances } from "../resources/dancesResource";
+import { mapToAddDancesDto, mapToUpdateDanceDto } from "./mapToDtoService";
+
+export async function getAllDances(): Promise<TApiResponseDto<TDance[]>> {
+  return await getDances();
+}
+
+export async function updateDance(
+  danceId: number,
+  newDanceName?: string,
+  newTeacherId?: number
+): Promise<TApiResponseDto<number>> {
+  const mappedData = mapToUpdateDanceDto(newDanceName, newTeacherId);
+
+  return await patchDance(danceId, mappedData);
+}
 
 export async function addDances(
   value: string,
