@@ -1,1 +1,1 @@
-export type TAdminDialogAction = "add" | "edit";
+export type TAdminDialogAction = "add" | "edit" | "delete";

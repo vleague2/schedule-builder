@@ -183,7 +183,7 @@ export async function deleteTeacher(
   };
 
   try {
-    const teacherRes = await this.teacherModel.destroy({
+    const teacherRes = await teacherModel.destroy({
       where: {
         id: teacherId,
       },
@@ -191,6 +191,7 @@ export async function deleteTeacher(
 
     res.data = teacherRes;
   } catch (error) {
+    console.log(error);
     res.error.push(error);
   }
 

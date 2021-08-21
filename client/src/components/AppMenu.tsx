@@ -12,6 +12,7 @@ import { TAdminDialogType } from "../models/TAdminDialogType";
 import { TAdminDialogAction } from "../models/TAdminDialogAction";
 import { AdminDrawer } from "./AdminDrawer";
 import { Snackbar } from "./Snackbar";
+import { DeleteDialog } from "./DeleteDialog";
 
 type TAppMenuProps = {
   state: {
@@ -132,6 +133,16 @@ export function AppMenu(props: TAppMenuProps): JSX.Element {
           dialogType={dialogOpen.type}
           items={mapDialogTypeToState[dialogOpen.type] ?? []}
           teachers={state.teachers}
+        />
+      )}
+
+      {dialogOpen.type !== undefined && (
+        <DeleteDialog
+          open={dialogOpen.action === "delete"}
+          onClose={closeDialog}
+          onSuccess={onDialogSuccess}
+          dialogType={dialogOpen.type}
+          items={mapDialogTypeToState[dialogOpen.type] ?? []}
         />
       )}
 

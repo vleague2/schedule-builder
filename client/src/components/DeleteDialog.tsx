@@ -6,44 +6,35 @@ import { TDance } from "../models/TDance";
 import { TDancer } from "../models/TDancer";
 import { TStudio } from "../models/TStudio";
 import { TTeacher } from "../models/TTeacher";
-import { updateTeacher } from "../services/teachersService";
-import { updateStudio } from "../services/studiosService";
-import { updateDancer } from "../services/dancersService";
-import { updateDance } from "../services/dancesService";
+import { deleteTeacher } from "../services/teachersService";
+import { deleteStudio } from "../services/studiosService";
+import { deleteDancer } from "../services/dancersService";
+import { deleteDance } from "../services/dancesService";
 import { TAdminDialogType } from "../models/TAdminDialogType";
 import { useErrorHandling } from "../hooks/useErrorHandling";
 import { DialogErrorMessage } from "./DialogErrorMessage";
 
-type TEditDialogProps = {
+type TDeleteDialogProps = {
   open: boolean;
   onClose: () => void;
   onSuccess: (message: string) => void;
   dialogType: TAdminDialogType;
   items: TTeacher[] | TStudio[] | TDancer[] | TDance[];
-  // Required if dialogType is "dance"
-  teachers?: TTeacher[];
 };
 
-export function EditDialog(props: TEditDialogProps): JSX.Element {
-  const { open, onClose, onSuccess, dialogType, items, teachers } = props;
+export function DeleteDialog(props: TDeleteDialogProps): JSX.Element {
+  const { open, onClose, onSuccess, dialogType, items } = props;
 
-  const [newValue, setNewValue] = useState<string>("");
   const [selectValue, setSelectValue] = useState<number>(0);
-  const [selectedTeacher, setSelectedTeacher] = useState<number>(0);
 
   const { apiResponseState, resetApiResponseState, makeApiCall } =
     useErrorHandling();
 
   function buttonIsDisabled() {
-    if (dialogType === "dance") {
-      return selectValue === 0 || (newValue === "" && selectedTeacher === 0);
-    }
-
-    return newValue === "" || selectValue === 0;
+    return selectValue === 0;
   }
 
   function onCloseHandler() {
-    setNewValue("");
     resetApiResponseState();
     setSelectValue(0);
     onClose();
@@ -53,13 +44,13 @@ export function EditDialog(props: TEditDialogProps): JSX.Element {
     async function getApiCallBasedOnDialogType() {
       switch (dialogType) {
         case "studio":
-          return await updateStudio(newValue, selectValue);
+          return await deleteStudio(selectValue);
         case "teacher":
-          return await updateTeacher(newValue, selectValue);
+          return await deleteTeacher(selectValue);
         case "dancer":
-          return await updateDancer(newValue, selectValue);
+          return await deleteDancer(selectValue);
         case "dance":
-          return await updateDance(selectValue, newValue, selectedTeacher);
+          return await deleteDance(selectValue);
         default:
           return undefined;
       }
@@ -67,29 +58,17 @@ export function EditDialog(props: TEditDialogProps): JSX.Element {
 
     if (dialogType !== undefined) {
       await makeApiCall(getApiCallBasedOnDialogType, (count: number) => {
-        onSuccess(`Successfully added ${count} ${dialogType}(s)`);
+        onSuccess(`Successfully deleted ${count} ${dialogType}(s)`);
         onCloseHandler();
       });
     }
   }
 
-  useEffect(() => {
-    const selectedItem = items.find((item) => item.id === selectValue);
-
-    if (selectedItem) {
-      setNewValue(selectedItem.name);
-    }
-
-    if (dialogType === "dance" && selectedItem) {
-      setSelectedTeacher((selectedItem as TDance).TeacherId);
-    }
-  }, [selectValue]);
-
   return (
     <Dialog open={open} onClose={onCloseHandler}>
       <div style={{ padding: 40, width: 600 }}>
         <DialogTitle style={{ marginBottom: 15 }}>
-          Edit existing {dialogType}
+          Delete a {dialogType}
         </DialogTitle>
         <DialogErrorMessage
           errors={apiResponseState.errors}
@@ -100,7 +79,7 @@ export function EditDialog(props: TEditDialogProps): JSX.Element {
           select
           fullWidth
           variant="outlined"
-          label={`Select the ${dialogType} you want to edit`}
+          label={`Select the ${dialogType} you want to delete`}
           onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
             setSelectValue(parseInt(event.target.value));
           }}
@@ -116,40 +95,6 @@ export function EditDialog(props: TEditDialogProps): JSX.Element {
             </option>
           ))}
         </TextField>
-        <TextField
-          variant="outlined"
-          fullWidth
-          label={
-            dialogType === "dance"
-              ? `Enter new ${dialogType} name (optional)`
-              : `Enter new ${dialogType} name`
-          }
-          value={newValue}
-          onChange={(e) => setNewValue(e.target.value)}
-        />
-        {dialogType === "dance" && teachers && (
-          <TextField
-            select
-            fullWidth
-            variant="outlined"
-            label="Select a new teacher for this dance (optional)"
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-              setSelectedTeacher(parseInt(event.target.value));
-            }}
-            style={{ marginBottom: 20, marginTop: 20 }}
-            value={selectedTeacher}
-          >
-            {teachers.map((teacher) => (
-              <option
-                value={teacher.id}
-                key={teacher.id}
-                selected={teacher.id === selectedTeacher}
-              >
-                {teacher.name}
-              </option>
-            ))}
-          </TextField>
-        )}
         <ButtonGroup style={{ marginTop: 30 }}>
           <Button
             color="primary"
@@ -157,7 +102,7 @@ export function EditDialog(props: TEditDialogProps): JSX.Element {
             onClick={saveData}
             disabled={buttonIsDisabled()}
           >
-            Save
+            Delete
           </Button>
           <Button onClick={onCloseHandler}>Cancel</Button>
         </ButtonGroup>

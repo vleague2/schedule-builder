@@ -18,6 +18,9 @@ export function AdminDrawer(props: TAdminDrawerProps) {
         <Button onClick={() => openDialog("edit", "dancer")}>
           Edit Dancer
         </Button>
+        <Button onClick={() => openDialog("delete", "dancer")}>
+          Delete Dancer
+        </Button>
         <br />
         <Button onClick={() => openDialog("add", "teacher")}>
           Add Teachers
@@ -25,13 +28,22 @@ export function AdminDrawer(props: TAdminDrawerProps) {
         <Button onClick={() => openDialog("edit", "teacher")}>
           Edit Teacher
         </Button>
+        <Button onClick={() => openDialog("delete", "teacher")}>
+          Delete Teacher
+        </Button>
         <br />
         <Button onClick={() => openDialog("add", "dance")}>Add Dances</Button>
         <Button onClick={() => openDialog("edit", "dance")}>Edit Dance</Button>
+        <Button onClick={() => openDialog("delete", "dance")}>
+          Delete Dance
+        </Button>
         <br />
         <Button onClick={() => openDialog("add", "studio")}>Add Studios</Button>
         <Button onClick={() => openDialog("edit", "studio")}>
           Edit Studio
+        </Button>
+        <Button onClick={() => openDialog("delete", "studio")}>
+          Delete Studio
         </Button>
       </div>
     </Drawer>
