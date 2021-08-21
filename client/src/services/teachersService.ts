@@ -4,6 +4,7 @@ import {
   postTeachers,
   getTeachers,
   patchTeacher,
+  deleteTeacher as deleteTeacherApi,
 } from "../resources/teachersResource";
 import { mapToAddTeachersDto, mapToUpdateTeacherDto } from "./mapToDtoService";
 
@@ -26,4 +27,10 @@ export async function addTeachers(
   const mappedData = mapToAddTeachersDto(value);
 
   return await postTeachers(mappedData);
+}
+
+export async function deleteTeacher(
+  teacherId: number
+): Promise<TApiResponseDto<number>> {
+  return await deleteTeacherApi(teacherId);
 }

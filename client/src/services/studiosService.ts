@@ -4,6 +4,7 @@ import {
   getStudios,
   patchStudio,
   postStudios,
+  deleteStudio as deleteStudioApi,
 } from "../resources/studiosResource";
 import { mapToAddStudiosDto, mapToUpdateStudioDto } from "./mapToDtoService";
 
@@ -26,4 +27,10 @@ export async function addStudios(
   const mappedData = mapToAddStudiosDto(value);
 
   return await postStudios(mappedData);
+}
+
+export async function deleteStudio(
+  studioId: number
+): Promise<TApiResponseDto<number>> {
+  return await deleteStudioApi(studioId);
 }

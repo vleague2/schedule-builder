@@ -61,3 +61,21 @@ export async function postStudios(
 
   return response.json();
 }
+
+export async function deleteStudio(
+  studioId: number
+): Promise<TApiResponseDto<number>> {
+  const response = await fetch(`${url}/${studioId}`, {
+    method: "DELETE",
+    mode: "cors",
+    cache: "no-cache",
+    credentials: "same-origin",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    redirect: "follow",
+    referrerPolicy: "no-referrer",
+  });
+
+  return response.json();
+}

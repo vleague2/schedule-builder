@@ -1,6 +1,7 @@
 import { Button, ButtonGroup, DialogTitle, TextField } from "@material-ui/core";
 import { Dialog } from "@material-ui/core";
 import { useEffect, useState } from "react";
+
 import { TDance } from "../models/TDance";
 import { TDancer } from "../models/TDancer";
 import { TStudio } from "../models/TStudio";
@@ -10,19 +11,15 @@ import { updateTeacher } from "../services/teachersService";
 import { updateStudio } from "../services/studiosService";
 import { updateDancer } from "../services/dancersService";
 import { updateDance } from "../services/dancesService";
-
-export type TDialogOpenType =
-  | "studio"
-  | "teacher"
-  | "dancer"
-  | "dance"
-  | undefined;
+import { TAdminDialogType } from "../models/TAdminDialogType";
+import { useErrorHandling } from "../hooks/useErrorHandling";
+import { DialogErrorMessage } from "./DialogErrorMessage";
 
 type TEditDialogProps = {
   open: boolean;
   onClose: () => void;
   onSuccess: (message: string) => void;
-  dialogType: TDialogOpenType;
+  dialogType: TAdminDialogType;
   items: TTeacher[] | TStudio[] | TDancer[] | TDance[];
   // Required if dialogType is "dance"
   teachers?: TTeacher[];
@@ -34,10 +31,9 @@ export function EditDialog(props: TEditDialogProps): JSX.Element {
   const [newValue, setNewValue] = useState<string>("");
   const [selectValue, setSelectValue] = useState<number>(0);
   const [selectedTeacher, setSelectedTeacher] = useState<number>(0);
-  const [mixedSuccess, setMixedSuccess] = useState<{
-    errors: string[];
-    successes: number;
-  }>({ errors: [], successes: 0 });
+
+  const { apiResponseState, resetApiResponseState, makeApiCall } =
+    useErrorHandling();
 
   function buttonIsDisabled() {
     if (dialogType === "dance") {
@@ -49,47 +45,32 @@ export function EditDialog(props: TEditDialogProps): JSX.Element {
 
   function onCloseHandler() {
     setNewValue("");
-    setMixedSuccess({ errors: [], successes: 0 });
+    resetApiResponseState();
     setSelectValue(0);
     onClose();
   }
 
   async function saveData() {
-    setMixedSuccess({ errors: [], successes: 0 });
-
-    let result;
-
-    switch (dialogType) {
-      case "studio":
-        result = await updateStudio(newValue, selectValue);
-        break;
-      case "teacher":
-        result = await updateTeacher(newValue, selectValue);
-        break;
-      case "dancer":
-        result = await updateDancer(newValue, selectValue);
-        break;
-      case "dance":
-        result = await updateDance(selectValue, newValue, selectedTeacher);
-        break;
+    async function getApiCallBasedOnDialogType() {
+      switch (dialogType) {
+        case "studio":
+          return await updateStudio(newValue, selectValue);
+        case "teacher":
+          return await updateTeacher(newValue, selectValue);
+        case "dancer":
+          return await updateDancer(newValue, selectValue);
+        case "dance":
+          return await updateDance(selectValue, newValue, selectedTeacher);
+        default:
+          return undefined;
+      }
     }
 
-    if (result === undefined) {
-      setMixedSuccess({
-        errors: ["You have to select something to edit"],
-        successes: 0,
+    if (dialogType !== undefined) {
+      await makeApiCall(getApiCallBasedOnDialogType, (count: number) => {
+        onSuccess(`Successfully added ${count} ${dialogType}(s)`);
+        onCloseHandler();
       });
-      return;
-    }
-
-    if (result.error.length > 0) {
-      setMixedSuccess({ errors: result.error, successes: result.data });
-      return;
-    }
-
-    if (result.data > 0) {
-      onSuccess(`Successfully edited ${result.data} ${dialogType}(s)`);
-      onCloseHandler();
     }
   }
 
@@ -111,19 +92,11 @@ export function EditDialog(props: TEditDialogProps): JSX.Element {
         <DialogTitle style={{ marginBottom: 15 }}>
           Edit existing {dialogType}
         </DialogTitle>
-        {mixedSuccess.errors.length > 0 && mixedSuccess.successes > 0 && (
-          <MessageBox
-            style="success"
-            messages={[
-              `Successfully added ${mixedSuccess.successes} ${dialogType}(s)`,
-            ]}
-          />
-        )}
-        {mixedSuccess.errors.length > 0 && (
-          <div style={{ marginBottom: 30 }}>
-            <MessageBox style="error" messages={mixedSuccess.errors} />
-          </div>
-        )}
+        <DialogErrorMessage
+          errors={apiResponseState.errors}
+          successCount={apiResponseState.successes}
+          dialogType={dialogType}
+        />
         <TextField
           select
           fullWidth
@@ -150,7 +123,7 @@ export function EditDialog(props: TEditDialogProps): JSX.Element {
           label={
             dialogType === "dance"
               ? `Enter new ${dialogType} name (optional)`
-              : `Enter new ${dialogType} name (optional)`
+              : `Enter new ${dialogType} name`
           }
           value={newValue}
           onChange={(e) => setNewValue(e.target.value)}

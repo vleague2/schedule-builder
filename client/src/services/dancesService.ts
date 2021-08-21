@@ -1,6 +1,11 @@
 import { TApiResponseDto } from "../models/TApiResponseDto";
 import { TDance } from "../models/TDance";
-import { getDances, patchDance, postDances } from "../resources/dancesResource";
+import {
+  getDances,
+  patchDance,
+  postDances,
+  deleteDance as deleteDanceApi,
+} from "../resources/dancesResource";
 import { mapToAddDancesDto, mapToUpdateDanceDto } from "./mapToDtoService";
 
 export async function getAllDances(): Promise<TApiResponseDto<TDance[]>> {
@@ -24,4 +29,10 @@ export async function addDances(
   const mappedData = mapToAddDancesDto(value, teacherId);
 
   return await postDances(mappedData);
+}
+
+export async function deleteDance(
+  danceId: number
+): Promise<TApiResponseDto<number>> {
+  return await deleteDanceApi(danceId);
 }

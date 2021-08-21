@@ -1,31 +1,21 @@
 import { Button, ButtonGroup, DialogTitle, TextField } from "@material-ui/core";
 import { Dialog } from "@material-ui/core";
 import { useState } from "react";
-import { TDance } from "../models/TDance";
-import { TDancer } from "../models/TDancer";
-import { TStudio } from "../models/TStudio";
+
 import { TTeacher } from "../models/TTeacher";
-import { MessageBox } from "./MessageBox";
-import { addStudios } from "../services/studiosService";
-import { addTeachers } from "../services/teachersService";
 import { addDancers } from "../services/dancersService";
 import { addDances } from "../services/dancesService";
-import { TApiResponseDto } from "../models/TApiResponseDto";
-
-export type TDialogOpenType =
-  | "studio"
-  | "teacher"
-  | "dancer"
-  | "dance"
-  | undefined;
-
-type TResourceReturnType = TTeacher | TStudio | TDancer | TDance;
+import { addStudios } from "../services/studiosService";
+import { addTeachers } from "../services/teachersService";
+import { TAdminDialogType } from "../models/TAdminDialogType";
+import { useErrorHandling } from "../hooks/useErrorHandling";
+import { DialogErrorMessage } from "./DialogErrorMessage";
 
 type TAddDialogProps = {
   open: boolean;
   onClose: () => void;
   onSuccess: (message: string) => void;
-  dialogType: TDialogOpenType;
+  dialogType: TAdminDialogType;
   // Required if dialogType is 'dance'
   teachers?: TTeacher[];
 };
@@ -35,10 +25,9 @@ export function AddDialog(props: TAddDialogProps): JSX.Element {
 
   const [value, setValue] = useState<string>("");
   const [teacherSelectValue, setTeacherSelectValue] = useState<number>(0);
-  const [mixedSuccess, setMixedSuccess] = useState<{
-    errors: string[];
-    successes: TResourceReturnType[];
-  }>({ errors: [], successes: [] });
+
+  const { apiResponseState, resetApiResponseState, makeApiCall } =
+    useErrorHandling();
 
   function buttonIsDisabled() {
     if (dialogType === "dance") {
@@ -50,46 +39,36 @@ export function AddDialog(props: TAddDialogProps): JSX.Element {
 
   function onCloseHandler() {
     setValue("");
-    setMixedSuccess({ errors: [], successes: [] });
+    resetApiResponseState();
     setTeacherSelectValue(0);
     onClose();
   }
 
   async function saveData() {
-    setMixedSuccess({ errors: [], successes: [] });
+    async function getApiCallBasedOnDialogType() {
+      switch (dialogType) {
+        case "studio":
+          return await addStudios(value);
+        case "teacher":
+          return await addTeachers(value);
+        case "dancer":
+          return await addDancers(value);
+        case "dance":
+          if (teacherSelectValue > 0) {
+            return await addDances(value, teacherSelectValue);
+          }
 
-    let result: undefined | TApiResponseDto<TResourceReturnType[]>;
-
-    switch (dialogType) {
-      case "studio":
-        result = await addStudios(value);
-        break;
-      case "teacher":
-        result = await addTeachers(value);
-        break;
-      case "dancer":
-        result = await addDancers(value);
-        break;
-      case "dance":
-        if (teacherSelectValue > 0) {
-          result = await addDances(value, teacherSelectValue);
-        }
-        break;
+          return undefined;
+        default:
+          return undefined;
+      }
     }
 
-    if (result === undefined) {
-      setMixedSuccess({ errors: ["Something went wrong"], successes: [] });
-      return;
-    }
-
-    if (result.error.length > 0) {
-      setMixedSuccess({ errors: result.error, successes: result.data });
-      return;
-    }
-
-    if (result.data.length > 0) {
-      onSuccess(`Successfully added ${result.data.length} ${dialogType}(s)`);
-      onCloseHandler();
+    if (dialogType !== undefined) {
+      await makeApiCall(getApiCallBasedOnDialogType, (count: number) => {
+        onSuccess(`Successfully added ${count} ${dialogType}(s)`);
+        onCloseHandler();
+      });
     }
   }
 
@@ -99,20 +78,11 @@ export function AddDialog(props: TAddDialogProps): JSX.Element {
         <DialogTitle style={{ marginBottom: 15 }}>
           Add {dialogType}s to database
         </DialogTitle>
-        {mixedSuccess.errors.length > 0 &&
-          mixedSuccess.successes.length > 0 && (
-            <MessageBox
-              style="success"
-              messages={[
-                `Successfully added ${mixedSuccess.successes.length} ${dialogType}(s)`,
-              ]}
-            />
-          )}
-        {mixedSuccess.errors.length > 0 && (
-          <div style={{ marginBottom: 30 }}>
-            <MessageBox style="error" messages={mixedSuccess.errors} />
-          </div>
-        )}
+        <DialogErrorMessage
+          dialogType={dialogType}
+          errors={apiResponseState.errors}
+          successCount={apiResponseState.successes}
+        />
         {dialogType === "dance" && teachers && (
           <TextField
             select

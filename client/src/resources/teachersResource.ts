@@ -61,3 +61,21 @@ export async function postTeachers(
 
   return response.json();
 }
+
+export async function deleteTeacher(
+  teacherId: number
+): Promise<TApiResponseDto<number>> {
+  const response = await fetch(`${url}/${teacherId}`, {
+    method: "DELETE",
+    mode: "cors",
+    cache: "no-cache",
+    credentials: "same-origin",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    redirect: "follow",
+    referrerPolicy: "no-referrer",
+  });
+
+  return response.json();
+}

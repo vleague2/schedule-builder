@@ -1,24 +1,17 @@
-import {
-  AppBar,
-  IconButton,
-  Drawer,
-  Toolbar,
-  Button,
-  Typography,
-  Snackbar,
-} from "@material-ui/core";
+import { AppBar, IconButton, Toolbar, Typography } from "@material-ui/core";
 import MenuIcon from "@material-ui/icons/Menu";
-import CloseIcon from "@material-ui/icons/Close";
 import { MouseEventHandler, useState, SyntheticEvent } from "react";
 
-import { AddDialog, TDialogOpenType } from "./AddDialog";
-import { useEffect } from "react";
+import { AddDialog } from "./AddDialog";
 import { TTeacher } from "../models/TTeacher";
-import { getAllTeachers } from "../services/teachersService";
 import { TDancer } from "../models/TDancer";
 import { TDance } from "../models/TDance";
 import { TStudio } from "../models/TStudio";
 import { EditDialog } from "./EditDialog";
+import { TAdminDialogType } from "../models/TAdminDialogType";
+import { TAdminDialogAction } from "../models/TAdminDialogAction";
+import { AdminDrawer } from "./AdminDrawer";
+import { Snackbar } from "./Snackbar";
 
 type TAppMenuProps = {
   state: {
@@ -44,8 +37,8 @@ export function AppMenu(props: TAppMenuProps): JSX.Element {
     undefined
   );
   const [dialogOpen, setDialogOpen] = useState<{
-    action: "add" | "edit" | undefined;
-    type: TDialogOpenType;
+    action: TAdminDialogAction | undefined;
+    type: TAdminDialogType | undefined;
   }>({ action: undefined, type: undefined });
 
   function handleSnackbarClose(
@@ -64,7 +57,10 @@ export function AppMenu(props: TAppMenuProps): JSX.Element {
     setSnackbarOpen(true);
   }
 
-  function openDialog(action: "edit" | "add", type: TDialogOpenType): void {
+  function openDialog(
+    action: TAdminDialogAction,
+    type: TAdminDialogType
+  ): void {
     setDialogOpen({ action, type });
     setMenuOpen(false);
   }
@@ -112,40 +108,21 @@ export function AppMenu(props: TAppMenuProps): JSX.Element {
           </Typography>
         </Toolbar>
       </AppBar>
-      <Drawer anchor="left" open={menuOpen} onClose={() => setMenuOpen(false)}>
-        <div style={{ padding: 20, display: "flex", flexDirection: "column" }}>
-          <Button onClick={() => openDialog("add", "dancer")}>
-            Add Dancers
-          </Button>
-          <Button onClick={() => openDialog("edit", "dancer")}>
-            Edit Dancer
-          </Button>
-          <Button onClick={() => openDialog("add", "teacher")}>
-            Add Teachers
-          </Button>
-          <Button onClick={() => openDialog("edit", "teacher")}>
-            Edit Teacher
-          </Button>
-          <Button onClick={() => openDialog("add", "dance")}>Add Dances</Button>
-          <Button onClick={() => openDialog("edit", "dance")}>
-            Edit Dance
-          </Button>
-          <Button onClick={() => openDialog("add", "studio")}>
-            Add Studios
-          </Button>
-          <Button onClick={() => openDialog("edit", "studio")}>
-            Edit Studio
-          </Button>
-        </div>
-      </Drawer>
-
-      <AddDialog
-        open={dialogOpen.action === "add"}
-        onClose={closeDialog}
-        onSuccess={onDialogSuccess}
-        dialogType={dialogOpen.type}
-        teachers={state.teachers}
+      <AdminDrawer
+        open={menuOpen}
+        onClose={() => setMenuOpen(false)}
+        openDialog={openDialog}
       />
+
+      {dialogOpen.type !== undefined && (
+        <AddDialog
+          open={dialogOpen.action === "add"}
+          onClose={closeDialog}
+          onSuccess={onDialogSuccess}
+          dialogType={dialogOpen.type}
+          teachers={state.teachers}
+        />
+      )}
 
       {dialogOpen.type !== undefined && (
         <EditDialog
@@ -158,26 +135,13 @@ export function AppMenu(props: TAppMenuProps): JSX.Element {
         />
       )}
 
-      <Snackbar
-        anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "left",
-        }}
-        open={snackbarOpen}
-        autoHideDuration={6000}
-        onClose={handleSnackbarClose}
-        message={snackbarMessage}
-        action={
-          <IconButton
-            size="small"
-            aria-label="close"
-            color="inherit"
-            onClick={handleSnackbarClose}
-          >
-            <CloseIcon fontSize="small" />
-          </IconButton>
-        }
-      />
+      {snackbarMessage && (
+        <Snackbar
+          open={snackbarOpen}
+          message={snackbarMessage}
+          onClose={handleSnackbarClose}
+        />
+      )}
     </>
   );
 }

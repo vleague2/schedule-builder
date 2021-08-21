@@ -1,6 +1,7 @@
 import { TApiResponseDto } from "../models/TApiResponseDto";
 import { TDancer } from "../models/TDancer";
 import {
+  deleteDancer as deleteDancerApi,
   getDancers,
   patchDancer,
   postDancers,
@@ -26,4 +27,10 @@ export async function addDancers(
   const mappedData = mapToAddDancersDto(value);
 
   return await postDancers(mappedData);
+}
+
+export async function deleteDancer(
+  dancerId: number
+): Promise<TApiResponseDto<number>> {
+  return await deleteDancerApi(dancerId);
 }
