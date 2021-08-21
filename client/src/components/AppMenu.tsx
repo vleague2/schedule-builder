@@ -13,6 +13,7 @@ import { TAdminDialogAction } from "../models/TAdminDialogAction";
 import { AdminDrawer } from "./AdminDrawer";
 import { Snackbar } from "./Snackbar";
 import { DeleteDialog } from "./DeleteDialog";
+import { DancerInDanceDialog } from "./DancerInDanceDialog";
 
 type TAppMenuProps = {
   state: {
@@ -42,6 +43,10 @@ export function AppMenu(props: TAppMenuProps): JSX.Element {
     type: TAdminDialogType | undefined;
   }>({ action: undefined, type: undefined });
 
+  const [dancerInDanceDialogOpen, setDancerInDanceDialogOpen] = useState<
+    "add" | "delete" | undefined
+  >(undefined);
+
   function handleSnackbarClose(
     event: SyntheticEvent<any, Event> | MouseEventHandler<HTMLButtonElement>,
     reason?: string
@@ -66,6 +71,11 @@ export function AppMenu(props: TAppMenuProps): JSX.Element {
     setMenuOpen(false);
   }
 
+  function openDancerInDanceDialog(action: "add" | "delete"): void {
+    setDancerInDanceDialogOpen(action);
+    setMenuOpen(false);
+  }
+
   function closeDialog(): void {
     switch (dialogOpen.type) {
       case "teacher":
@@ -83,6 +93,7 @@ export function AppMenu(props: TAppMenuProps): JSX.Element {
     }
 
     setDialogOpen({ action: undefined, type: undefined });
+    setDancerInDanceDialogOpen(undefined);
   }
 
   const mapDialogTypeToState = {
@@ -113,6 +124,7 @@ export function AppMenu(props: TAppMenuProps): JSX.Element {
         open={menuOpen}
         onClose={() => setMenuOpen(false)}
         openDialog={openDialog}
+        openDancerInDanceDialog={openDancerInDanceDialog}
       />
 
       {dialogOpen.type !== undefined && (
@@ -143,6 +155,17 @@ export function AppMenu(props: TAppMenuProps): JSX.Element {
           onSuccess={onDialogSuccess}
           dialogType={dialogOpen.type}
           items={mapDialogTypeToState[dialogOpen.type] ?? []}
+        />
+      )}
+
+      {dancerInDanceDialogOpen !== undefined && (
+        <DancerInDanceDialog
+          open={true}
+          onClose={closeDialog}
+          onSuccess={onDialogSuccess}
+          dances={state.dances ?? []}
+          dancers={state.dancers ?? []}
+          dialogAction={dancerInDanceDialogOpen}
         />
       )}
 

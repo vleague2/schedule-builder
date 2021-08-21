@@ -75,10 +75,11 @@ export function danceRouter(api: Api) {
     });
   });
 
-  router.delete("/:danceId/dancers/:dancerId", (req, res) => {
-    const { danceId, dancerId } = req.params;
+  router.delete("/:danceId/dancers", (req, res) => {
+    const { danceId } = req.params;
+    const { dancerIds }: { dancerIds: string[] } = req.body;
 
-    api.removeDancerFromDance({ danceId, dancerId }).then((returnVal) => {
+    api.removeDancersFromDance({ danceId, dancerIds }).then((returnVal) => {
       res.send(returnVal);
     });
   });

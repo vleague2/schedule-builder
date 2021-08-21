@@ -1,17 +1,15 @@
-import { FindOptions, Model, ModelCtor, Sequelize } from "sequelize";
+import { ModelCtor, Sequelize } from "sequelize";
 import {
-  addDance,
   addDancersToDance,
   addDances,
   deleteDance,
   getDance,
   getDancersForDance,
   getDances,
-  removeDancerFromDance,
+  removeDancersFromDance,
   updateDance,
 } from "./managers/danceManager";
 import {
-  addDancer,
   addDancers,
   deleteDancer,
   getDancer,
@@ -25,7 +23,6 @@ import {
   updateScheduledDance,
 } from "./managers/scheduledDanceManager";
 import {
-  addStudio,
   addStudios,
   deleteStudio,
   getStudio,
@@ -33,7 +30,6 @@ import {
   updateStudio,
 } from "./managers/studioManager";
 import {
-  addTeacher,
   addTeachers,
   deleteTeacher,
   getTeacher,
@@ -234,16 +230,16 @@ class Api {
     });
   }
 
-  async removeDancerFromDance({
+  async removeDancersFromDance({
     danceId,
-    dancerId,
+    dancerIds,
   }: {
     danceId: string;
-    dancerId: string;
+    dancerIds: string[];
   }): Promise<TReturnDto<number>> {
-    return await removeDancerFromDance(this.dancerDancesModel, {
+    return await removeDancersFromDance(this.dancerDancesModel, {
       danceId,
-      dancerId,
+      dancerIds,
     });
   }
 

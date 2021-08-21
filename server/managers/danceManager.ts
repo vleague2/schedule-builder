@@ -239,6 +239,7 @@ export async function addDancersToDance(
           return addDancerDanceRes;
         }
       } catch (error) {
+        console.log(error);
         res.error.push(error);
       }
     })
@@ -367,27 +368,22 @@ export async function removeDancerFromDance(
     danceId: string;
     dancerId: string;
   }
-): Promise<TReturnDto<number>> {
+): Promise<number> {
   if (!dancerId || !danceId) {
-    return { data: 0, error: ["Must provide dancer id and dance id"] };
+    throw "Must provide dancer id and dance id";
   }
 
   const parsedDanceId = parseInt(danceId);
 
   if (parsedDanceId === NaN) {
-    return { data: 0, error: ["Dance ID must be a number"] };
+    throw "Dance ID must be a number";
   }
 
   const parsedDancer = parseInt(dancerId);
 
   if (parsedDancer === NaN) {
-    return { data: 0, error: ["Dancer ID must be a number"] };
+    throw "Dancer ID must be a number";
   }
-
-  const res: TReturnDto<number> = {
-    data: 0,
-    error: [],
-  };
 
   try {
     const dancerDancesRes = await dancerDancesModel.destroy({
@@ -397,10 +393,48 @@ export async function removeDancerFromDance(
       },
     });
 
-    res.data = dancerDancesRes;
+    return dancerDancesRes;
   } catch (error) {
-    res.error.push(error);
+    throw error;
   }
+}
+
+export async function removeDancersFromDance(
+  dancerDancesModel: ModelCtor<DancerDancesModelInstance>,
+  {
+    danceId,
+    dancerIds,
+  }: {
+    danceId: string;
+    dancerIds: string[];
+  }
+): Promise<TReturnDto<number>> {
+  const res: TReturnDto<number> = {
+    data: 0,
+    error: [],
+  };
+
+  if (dancerIds.length < 1) {
+    return { data: 0, error: ["No dances provided"] };
+  }
+
+  await Promise.all(
+    dancerIds.map(async (dancerId) => {
+      try {
+        const addDancerToDanceRes = await removeDancerFromDance(
+          dancerDancesModel,
+          { danceId, dancerId }
+        );
+        if (addDancerToDanceRes) {
+          res.data++;
+        }
+      } catch (error) {
+        const errorMessage = (error as ValidationError).errors[0].message;
+        const errorValue = (error as ValidationError).errors[0].value;
+        res.error.push(`${errorMessage}: ${errorValue}`);
+      }
+    })
+  );
 
   return res;
 }

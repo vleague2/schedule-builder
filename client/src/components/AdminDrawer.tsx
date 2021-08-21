@@ -6,10 +6,11 @@ type TAdminDrawerProps = {
   open: boolean;
   onClose: () => void;
   openDialog: (action: TAdminDialogAction, type: TAdminDialogType) => void;
+  openDancerInDanceDialog: (action: "add" | "delete") => void;
 };
 
 export function AdminDrawer(props: TAdminDrawerProps) {
-  const { open, onClose, openDialog } = props;
+  const { open, onClose, openDialog, openDancerInDanceDialog } = props;
 
   return (
     <Drawer anchor="left" open={open} onClose={onClose}>
@@ -36,6 +37,13 @@ export function AdminDrawer(props: TAdminDrawerProps) {
         <Button onClick={() => openDialog("edit", "dance")}>Edit Dance</Button>
         <Button onClick={() => openDialog("delete", "dance")}>
           Delete Dance
+        </Button>
+        <br />
+        <Button onClick={() => openDancerInDanceDialog("add")}>
+          Add Dancers to Dance
+        </Button>
+        <Button onClick={() => openDancerInDanceDialog("delete")}>
+          Remove Dancers from Dance
         </Button>
         <br />
         <Button onClick={() => openDialog("add", "studio")}>Add Studios</Button>
