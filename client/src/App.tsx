@@ -1,13 +1,16 @@
-import { Container, CssBaseline, Grid } from "@material-ui/core";
+import { Card, Container, CssBaseline, Grid } from "@material-ui/core";
 import { useEffect } from "react";
 import { useState } from "react";
 import { AppMenu } from "./components/AppMenu";
+import { UnscheduledDanceColumn } from "./components/UnscheduledDanceColumn";
 import { TDance } from "./models/TDance";
 import { TDancer } from "./models/TDancer";
+import { TScheduledDance } from "./models/TScheduledDance";
 import { TStudio } from "./models/TStudio";
 import { TTeacher } from "./models/TTeacher";
 import { getAllDancers } from "./services/dancersService";
 import { getAllDances } from "./services/dancesService";
+import { getAllScheduledDances } from "./services/scheduledDancesService";
 import { getAllStudios } from "./services/studiosService";
 import { getAllTeachers } from "./services/teachersService";
 
@@ -16,6 +19,15 @@ function App(): JSX.Element {
   const [dancers, setDancers] = useState<TDancer[] | undefined>(undefined);
   const [dances, setDances] = useState<TDance[] | undefined>(undefined);
   const [studios, setStudios] = useState<TStudio[] | undefined>(undefined);
+  const [scheduledDances, setScheduledDances] = useState<
+    TScheduledDance[] | undefined
+  >(undefined);
+
+  const unscheduledDances = dances?.filter((dance) => {
+    return !scheduledDances?.find(
+      (scheduledDance) => scheduledDance.danceId === dance.id
+    );
+  });
 
   function fetchTeachers() {
     getAllTeachers().then((teachersResponse) => {
@@ -49,11 +61,18 @@ function App(): JSX.Element {
     });
   }
 
+  function fetchScheduledDances() {
+    getAllScheduledDances().then((scheduledDancesResponse) => {
+      setScheduledDances(scheduledDancesResponse.data);
+    });
+  }
+
   useEffect(() => {
     fetchTeachers();
     fetchStudios();
     fetchDancers();
     fetchDances();
+    fetchScheduledDances();
   }, []);
 
   return (
@@ -105,9 +124,14 @@ function App(): JSX.Element {
               studio 5
             </Grid>
           </Grid>
-          <Grid item xs={1}></Grid>
-          <Grid container item xs={2}>
-            Un-scheduled dances go here
+          <Grid container item xs={3}>
+            {unscheduledDances && teachers && dancers && (
+              <UnscheduledDanceColumn
+                unscheduledDances={unscheduledDances}
+                teachers={teachers}
+                dancers={dancers}
+              />
+            )}
           </Grid>
         </Grid>
       </Container>

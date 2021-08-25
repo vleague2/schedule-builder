@@ -2,6 +2,25 @@ import { ModelCtor } from "sequelize/types";
 import { ScheduledDanceModelInstance } from "../models/scheduledDanceModel";
 import { TReturnDto } from "../types";
 
+export async function getScheduledDances(
+  scheduledDanceModel: ModelCtor<ScheduledDanceModelInstance>
+): Promise<TReturnDto<ScheduledDanceModelInstance[]>> {
+  const res: TReturnDto<ScheduledDanceModelInstance[]> = {
+    data: [],
+    error: [],
+  };
+
+  try {
+    const scheduledDanceResponse = await scheduledDanceModel.findAll();
+
+    res.data = scheduledDanceResponse;
+  } catch (error) {
+    error.push(error);
+  }
+
+  return res;
+}
+
 export async function addScheduledDance(
   scheduledDanceModel: ModelCtor<ScheduledDanceModelInstance>,
   danceData: {

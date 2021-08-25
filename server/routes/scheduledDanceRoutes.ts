@@ -4,6 +4,12 @@ import Api from "../api";
 export function scheduledDanceRouter(api: Api) {
   const router = express.Router();
 
+  router.get("/", (req, res) => {
+    api.getScheduledDances().then((returnVal) => {
+      res.send(returnVal);
+    });
+  });
+
   router.post("/", (req, res) => {
     const { startsAt, endsAt, danceId, studioId } = req.body;
 

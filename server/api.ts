@@ -20,6 +20,7 @@ import {
 import {
   addScheduledDance,
   deleteScheduledDance,
+  getScheduledDances,
   updateScheduledDance,
 } from "./managers/scheduledDanceManager";
 import {
@@ -241,6 +242,12 @@ class Api {
       danceId,
       dancerIds,
     });
+  }
+
+  async getScheduledDances(): Promise<
+    TReturnDto<ScheduledDanceModelInstance[]>
+  > {
+    return await getScheduledDances(this.scheduledDanceModel);
   }
 
   async addScheduledDance({
