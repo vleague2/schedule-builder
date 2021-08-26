@@ -1,4 +1,4 @@
-import { ModelCtor } from "sequelize/types";
+import { ModelCtor, ValidationError } from "sequelize/types";
 import { ScheduledDanceModelInstance } from "../models/scheduledDanceModel";
 import { TReturnDto } from "../types";
 
@@ -24,15 +24,15 @@ export async function getScheduledDances(
 export async function addScheduledDance(
   scheduledDanceModel: ModelCtor<ScheduledDanceModelInstance>,
   danceData: {
-    startsAt: string;
-    endsAt: string;
+    startAt: string;
+    endAt: string;
     danceId: string;
     studioId: string;
   }
 ): Promise<TReturnDto<ScheduledDanceModelInstance[]>> {
-  const { startsAt, endsAt, danceId, studioId } = danceData;
+  const { startAt, endAt, danceId, studioId } = danceData;
 
-  if (!startsAt || !endsAt || !danceId || !studioId) {
+  if (!startAt || !endAt || !danceId || !studioId) {
     return {
       data: [],
       error: ["You need a start time, end time, dance id, and studio id"],
@@ -58,8 +58,8 @@ export async function addScheduledDance(
 
   try {
     const scheduleRes = await scheduledDanceModel.create({
-      startsAt: new Date(startsAt),
-      endsAt: new Date(endsAt),
+      startAt,
+      endAt,
       StudioId: studioId,
       DanceId: danceId,
     });
@@ -68,7 +68,9 @@ export async function addScheduledDance(
       res.data.push(scheduleRes);
     }
   } catch (error) {
-    res.error.push(error);
+    const errorMessage = (error as ValidationError).errors[0].message;
+    const errorValue = (error as ValidationError).errors[0].value;
+    res.error.push(`${errorMessage}: ${errorValue}`);
   }
 
   return res;
@@ -110,8 +112,8 @@ export async function updateScheduledDance(
   scheduledDanceModel: ModelCtor<ScheduledDanceModelInstance>,
   scheduledDanceId: string,
   options: {
-    startsAt?: string;
-    endsAt?: string;
+    startAt?: string;
+    endAt?: string;
     studioId?: string;
   }
 ): Promise<TReturnDto<number>> {
@@ -125,7 +127,7 @@ export async function updateScheduledDance(
     return { data: 0, error: ["ID must be a number"] };
   }
 
-  const { startsAt, endsAt, studioId } = options;
+  const { startAt, endAt, studioId } = options;
 
   const res: TReturnDto<number> = {
     data: 0,
@@ -134,12 +136,12 @@ export async function updateScheduledDance(
 
   const values: { [key: string]: any } = {};
 
-  if (startsAt) {
-    values.startsAt = new Date(startsAt);
+  if (startAt) {
+    values.startAt = new Date(startAt);
   }
 
-  if (endsAt) {
-    values.endsAt = new Date(endsAt);
+  if (endAt) {
+    values.endAt = new Date(endAt);
   }
 
   if (studioId) {

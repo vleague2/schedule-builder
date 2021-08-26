@@ -1,5 +1,6 @@
 import { TDance } from "../models/TDance";
 import { TDancer } from "../models/TDancer";
+import { TStudio } from "../models/TStudio";
 import { TTeacher } from "../models/TTeacher";
 import { UnscheduledDanceCard } from "./UnscheduledDanceCard";
 
@@ -7,12 +8,14 @@ type TUnscheduledDanceColumnProps = {
   unscheduledDances: TDance[];
   teachers: TTeacher[];
   dancers: TDancer[];
+  studios: TStudio[];
+  refetch: () => void;
 };
 
 export function UnscheduledDanceColumn(
   props: TUnscheduledDanceColumnProps
 ): JSX.Element {
-  const { unscheduledDances, teachers, dancers } = props;
+  const { unscheduledDances, teachers, refetch, studios } = props;
 
   return (
     <div style={{ width: "100%" }}>
@@ -23,6 +26,8 @@ export function UnscheduledDanceColumn(
             teacher={teachers.find(
               (teacher) => teacher.id === unscheduledDance.TeacherId
             )}
+            refetch={refetch}
+            studios={studios}
           />
         </div>
       ))}

@@ -1,6 +1,8 @@
-import { Card, Container, CssBaseline, Grid } from "@material-ui/core";
-import { useEffect } from "react";
-import { useState } from "react";
+import { Container, CssBaseline, Grid } from "@material-ui/core";
+import { useState, useEffect } from "react";
+import { MuiPickersUtilsProvider } from "@material-ui/pickers";
+import DayJsUtils from "@date-io/dayjs";
+
 import { AppMenu } from "./components/AppMenu";
 import { UnscheduledDanceColumn } from "./components/UnscheduledDanceColumn";
 import { TDance } from "./models/TDance";
@@ -77,64 +79,68 @@ function App(): JSX.Element {
 
   return (
     <div>
-      <CssBaseline />
-      <AppMenu
-        state={{
-          teachers,
-          dancers,
-          dances,
-          studios,
-        }}
-        refetch={{
-          teachers: fetchTeachers,
-          studios: fetchStudios,
-          dancers: fetchDancers,
-          dances: fetchDances,
-        }}
-      />
-      <Container maxWidth="lg" style={{ marginTop: 30 }}>
-        {/* <table style={{ width: "100%" }}>
-          <tr>
-            <td>Time</td>
-            <td>Studio 1</td>
-            <td>Studio 2</td>
-            <td>Studio 3</td>
-            <td>Studio 4</td>
-            <td>Studio 5</td>
-          </tr>
-        </table> */}
-        <Grid container justifyContent="center">
-          <Grid container item xs={9}>
-            <Grid item xs={2}>
-              Time
+      <MuiPickersUtilsProvider utils={DayJsUtils}>
+        <CssBaseline />
+        <AppMenu
+          state={{
+            teachers,
+            dancers,
+            dances,
+            studios,
+          }}
+          refetch={{
+            teachers: fetchTeachers,
+            studios: fetchStudios,
+            dancers: fetchDancers,
+            dances: fetchDances,
+          }}
+        />
+        <Container maxWidth="lg" style={{ marginTop: 30 }}>
+          {/* <table style={{ width: "100%" }}>
+            <tr>
+              <td>Time</td>
+              <td>Studio 1</td>
+              <td>Studio 2</td>
+              <td>Studio 3</td>
+              <td>Studio 4</td>
+              <td>Studio 5</td>
+            </tr>
+          </table> */}
+          <Grid container justifyContent="center">
+            <Grid container item xs={9}>
+              <Grid item xs={2}>
+                Time
+              </Grid>
+              <Grid item xs={2}>
+                studio 1
+              </Grid>
+              <Grid item xs={2}>
+                studio 2
+              </Grid>
+              <Grid item xs={2}>
+                studio 3
+              </Grid>
+              <Grid item xs={2}>
+                studio 4
+              </Grid>
+              <Grid item xs={2}>
+                studio 5
+              </Grid>
             </Grid>
-            <Grid item xs={2}>
-              studio 1
-            </Grid>
-            <Grid item xs={2}>
-              studio 2
-            </Grid>
-            <Grid item xs={2}>
-              studio 3
-            </Grid>
-            <Grid item xs={2}>
-              studio 4
-            </Grid>
-            <Grid item xs={2}>
-              studio 5
+            <Grid container item xs={3}>
+              {unscheduledDances && teachers && dancers && studios && (
+                <UnscheduledDanceColumn
+                  unscheduledDances={unscheduledDances}
+                  teachers={teachers}
+                  dancers={dancers}
+                  refetch={fetchScheduledDances}
+                  studios={studios}
+                />
+              )}
             </Grid>
           </Grid>
-          <Grid container item xs={3}>
-            {unscheduledDances && teachers && dancers && (
-              <UnscheduledDanceColumn
-                unscheduledDances={unscheduledDances}
-                teachers={teachers}
-                dancers={dancers}
-              />
-            )}
-          </Grid>
-        </Grid>
-      </Container>
+        </Container>
+      </MuiPickersUtilsProvider>
     </div>
   );
 }

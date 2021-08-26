@@ -9,7 +9,7 @@ type TAdminDrawerProps = {
   openDancerInDanceDialog: (action: "add" | "delete") => void;
 };
 
-export function AdminDrawer(props: TAdminDrawerProps) {
+export function AdminDrawer(props: TAdminDrawerProps): JSX.Element {
   const { open, onClose, openDialog, openDancerInDanceDialog } = props;
 
   return (

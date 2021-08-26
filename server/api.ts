@@ -251,19 +251,19 @@ class Api {
   }
 
   async addScheduledDance({
-    startsAt,
-    endsAt,
+    startAt,
+    endAt,
     danceId,
     studioId,
   }: {
-    startsAt: string;
-    endsAt: string;
+    startAt: string;
+    endAt: string;
     danceId: string;
     studioId: string;
   }): Promise<TReturnDto<ScheduledDanceModelInstance[]>> {
     return await addScheduledDance(this.scheduledDanceModel, {
-      startsAt,
-      endsAt,
+      startAt,
+      endAt,
       danceId,
       studioId,
     });
@@ -278,8 +278,8 @@ class Api {
   async updateScheduledDance(
     scheduledDanceId: string,
     options: {
-      startsAt?: string;
-      endsAt?: string;
+      startAt?: string;
+      endAt?: string;
       studioId?: string;
     }
   ): Promise<TReturnDto<number>> {

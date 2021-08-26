@@ -1,6 +1,6 @@
 export type TAddScheduledDanceDto = {
-  startsAt: Date;
-  endsAt: Date;
+  startAt: Date;
+  endAt: Date;
   danceId: number;
   studioId: number;
 };

@@ -5,6 +5,7 @@ import { MouseEventHandler, SyntheticEvent } from "react";
 type TSnackbarProps = {
   open: boolean;
   onClose: (
+    // eslint-disable-next-line
     event: SyntheticEvent<any, Event> | MouseEventHandler<HTMLButtonElement>,
     reason?: string
   ) => void;

@@ -11,10 +11,10 @@ export function scheduledDanceRouter(api: Api) {
   });
 
   router.post("/", (req, res) => {
-    const { startsAt, endsAt, danceId, studioId } = req.body;
+    const { startAt, endAt, danceId, studioId } = req.body;
 
     api
-      .addScheduledDance({ startsAt, endsAt, danceId, studioId })
+      .addScheduledDance({ startAt, endAt, danceId, studioId })
       .then((returnVal) => {
         res.send(returnVal);
       });
@@ -23,12 +23,12 @@ export function scheduledDanceRouter(api: Api) {
   router.patch("/:scheduledDanceId", (req, res) => {
     const { scheduledDanceId } = req.params;
     const {
-      options: { startsAt, endsAt, studioId },
-    }: { options: { startsAt?: string; endsAt?: string; studioId?: string } } =
+      options: { startAt, endAt, studioId },
+    }: { options: { startAt?: string; endAt?: string; studioId?: string } } =
       req.body;
 
     api
-      .updateScheduledDance(scheduledDanceId, { startsAt, endsAt, studioId })
+      .updateScheduledDance(scheduledDanceId, { startAt, endAt, studioId })
       .then((returnVal) => {
         res.send(returnVal);
       });

@@ -1,6 +1,6 @@
 import { Button, ButtonGroup, DialogTitle, TextField } from "@material-ui/core";
 import { Dialog } from "@material-ui/core";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { TDance } from "../models/TDance";
 import { TDancer } from "../models/TDancer";

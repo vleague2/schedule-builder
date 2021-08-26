@@ -12,18 +12,11 @@ import { useEffect, useState } from "react";
 
 import { TDance } from "../models/TDance";
 import { TDancer } from "../models/TDancer";
-import { TStudio } from "../models/TStudio";
-import { TTeacher } from "../models/TTeacher";
-import { deleteTeacher } from "../services/teachersService";
-import { deleteStudio } from "../services/studiosService";
-import { deleteDancer } from "../services/dancersService";
 import {
   addDancersToDance,
-  deleteDance,
   getDancersInDance,
   removeDancersFromDance,
 } from "../services/dancesService";
-import { TAdminDialogType } from "../models/TAdminDialogType";
 import { useErrorHandling } from "../hooks/useErrorHandling";
 import { DialogErrorMessage } from "./DialogErrorMessage";
 import { TAdminDialogAction } from "../models/TAdminDialogAction";

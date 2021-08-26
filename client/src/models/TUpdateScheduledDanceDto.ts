@@ -1,7 +1,7 @@
 export type TUpdateScheduledDanceDto = {
   options: {
-    startsAt: Date;
-    endsAt: Date;
+    startAt: Date;
+    endAt: Date;
     studioId: number;
   };
 };

@@ -48,6 +48,7 @@ export function AppMenu(props: TAppMenuProps): JSX.Element {
   >(undefined);
 
   function handleSnackbarClose(
+    // eslint-disable-next-line
     event: SyntheticEvent<any, Event> | MouseEventHandler<HTMLButtonElement>,
     reason?: string
   ) {
