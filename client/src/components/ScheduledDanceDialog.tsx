@@ -13,26 +13,35 @@ import { useErrorHandling } from "../hooks/useErrorHandling";
 import { TDance } from "../models/TDance";
 import { TStudio } from "../models/TStudio";
 import { DialogErrorMessage } from "./DialogErrorMessage";
-import { addScheduledDance } from "../services/scheduledDancesService";
+import {
+  addScheduledDance,
+  editScheduledDance,
+} from "../services/scheduledDancesService";
+import { TScheduledDance } from "../models/TScheduledDance";
 
-type TAddScheduledDanceDialogProps = {
+type TScheduledDanceDialogProps = {
   dance: TDance;
   open: boolean;
   onClose: () => void;
   studios: TStudio[];
+  modalType: "add" | "edit";
+  // required if type is "edit"
+  scheduledDance?: TScheduledDance;
 };
 
-export function AddScheduledDanceDialog(
-  props: TAddScheduledDanceDialogProps
+const defaultDate = DateTime.fromObject({ hour: 8 }).toJSDate();
+
+export function ScheduledDanceDialog(
+  props: TScheduledDanceDialogProps
 ): JSX.Element {
-  const { dance, open, onClose, studios } = props;
+  const { dance, open, onClose, studios, modalType, scheduledDance } = props;
   const [startAt, setStartAt] = useState<Date | undefined>(
-    DateTime.fromObject({ hour: 8 }).toJSDate()
+    scheduledDance?.startAt ?? defaultDate
   );
   const [endAt, setEndAt] = useState<Date | undefined>(
-    DateTime.fromObject({ hour: 8 }).toJSDate()
+    scheduledDance?.endAt ?? defaultDate
   );
-  const [studio, setStudio] = useState<number>(0);
+  const [studio, setStudio] = useState<number>(scheduledDance?.StudioId ?? 0);
 
   const { apiResponseState, resetApiResponseState, makeApiCall } =
     useErrorHandling();
@@ -55,11 +64,20 @@ export function AddScheduledDanceDialog(
       return;
     }
 
+    if (modalType === "edit" && scheduledDance === undefined) {
+      return;
+    }
+
     resetApiResponseState();
 
-    const apiCall = () => addScheduledDance(startAt, endAt, dance.id, studio);
+    const getApiCall =
+      modalType === "add"
+        ? () => addScheduledDance(startAt, endAt, dance.id, studio)
+        : // eslint-disable-next-line
+          // @ts-ignore typescript is stupid sometimes
+          () => editScheduledDance(scheduledDance.id, startAt, endAt, studio);
 
-    await makeApiCall(apiCall, () => {
+    await makeApiCall(getApiCall, () => {
       onCloseHandler();
     });
   }
@@ -68,7 +86,10 @@ export function AddScheduledDanceDialog(
     <Dialog open={open} onClose={onClose}>
       <div style={{ padding: 40, width: 600 }}>
         <DialogTitle style={{ marginBottom: 15 }}>
-          Add {dance.name} to the schedule
+          {modalType === "add"
+            ? `Add ${dance.name} to`
+            : `Edit ${dance.name} on`}{" "}
+          the schedule
         </DialogTitle>
         <DialogErrorMessage
           dialogType="dance"

@@ -1,7 +1,9 @@
+import { Typography } from "@material-ui/core";
 import { DateTime } from "luxon";
 import { TDance } from "../models/TDance";
 import { TScheduledDance } from "../models/TScheduledDance";
 import { TStudio } from "../models/TStudio";
+import { TTeacher } from "../models/TTeacher";
 import { TOccupiedTimeSlots } from "../services/scheduleTimeService";
 import { ScheduledDanceCell } from "./ScheduledDanceCell";
 
@@ -10,7 +12,12 @@ type TTimeSlotRowProps = {
   studios: TStudio[];
   scheduledDances: TScheduledDance[] | undefined;
   dances: TDance[];
+  teachers: TTeacher[] | undefined;
   occupiedTimeSlotsPerStudio: TOccupiedTimeSlots;
+  editScheduledDance: (
+    dance: TScheduledDance,
+    modalType: "edit" | "delete"
+  ) => void;
 };
 
 export function TimeSlotRow(props: TTimeSlotRowProps): JSX.Element {
@@ -20,11 +27,15 @@ export function TimeSlotRow(props: TTimeSlotRowProps): JSX.Element {
     scheduledDances,
     dances,
     occupiedTimeSlotsPerStudio,
+    teachers,
+    editScheduledDance,
   } = props;
 
   return (
     <tr>
-      <td>{timeSlot.toFormat("h:mm a")}</td>
+      <td>
+        <Typography variant="body2">{timeSlot.toFormat("h:mm a")}</Typography>
+      </td>
       {studios.map((studio) => {
         if (
           !occupiedTimeSlotsPerStudio[studio.id].slots.includes(
@@ -37,7 +48,9 @@ export function TimeSlotRow(props: TTimeSlotRowProps): JSX.Element {
               scheduledDances={scheduledDances}
               dances={dances}
               timeSlot={timeSlot}
+              teachers={teachers}
               key={studio.id}
+              editScheduledDance={editScheduledDance}
             />
           );
         }

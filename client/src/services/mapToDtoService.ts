@@ -5,6 +5,7 @@ import { TAddStudiosDto } from "../models/TAddStudiosDto";
 import { TAddTeachersDto } from "../models/TAddTeachersDto";
 import { TUpdateDanceDto } from "../models/TUpdateDanceDto";
 import { TUpdateDancerDto } from "../models/TUpdateDancerDto";
+import { TUpdateScheduledDanceDto } from "../models/TUpdateScheduledDanceDto";
 import { TUpdateStudioDto } from "../models/TUpdateStudioDto";
 import { TUpdateTeacherDto } from "../models/TUpdateTeacherDto";
 
@@ -89,5 +90,19 @@ export function mapToAddScheduledDanceDto(
     endAt,
     danceId,
     studioId,
+  };
+}
+
+export function mapToUpdateScheduledDanceDto(
+  startAt: Date,
+  endAt: Date,
+  studioId: number
+): TUpdateScheduledDanceDto {
+  return {
+    options: {
+      startAt,
+      endAt,
+      studioId,
+    },
   };
 }

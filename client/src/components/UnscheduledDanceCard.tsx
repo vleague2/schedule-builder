@@ -8,7 +8,7 @@ import { TDance } from "../models/TDance";
 import { TDancer } from "../models/TDancer";
 import { TTeacher } from "../models/TTeacher";
 import { getDancersInDance } from "../services/dancesService";
-import { AddScheduledDanceDialog } from "./AddScheduledDanceDialog";
+import { ScheduledDanceDialog } from "./ScheduledDanceDialog";
 import { TStudio } from "../models/TStudio";
 
 type TUnscheduledDanceCardProps = {
@@ -68,7 +68,7 @@ export function UnscheduledDanceCard(
           })}
         </Collapse>
       </Card>
-      <AddScheduledDanceDialog
+      <ScheduledDanceDialog
         open={modalOpen}
         onClose={() => {
           setModalOpen(false);
@@ -76,6 +76,7 @@ export function UnscheduledDanceCard(
         }}
         dance={unscheduledDance}
         studios={studios}
+        modalType="add"
       />
     </>
   );

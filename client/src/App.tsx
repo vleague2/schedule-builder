@@ -1,4 +1,4 @@
-import { Container, CssBaseline, Grid } from "@material-ui/core";
+import { Container, CssBaseline, Grid, Typography } from "@material-ui/core";
 import { useState, useEffect } from "react";
 import { MuiPickersUtilsProvider } from "@material-ui/pickers";
 import LuxonUtils from "@date-io/luxon";
@@ -21,6 +21,7 @@ import {
   getAllTimeslots,
 } from "./services/scheduleTimeService";
 import { TimeSlotRow } from "./components/TimeSlotRow";
+import { ScheduleTable } from "./components/ScheduleTable";
 
 function App(): JSX.Element {
   const [teachers, setTeachers] = useState<TTeacher[] | undefined>(undefined);
@@ -84,13 +85,6 @@ function App(): JSX.Element {
     fetchScheduledDances();
   }, []);
 
-  const timeSlots = getAllTimeslots();
-
-  const occupiedTimeSlotsPerStudio = calculateOccupiedTimeslots(
-    studios,
-    scheduledDances
-  );
-
   return (
     <div>
       <MuiPickersUtilsProvider utils={LuxonUtils}>
@@ -112,44 +106,17 @@ function App(): JSX.Element {
         <Container maxWidth="lg" style={{ marginTop: 30 }}>
           <Grid container justifyContent="center">
             <Grid container item xs={8}>
-              <div style={{ width: "100%" }}>
-                <table
-                  style={{
-                    width: "100%",
-                    textAlign: "center",
-                    borderSpacing: "1px",
-                  }}
-                >
-                  <thead>
-                    <tr>
-                      <th>Time</th>
-                      {studios?.map((studio) => (
-                        <td key={studio.id}>{studio.name}</td>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {!studios || !dances ? (
-                      <tr>
-                        <td>Add some studios and dances</td>
-                      </tr>
-                    ) : (
-                      timeSlots.map((timeSlot) => (
-                        <TimeSlotRow
-                          timeSlot={timeSlot}
-                          dances={dances}
-                          scheduledDances={scheduledDances}
-                          studios={studios}
-                          occupiedTimeSlotsPerStudio={
-                            occupiedTimeSlotsPerStudio
-                          }
-                          key={timeSlot.toString()}
-                        />
-                      ))
-                    )}
-                  </tbody>
-                </table>
-              </div>
+              {!studios || !dances ? (
+                <p>Add some studios and dances first!</p>
+              ) : (
+                <ScheduleTable
+                  studios={studios}
+                  teachers={teachers}
+                  dances={dances}
+                  scheduledDances={scheduledDances}
+                  refetch={fetchScheduledDances}
+                />
+              )}
             </Grid>
             <Grid item xs={1} />
             <Grid container item xs={3}>
