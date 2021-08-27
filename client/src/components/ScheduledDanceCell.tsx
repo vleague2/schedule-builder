@@ -1,11 +1,16 @@
-import { IconButton, Typography } from "@material-ui/core";
+import { IconButton, Popover, Typography } from "@material-ui/core";
 import { DateTime } from "luxon";
 import EditIcon from "@material-ui/icons/Edit";
 import CancelIcon from "@material-ui/icons/Cancel";
+import InfoIcon from "@material-ui/icons/Info";
+import { MouseEvent, useEffect, useState } from "react";
 
 import { TDance } from "../models/TDance";
 import { TScheduledDance } from "../models/TScheduledDance";
 import { TTeacher } from "../models/TTeacher";
+import { TDancer } from "../models/TDancer";
+import { getDancersInDance } from "../resources/dancesResource";
+import { CastPopover } from "./CastPopover";
 
 type TScheduledDanceCell = {
   scheduledDances: TScheduledDance[] | undefined;
@@ -28,6 +33,19 @@ export function ScheduledDanceCell(props: TScheduledDanceCell): JSX.Element {
     teachers,
     editScheduledDance,
   } = props;
+
+  const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
+
+  // eslint-disable-next-line
+  function handleClick(event: any) {
+    setAnchorEl(event.currentTarget);
+  }
+
+  function handleClose() {
+    setAnchorEl(null);
+  }
+
+  const open = Boolean(anchorEl);
 
   const formattedTimeSlot = timeSlot.toFormat("h:mm a");
 
@@ -86,6 +104,9 @@ export function ScheduledDanceCell(props: TScheduledDanceCell): JSX.Element {
           {startAtDate.toFormat("h:mm a")} - {endAtDate.toFormat("h:mm a")}
         </Typography>
         <br />
+        <IconButton size="small" onClick={handleClick} component="button">
+          <InfoIcon style={{ fontSize: 16 }} />
+        </IconButton>
         <IconButton
           size="small"
           onClick={() => editScheduledDance(scheduledDance, "edit")}
@@ -98,6 +119,14 @@ export function ScheduledDanceCell(props: TScheduledDanceCell): JSX.Element {
         >
           <CancelIcon style={{ fontSize: 16 }} />
         </IconButton>
+        {anchorEl && scheduledDance && (
+          <CastPopover
+            open={open}
+            handleClose={handleClose}
+            anchorEl={anchorEl}
+            danceId={scheduledDance.DanceId}
+          />
+        )}
       </td>
     </>
   );

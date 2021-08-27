@@ -1,3 +1,4 @@
+import { Typography } from "@material-ui/core";
 import { TDance } from "../models/TDance";
 import { TDancer } from "../models/TDancer";
 import { TStudio } from "../models/TStudio";
@@ -19,6 +20,8 @@ export function UnscheduledDanceColumn(
 
   return (
     <div style={{ width: "100%" }}>
+      <Typography align="center">Dances To Be Scheduled</Typography>
+      <br />
       {unscheduledDances.map((unscheduledDance) => (
         <div key={unscheduledDance.name} style={{ marginBottom: 20 }}>
           <UnscheduledDanceCard

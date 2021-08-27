@@ -1,6 +1,7 @@
 import { Typography } from "@material-ui/core";
 import { DateTime } from "luxon";
 import { TDance } from "../models/TDance";
+import { TDancer } from "../models/TDancer";
 import { TScheduledDance } from "../models/TScheduledDance";
 import { TStudio } from "../models/TStudio";
 import { TTeacher } from "../models/TTeacher";
