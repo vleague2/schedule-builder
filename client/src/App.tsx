@@ -1,7 +1,8 @@
 import { Container, CssBaseline, Grid } from "@material-ui/core";
 import { useState, useEffect } from "react";
 import { MuiPickersUtilsProvider } from "@material-ui/pickers";
-import DayJsUtils from "@date-io/dayjs";
+import LuxonUtils from "@date-io/luxon";
+import "./index.css";
 
 import { AppMenu } from "./components/AppMenu";
 import { UnscheduledDanceColumn } from "./components/UnscheduledDanceColumn";
@@ -15,6 +16,11 @@ import { getAllDances } from "./services/dancesService";
 import { getAllScheduledDances } from "./services/scheduledDancesService";
 import { getAllStudios } from "./services/studiosService";
 import { getAllTeachers } from "./services/teachersService";
+import {
+  calculateOccupiedTimeslots,
+  getAllTimeslots,
+} from "./services/scheduleTimeService";
+import { TimeSlotRow } from "./components/TimeSlotRow";
 
 function App(): JSX.Element {
   const [teachers, setTeachers] = useState<TTeacher[] | undefined>(undefined);
@@ -25,11 +31,12 @@ function App(): JSX.Element {
     TScheduledDance[] | undefined
   >(undefined);
 
-  const unscheduledDances = dances?.filter((dance) => {
-    return !scheduledDances?.find(
-      (scheduledDance) => scheduledDance.danceId === dance.id
-    );
-  });
+  const unscheduledDances =
+    dances?.filter((dance) => {
+      return !scheduledDances?.find(
+        (scheduledDance) => scheduledDance.DanceId === dance.id
+      );
+    }) || [];
 
   function fetchTeachers() {
     getAllTeachers().then((teachersResponse) => {
@@ -77,9 +84,16 @@ function App(): JSX.Element {
     fetchScheduledDances();
   }, []);
 
+  const timeSlots = getAllTimeslots();
+
+  const occupiedTimeSlotsPerStudio = calculateOccupiedTimeslots(
+    studios,
+    scheduledDances
+  );
+
   return (
     <div>
-      <MuiPickersUtilsProvider utils={DayJsUtils}>
+      <MuiPickersUtilsProvider utils={LuxonUtils}>
         <CssBaseline />
         <AppMenu
           state={{
@@ -96,37 +110,48 @@ function App(): JSX.Element {
           }}
         />
         <Container maxWidth="lg" style={{ marginTop: 30 }}>
-          {/* <table style={{ width: "100%" }}>
-            <tr>
-              <td>Time</td>
-              <td>Studio 1</td>
-              <td>Studio 2</td>
-              <td>Studio 3</td>
-              <td>Studio 4</td>
-              <td>Studio 5</td>
-            </tr>
-          </table> */}
           <Grid container justifyContent="center">
-            <Grid container item xs={9}>
-              <Grid item xs={2}>
-                Time
-              </Grid>
-              <Grid item xs={2}>
-                studio 1
-              </Grid>
-              <Grid item xs={2}>
-                studio 2
-              </Grid>
-              <Grid item xs={2}>
-                studio 3
-              </Grid>
-              <Grid item xs={2}>
-                studio 4
-              </Grid>
-              <Grid item xs={2}>
-                studio 5
-              </Grid>
+            <Grid container item xs={8}>
+              <div style={{ width: "100%" }}>
+                <table
+                  style={{
+                    width: "100%",
+                    textAlign: "center",
+                    borderSpacing: "1px",
+                  }}
+                >
+                  <thead>
+                    <tr>
+                      <th>Time</th>
+                      {studios?.map((studio) => (
+                        <td key={studio.id}>{studio.name}</td>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {!studios || !dances ? (
+                      <tr>
+                        <td>Add some studios and dances</td>
+                      </tr>
+                    ) : (
+                      timeSlots.map((timeSlot) => (
+                        <TimeSlotRow
+                          timeSlot={timeSlot}
+                          dances={dances}
+                          scheduledDances={scheduledDances}
+                          studios={studios}
+                          occupiedTimeSlotsPerStudio={
+                            occupiedTimeSlotsPerStudio
+                          }
+                          key={timeSlot.toString()}
+                        />
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </Grid>
+            <Grid item xs={1} />
             <Grid container item xs={3}>
               {unscheduledDances && teachers && dancers && studios && (
                 <UnscheduledDanceColumn

@@ -52,8 +52,6 @@ export function useErrorHandling(): TReturnValue {
 
     const result = await apiCall();
 
-    console.log(result);
-
     if (result === undefined) {
       setApiResponseState({ errors: ["Something went wrong"], successes: 0 });
       return;

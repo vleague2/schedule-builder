@@ -7,6 +7,7 @@ import {
 } from "@material-ui/core";
 import { useState } from "react";
 import { TimePicker } from "@material-ui/pickers";
+import { DateTime } from "luxon";
 
 import { useErrorHandling } from "../hooks/useErrorHandling";
 import { TDance } from "../models/TDance";
@@ -25,8 +26,12 @@ export function AddScheduledDanceDialog(
   props: TAddScheduledDanceDialogProps
 ): JSX.Element {
   const { dance, open, onClose, studios } = props;
-  const [startAt, setStartAt] = useState<Date | undefined>(new Date());
-  const [endAt, setEndAt] = useState<Date | undefined>(new Date());
+  const [startAt, setStartAt] = useState<Date | undefined>(
+    DateTime.fromObject({ hour: 8 }).toJSDate()
+  );
+  const [endAt, setEndAt] = useState<Date | undefined>(
+    DateTime.fromObject({ hour: 8 }).toJSDate()
+  );
   const [studio, setStudio] = useState<number>(0);
 
   const { apiResponseState, resetApiResponseState, makeApiCall } =
@@ -37,17 +42,24 @@ export function AddScheduledDanceDialog(
   }
 
   function buttonIsDisabled() {
-    return studio === 0 || endAt === undefined || startAt === undefined;
+    return (
+      studio === 0 ||
+      endAt === undefined ||
+      startAt === undefined ||
+      endAt <= startAt
+    );
   }
 
   async function saveData() {
-    if (!startAt || !endAt || studio === 0) {
+    if (!startAt || !endAt || studio === 0 || endAt <= startAt) {
       return;
     }
 
+    resetApiResponseState();
+
     const apiCall = () => addScheduledDance(startAt, endAt, dance.id, studio);
 
-    await makeApiCall(apiCall, (count: number) => {
+    await makeApiCall(apiCall, () => {
       onCloseHandler();
     });
   }
@@ -86,15 +98,15 @@ export function AddScheduledDanceDialog(
         <TimePicker
           label="Choose a start time"
           value={startAt}
-          minutesStep={5}
-          onChange={(date) => setStartAt(date?.toDate())}
+          minutesStep={15}
+          onChange={(date) => setStartAt(date?.toJSDate())}
           style={{ marginRight: 30 }}
         />
         <TimePicker
           label="Choose an end time"
           value={endAt}
-          minutesStep={5}
-          onChange={(date) => setEndAt(date?.toDate())}
+          minutesStep={15}
+          onChange={(date) => setEndAt(date?.toJSDate())}
         />
         <br />
         <ButtonGroup style={{ marginTop: 30 }}>

@@ -1,6 +1,7 @@
 export type TScheduledDance = {
-  danceId: number;
-  studioId: number;
-  startsAt: Date;
-  endsAt: Date;
+  DanceId: number;
+  StudioId: number;
+  startAt: Date;
+  endAt: Date;
+  id: number;
 };
