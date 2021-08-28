@@ -25,7 +25,9 @@ const app = express();
 const port = process.env.PORT || 3001;
 
 async function start() {
-  const sequelize = new Sequelize(process.env.DATABASE_URL as string);
+  const sequelize = new Sequelize(
+    `${process.env.DATABASE_URL}&ssl=true` as string
+  );
 
   try {
     await sequelize.authenticate();
