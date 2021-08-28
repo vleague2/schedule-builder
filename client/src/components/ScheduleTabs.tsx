@@ -118,7 +118,7 @@ export function ScheduleTabs(props: TScheduleTabsProps): JSX.Element {
           <TabPanel value={selectedTab} index={index}>
             <Container maxWidth="lg" style={{ marginTop: 30 }}>
               <Grid container justifyContent="center">
-                <Grid container item xs={8}>
+                <Grid container item md={8} xs={12}>
                   {studios.length === 0 || dances.length === 0 ? (
                     <p>Add some studios and dances first!</p>
                   ) : (
@@ -132,8 +132,8 @@ export function ScheduleTabs(props: TScheduleTabsProps): JSX.Element {
                     />
                   )}
                 </Grid>
-                <Grid item xs={1} />
-                <Grid container item xs={3}>
+                <Grid item xs={12} md={1} />
+                <Grid container item md={3} xs={12}>
                   <UnscheduledDanceColumn
                     scheduledDances={dancesInThisSchedule}
                     unscheduledDances={unscheduledDances}
