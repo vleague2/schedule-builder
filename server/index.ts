@@ -26,7 +26,10 @@ const port = process.env.PORT || 3001;
 
 async function start() {
   const sequelize = new Sequelize(process.env.DATABASE_URL as string, {
-    ssl: true,
+    dialect: "postgres",
+    dialectOptions: {
+      ssl: true,
+    },
   });
 
   try {
