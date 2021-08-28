@@ -18,6 +18,7 @@
     "typescript": "^4.3.5"
   },
   "scripts": {
-    "start": "nodemon --config nodemon.json index.ts"
+    "start": "nodemon --config nodemon.json index.ts",
+    "start:prod": "tsc index.ts && node index.js"
   }
 }
