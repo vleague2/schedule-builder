@@ -1,0 +1,8 @@
+{
+  "name": "Schedule Builder",
+  "buildpacks": [
+    {
+      "url": "https://github.com/heroku/heroku-buildpack-nodejs"
+    }
+  ]
+}
