@@ -18,6 +18,7 @@ import {
   editScheduledDance,
 } from "../services/scheduledDancesService";
 import { TScheduledDance } from "../models/TScheduledDance";
+import { valiateScheduledDance } from "../services/scheduleService";
 
 type TScheduledDanceDialogProps = {
   dance: TDance;
@@ -25,6 +26,7 @@ type TScheduledDanceDialogProps = {
   onClose: () => void;
   studios: TStudio[];
   modalType: "add" | "edit";
+  scheduledDances: TScheduledDance[];
   // required if type is "edit"
   scheduledDance?: TScheduledDance;
 };
@@ -34,7 +36,15 @@ const defaultDate = DateTime.fromObject({ hour: 8 }).toJSDate();
 export function ScheduledDanceDialog(
   props: TScheduledDanceDialogProps
 ): JSX.Element {
-  const { dance, open, onClose, studios, modalType, scheduledDance } = props;
+  const {
+    dance,
+    open,
+    onClose,
+    studios,
+    modalType,
+    scheduledDance,
+    scheduledDances,
+  } = props;
   const [startAt, setStartAt] = useState<Date | undefined>(
     scheduledDance?.startAt ?? defaultDate
   );
@@ -45,8 +55,11 @@ export function ScheduledDanceDialog(
 
   const { apiResponseState, resetApiResponseState, makeApiCall } =
     useErrorHandling();
+  const [validationErrors, setValidationErrors] = useState<string[]>([]);
 
   function onCloseHandler() {
+    resetApiResponseState();
+    setValidationErrors([]);
     onClose();
   }
 
@@ -69,6 +82,22 @@ export function ScheduledDanceDialog(
     }
 
     resetApiResponseState();
+    setValidationErrors([]);
+
+    const errors = await valiateScheduledDance(
+      scheduledDance || {
+        startAt,
+        endAt,
+        StudioId: studio,
+        DanceId: dance.id,
+      },
+      scheduledDances
+    );
+
+    if (errors.length > 0) {
+      setValidationErrors(errors);
+      return;
+    }
 
     const getApiCall =
       modalType === "add"
@@ -93,7 +122,7 @@ export function ScheduledDanceDialog(
         </DialogTitle>
         <DialogErrorMessage
           dialogType="dance"
-          errors={apiResponseState.errors}
+          errors={[...apiResponseState.errors, ...validationErrors]}
           successCount={apiResponseState.successes}
         />
         <TextField

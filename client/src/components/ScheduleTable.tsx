@@ -2,14 +2,13 @@ import { Typography } from "@material-ui/core";
 import { useState } from "react";
 
 import { TDance } from "../models/TDance";
-import { TDancer } from "../models/TDancer";
 import { TScheduledDance } from "../models/TScheduledDance";
 import { TStudio } from "../models/TStudio";
 import { TTeacher } from "../models/TTeacher";
 import {
   calculateOccupiedTimeslots,
   getAllTimeslots,
-} from "../services/scheduleTimeService";
+} from "../services/scheduleService";
 import { DeleteScheduledDanceDialog } from "./DeleteScheduledDanceDialog";
 import { ScheduledDanceDialog } from "./ScheduledDanceDialog";
 import { TimeSlotRow } from "./TimeSlotRow";
@@ -17,8 +16,8 @@ import { TimeSlotRow } from "./TimeSlotRow";
 type TScheduleTableProps = {
   studios: TStudio[];
   dances: TDance[];
-  scheduledDances: TScheduledDance[] | undefined;
-  teachers: TTeacher[] | undefined;
+  scheduledDances: TScheduledDance[];
+  teachers: TTeacher[];
   refetch: () => void;
 };
 
@@ -56,7 +55,7 @@ export function ScheduleTable(props: TScheduleTableProps): JSX.Element {
           <thead>
             <tr>
               <th>Time</th>
-              {studios?.map((studio) => (
+              {studios.map((studio) => (
                 <td key={studio.id}>
                   <Typography variant="body2">{studio.name}</Typography>
                 </td>
@@ -94,6 +93,7 @@ export function ScheduleTable(props: TScheduleTableProps): JSX.Element {
             refetch();
           }}
           dance={selectedDance}
+          scheduledDances={scheduledDances}
           scheduledDance={selectedScheduledDance}
           studios={studios}
           modalType="edit"

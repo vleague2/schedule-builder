@@ -1,23 +1,22 @@
-import { IconButton, Popover, Typography } from "@material-ui/core";
+import { IconButton, Typography } from "@material-ui/core";
 import { DateTime } from "luxon";
 import EditIcon from "@material-ui/icons/Edit";
 import CancelIcon from "@material-ui/icons/Cancel";
 import InfoIcon from "@material-ui/icons/Info";
-import { MouseEvent, useEffect, useState } from "react";
+import { MouseEvent, useState } from "react";
 
 import { TDance } from "../models/TDance";
 import { TScheduledDance } from "../models/TScheduledDance";
 import { TTeacher } from "../models/TTeacher";
-import { TDancer } from "../models/TDancer";
-import { getDancersInDance } from "../resources/dancesResource";
 import { CastPopover } from "./CastPopover";
+import { getScheduledDanceInfo } from "../services/scheduleService";
 
 type TScheduledDanceCell = {
-  scheduledDances: TScheduledDance[] | undefined;
+  scheduledDances: TScheduledDance[];
   timeSlot: DateTime;
   studioId: number;
   dances: TDance[];
-  teachers: TTeacher[] | undefined;
+  teachers: TTeacher[];
   editScheduledDance: (
     dance: TScheduledDance,
     modalType: "edit" | "delete"
@@ -35,9 +34,9 @@ export function ScheduledDanceCell(props: TScheduledDanceCell): JSX.Element {
   } = props;
 
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
+  const open = Boolean(anchorEl);
 
-  // eslint-disable-next-line
-  function handleClick(event: any) {
+  function handleClick(event: MouseEvent<HTMLButtonElement>) {
     setAnchorEl(event.currentTarget);
   }
 
@@ -45,21 +44,17 @@ export function ScheduledDanceCell(props: TScheduledDanceCell): JSX.Element {
     setAnchorEl(null);
   }
 
-  const open = Boolean(anchorEl);
-
   const formattedTimeSlot = timeSlot.toFormat("h:mm a");
 
-  const scheduledDance = scheduledDances?.find((sDance) => {
-    const formattedStartDate = DateTime.fromJSDate(
-      new Date(sDance.startAt)
-    ).toFormat("h:mm a");
+  const scheduledDanceInfo = getScheduledDanceInfo(
+    scheduledDances,
+    studioId,
+    formattedTimeSlot,
+    dances,
+    teachers
+  );
 
-    return (
-      sDance.StudioId === studioId && formattedStartDate === formattedTimeSlot
-    );
-  });
-
-  if (scheduledDance === undefined) {
+  if (scheduledDanceInfo === undefined) {
     return (
       <td
         key={`${formattedTimeSlot}-${studioId}`}
@@ -68,25 +63,8 @@ export function ScheduledDanceCell(props: TScheduledDanceCell): JSX.Element {
     );
   }
 
-  const dance = dances.find((dance) => dance.id === scheduledDance.DanceId);
-
-  if (!dance) {
-    return (
-      <td
-        key={`${formattedTimeSlot}-${studioId}`}
-        style={{ border: "1px solid lightgray" }}
-      ></td>
-    );
-  }
-  const teacher = teachers?.find((t) => t.id === dance.TeacherId);
-
-  const startAtDate = DateTime.fromJSDate(new Date(scheduledDance.startAt));
-
-  const endAtDate = DateTime.fromJSDate(new Date(scheduledDance.endAt));
-
-  const duration = endAtDate.diff(startAtDate, "minutes");
-
-  const step = duration.minutes / 15;
+  const { scheduledDance, dance, teacher, step, startAtDate, endAtDate } =
+    scheduledDanceInfo;
 
   return (
     <>

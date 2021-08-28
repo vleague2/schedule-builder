@@ -1,19 +1,19 @@
 import { Typography } from "@material-ui/core";
 import { DateTime } from "luxon";
+
 import { TDance } from "../models/TDance";
-import { TDancer } from "../models/TDancer";
 import { TScheduledDance } from "../models/TScheduledDance";
 import { TStudio } from "../models/TStudio";
 import { TTeacher } from "../models/TTeacher";
-import { TOccupiedTimeSlots } from "../services/scheduleTimeService";
+import { TOccupiedTimeSlots } from "../services/scheduleService";
 import { ScheduledDanceCell } from "./ScheduledDanceCell";
 
 type TTimeSlotRowProps = {
   timeSlot: DateTime;
   studios: TStudio[];
-  scheduledDances: TScheduledDance[] | undefined;
+  scheduledDances: TScheduledDance[];
   dances: TDance[];
-  teachers: TTeacher[] | undefined;
+  teachers: TTeacher[];
   occupiedTimeSlotsPerStudio: TOccupiedTimeSlots;
   editScheduledDance: (
     dance: TScheduledDance,

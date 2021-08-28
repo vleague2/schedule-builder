@@ -1,4 +1,4 @@
-import { Container, CssBaseline, Grid, Typography } from "@material-ui/core";
+import { Container, CssBaseline, Grid } from "@material-ui/core";
 import { useState, useEffect } from "react";
 import { MuiPickersUtilsProvider } from "@material-ui/pickers";
 import LuxonUtils from "@date-io/luxon";
@@ -16,11 +16,6 @@ import { getAllDances } from "./services/dancesService";
 import { getAllScheduledDances } from "./services/scheduledDancesService";
 import { getAllStudios } from "./services/studiosService";
 import { getAllTeachers } from "./services/teachersService";
-import {
-  calculateOccupiedTimeslots,
-  getAllTimeslots,
-} from "./services/scheduleTimeService";
-import { TimeSlotRow } from "./components/TimeSlotRow";
 import { ScheduleTable } from "./components/ScheduleTable";
 
 function App(): JSX.Element {
@@ -111,9 +106,9 @@ function App(): JSX.Element {
               ) : (
                 <ScheduleTable
                   studios={studios}
-                  teachers={teachers}
+                  teachers={teachers ?? []}
                   dances={dances}
-                  scheduledDances={scheduledDances}
+                  scheduledDances={scheduledDances ?? []}
                   refetch={fetchScheduledDances}
                 />
               )}
@@ -122,6 +117,7 @@ function App(): JSX.Element {
             <Grid container item xs={3}>
               {unscheduledDances && teachers && dancers && studios && (
                 <UnscheduledDanceColumn
+                  scheduledDances={scheduledDances ?? []}
                   unscheduledDances={unscheduledDances}
                   teachers={teachers}
                   dancers={dancers}

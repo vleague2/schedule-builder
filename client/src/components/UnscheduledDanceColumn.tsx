@@ -1,12 +1,15 @@
 import { Typography } from "@material-ui/core";
+
 import { TDance } from "../models/TDance";
 import { TDancer } from "../models/TDancer";
+import { TScheduledDance } from "../models/TScheduledDance";
 import { TStudio } from "../models/TStudio";
 import { TTeacher } from "../models/TTeacher";
 import { UnscheduledDanceCard } from "./UnscheduledDanceCard";
 
 type TUnscheduledDanceColumnProps = {
   unscheduledDances: TDance[];
+  scheduledDances: TScheduledDance[];
   teachers: TTeacher[];
   dancers: TDancer[];
   studios: TStudio[];
@@ -16,7 +19,8 @@ type TUnscheduledDanceColumnProps = {
 export function UnscheduledDanceColumn(
   props: TUnscheduledDanceColumnProps
 ): JSX.Element {
-  const { unscheduledDances, teachers, refetch, studios } = props;
+  const { unscheduledDances, teachers, refetch, studios, scheduledDances } =
+    props;
 
   return (
     <div style={{ width: "100%" }}>
@@ -25,6 +29,7 @@ export function UnscheduledDanceColumn(
       {unscheduledDances.map((unscheduledDance) => (
         <div key={unscheduledDance.name} style={{ marginBottom: 20 }}>
           <UnscheduledDanceCard
+            scheduledDances={scheduledDances}
             unscheduledDance={unscheduledDance}
             teacher={teachers.find(
               (teacher) => teacher.id === unscheduledDance.TeacherId

@@ -37,6 +37,7 @@ export function CastPopover(props: TCastPopoverProps): JSX.Element {
     >
       <div style={{ padding: 15, maxWidth: 275 }}>
         <Typography variant="caption">
+          Dancers:{" "}
           {cast?.map((castMember, index) => {
             const itemIsLastInArray = index === cast.length - 1;
             return (
