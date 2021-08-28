@@ -26,7 +26,7 @@ const port = process.env.PORT || 3001;
 
 async function start() {
   const sequelize = new Sequelize(
-    `${process.env.DATABASE_URL}&ssl=true` as string
+    `${process.env.DATABASE_URL}&sslmode=require` as string
   );
 
   try {
