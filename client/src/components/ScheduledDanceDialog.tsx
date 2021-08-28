@@ -27,6 +27,7 @@ type TScheduledDanceDialogProps = {
   studios: TStudio[];
   modalType: "add" | "edit";
   scheduledDances: TScheduledDance[];
+  scheduleId: number;
   // required if type is "edit"
   scheduledDance?: TScheduledDance;
 };
@@ -44,6 +45,7 @@ export function ScheduledDanceDialog(
     modalType,
     scheduledDance,
     scheduledDances,
+    scheduleId,
   } = props;
   const [startAt, setStartAt] = useState<Date | undefined>(
     scheduledDance?.startAt ?? defaultDate
@@ -91,7 +93,8 @@ export function ScheduledDanceDialog(
         StudioId: studio,
         DanceId: dance.id,
       },
-      scheduledDances
+      scheduledDances,
+      scheduleId
     );
 
     if (errors.length > 0) {
@@ -101,7 +104,7 @@ export function ScheduledDanceDialog(
 
     const getApiCall =
       modalType === "add"
-        ? () => addScheduledDance(startAt, endAt, dance.id, studio)
+        ? () => addScheduledDance(startAt, endAt, dance.id, studio, scheduleId)
         : // eslint-disable-next-line
           // @ts-ignore typescript is stupid sometimes
           () => editScheduledDance(scheduledDance.id, startAt, endAt, studio);

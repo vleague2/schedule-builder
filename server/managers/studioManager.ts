@@ -130,7 +130,7 @@ export async function updateStudio(
   if (parsedStudioId === NaN) {
     return {
       data: 0,
-      error: ["Must provide a number as the teacher ID"],
+      error: ["Must provide a number as the studio ID"],
     };
   }
 

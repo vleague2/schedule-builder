@@ -17,14 +17,21 @@ type TUnscheduledDanceCardProps = {
   scheduledDances: TScheduledDance[];
   refetch: () => void;
   studios: TStudio[];
+  scheduleId: number;
   teacher?: TTeacher;
 };
 
 export function UnscheduledDanceCard(
   props: TUnscheduledDanceCardProps
 ): JSX.Element {
-  const { unscheduledDance, teacher, refetch, studios, scheduledDances } =
-    props;
+  const {
+    unscheduledDance,
+    teacher,
+    refetch,
+    studios,
+    scheduledDances,
+    scheduleId,
+  } = props;
   const [cast, setCast] = useState<TDancer[] | undefined>(undefined);
   const [castOpen, setCastOpen] = useState<boolean>(false);
   const [modalOpen, setModalOpen] = useState<boolean>(false);
@@ -81,6 +88,7 @@ export function UnscheduledDanceCard(
         studios={studios}
         modalType="add"
         scheduledDances={scheduledDances}
+        scheduleId={scheduleId}
       />
     </>
   );

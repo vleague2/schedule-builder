@@ -1,14 +1,53 @@
 import { DateTime } from "luxon";
+import { TApiResponseDto } from "../models/TApiResponseDto";
 import { TDance } from "../models/TDance";
+import { TSchedule } from "../models/TSchedule";
 import { TScheduledDance } from "../models/TScheduledDance";
 import { TStudio } from "../models/TStudio";
 import { TTeacher } from "../models/TTeacher";
+import {
+  deleteSchedule,
+  getSchedules,
+  patchSchedule,
+  postSchedules,
+} from "../resources/schedulesResource";
 import { getDancersInDance } from "./dancesService";
+import {
+  mapToAddSchedulesDto,
+  mapToUpdateScheduleDto,
+} from "./mapToDtoService";
 
 type TScheduledDancePartial = Pick<
   TScheduledDance,
   "StudioId" | "endAt" | "startAt" | "DanceId"
 >;
+
+export async function getAllSchedules(): Promise<TApiResponseDto<TSchedule[]>> {
+  return await getSchedules();
+}
+
+export async function updateSchedule(
+  value: string,
+  scheduleId: number
+): Promise<TApiResponseDto<number>> {
+  const mappedData = mapToUpdateScheduleDto(value);
+
+  return await patchSchedule(scheduleId, mappedData);
+}
+
+export async function addSchedules(
+  value: string
+): Promise<TApiResponseDto<TStudio[]>> {
+  const mappedData = mapToAddSchedulesDto(value);
+
+  return await postSchedules(mappedData);
+}
+
+export async function removeSchedule(
+  scheduleId: number
+): Promise<TApiResponseDto<number>> {
+  return await deleteSchedule(scheduleId);
+}
 
 export function getAllTimeslots(): DateTime[] {
   const timeSlots: DateTime[] = [];
@@ -163,7 +202,8 @@ function isScheduledDance(
 
 export async function valiateScheduledDance(
   scheduledDance: TScheduledDancePartial | TScheduledDance,
-  scheduledDances: TScheduledDance[]
+  scheduledDances: TScheduledDance[],
+  scheduleId: number
 ): Promise<string[]> {
   const { StudioId } = scheduledDance;
 
@@ -177,12 +217,14 @@ export async function valiateScheduledDance(
     scheduledDancesFiltered,
     StudioId,
     startStamp,
-    endStamp
+    endStamp,
+    scheduleId
   );
 
   const dancersDoubleBookedErrors = await getDancersWhoAreDoubleBooked(
     scheduledDancesFiltered,
-    scheduledDance
+    scheduledDance,
+    scheduleId
   );
 
   return [...dancesAtSameTimeErrors, ...dancersDoubleBookedErrors];
@@ -192,12 +234,13 @@ function getDancesAtSameTimeInSameStudio(
   scheduledDances: TScheduledDance[],
   studioId: number,
   startStamp: number,
-  endStamp: number
+  endStamp: number,
+  scheduleId: number
 ): string[] {
   const errors: string[] = [];
 
   const dancesInSameStudio = scheduledDances.filter(
-    (dance) => dance.StudioId === studioId
+    (dance) => dance.StudioId === studioId && scheduleId === dance.ScheduleId
   );
 
   dancesInSameStudio.forEach((danceInSameStudio) => {
@@ -256,7 +299,8 @@ function getStartAndEndStamp(
 
 async function getDancersWhoAreDoubleBooked(
   scheduledDances: TScheduledDance[],
-  newScheduledDance: TScheduledDancePartial
+  newScheduledDance: TScheduledDancePartial,
+  scheduleId: number
 ): Promise<string[]> {
   const errors: string[] = [];
 
@@ -266,6 +310,10 @@ async function getDancersWhoAreDoubleBooked(
   const { startStamp, endStamp } = getStartAndEndStamp(newScheduledDance);
 
   const dancesAtSameTime = scheduledDances.filter((scheduledDance) => {
+    if (scheduledDance.ScheduleId !== scheduleId) {
+      return false;
+    }
+
     const { startStamp: sdStartStamp, endStamp: sdEndStamp } =
       getStartAndEndStamp(scheduledDance);
 

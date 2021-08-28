@@ -11,10 +11,10 @@ export function scheduledDanceRouter(api: Api) {
   });
 
   router.post("/", (req, res) => {
-    const { startAt, endAt, danceId, studioId } = req.body;
+    const { startAt, endAt, danceId, studioId, scheduleId } = req.body;
 
     api
-      .addScheduledDance({ startAt, endAt, danceId, studioId })
+      .addScheduledDance({ startAt, endAt, danceId, studioId, scheduleId })
       .then((returnVal) => {
         res.send(returnVal);
       });

@@ -18,11 +18,13 @@ type TScheduleTableProps = {
   dances: TDance[];
   scheduledDances: TScheduledDance[];
   teachers: TTeacher[];
+  scheduleId: number;
   refetch: () => void;
 };
 
 export function ScheduleTable(props: TScheduleTableProps): JSX.Element {
-  const { studios, dances, teachers, scheduledDances, refetch } = props;
+  const { studios, dances, teachers, scheduledDances, refetch, scheduleId } =
+    props;
 
   const [selectedScheduledDance, setSelectedScheduledDance] = useState<
     TScheduledDance | undefined
@@ -97,6 +99,7 @@ export function ScheduleTable(props: TScheduleTableProps): JSX.Element {
           scheduledDance={selectedScheduledDance}
           studios={studios}
           modalType="edit"
+          scheduleId={scheduleId}
         />
       )}
       {selectedDance && selectedScheduledDance && (

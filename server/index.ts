@@ -14,6 +14,8 @@ import { teacherRouter } from "./routes/teacherRoutes";
 import { dancerRouter } from "./routes/dancerRoutes";
 import { studioRouter } from "./routes/studioRoutes";
 import { scheduledDanceRouter } from "./routes/scheduledDanceRoutes";
+import { ScheduleModel } from "./models/scheduleModel";
+import { scheduleRouter } from "./routes/scheduleRoutes";
 
 if (process.env.NODE_ENV !== "production") {
   require("dotenv").config();
@@ -37,6 +39,7 @@ async function start() {
   const dancer = DancerModel(sequelize);
   const dance = DanceModel(sequelize);
   const scheduledDance = ScheduledDanceModel(sequelize);
+  const schedule = ScheduleModel(sequelize);
 
   teacher.hasMany(dance);
   dance.belongsTo(teacher);
@@ -46,8 +49,12 @@ async function start() {
 
   scheduledDance.belongsTo(studio);
   studio.hasMany(scheduledDance);
+
   scheduledDance.belongsTo(dance);
   dance.hasMany(scheduledDance);
+
+  scheduledDance.belongsTo(schedule);
+  schedule.hasMany(scheduledDance);
 
   await sequelize.sync({ alter: true });
 
@@ -59,6 +66,7 @@ async function start() {
   app.use("/dancers", dancerRouter(api));
   app.use("/studios", studioRouter(api));
   app.use("/scheduledDances", scheduledDanceRouter(api));
+  app.use("/schedules", scheduleRouter(api));
 
   app.use(express.static(path.resolve(__dirname, "../client/build")));
 

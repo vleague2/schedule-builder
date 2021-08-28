@@ -28,14 +28,17 @@ export async function addScheduledDance(
     endAt: string;
     danceId: string;
     studioId: string;
+    scheduleId: string;
   }
 ): Promise<TReturnDto<ScheduledDanceModelInstance[]>> {
-  const { startAt, endAt, danceId, studioId } = danceData;
+  const { startAt, endAt, danceId, studioId, scheduleId } = danceData;
 
-  if (!startAt || !endAt || !danceId || !studioId) {
+  if (!startAt || !endAt || !danceId || !studioId || !scheduleId) {
     return {
       data: [],
-      error: ["You need a start time, end time, dance id, and studio id"],
+      error: [
+        "You need a start time, end time, dance id, studio id, and schedule id",
+      ],
     };
   }
 
@@ -51,6 +54,12 @@ export async function addScheduledDance(
     return { data: [], error: ["Studio ID must be a number"] };
   }
 
+  const parsedScheduleId = parseInt(studioId);
+
+  if (parsedScheduleId === NaN) {
+    return { data: [], error: ["Schedule ID must be a number"] };
+  }
+
   const res: TReturnDto<ScheduledDanceModelInstance[]> = {
     data: [],
     error: [],
@@ -62,6 +71,7 @@ export async function addScheduledDance(
       endAt,
       StudioId: studioId,
       DanceId: danceId,
+      ScheduleId: scheduleId,
     });
 
     if (scheduleRes) {

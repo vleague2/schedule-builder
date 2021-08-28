@@ -3,4 +3,5 @@ export type TAddScheduledDanceDto = {
   endAt: Date;
   danceId: number;
   studioId: number;
+  scheduleId: number;
 };

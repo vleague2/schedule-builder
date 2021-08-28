@@ -24,6 +24,13 @@ import {
   updateScheduledDance,
 } from "./managers/scheduledDanceManager";
 import {
+  addSchedules,
+  deleteSchedule,
+  getSchedule,
+  getSchedules,
+  updateSchedule,
+} from "./managers/scheduleManager";
+import {
   addStudios,
   deleteStudio,
   getStudio,
@@ -41,6 +48,7 @@ import { DanceModelInstance } from "./models/danceModel";
 import { DancerDancesModelInstance } from "./models/dancerDancesModel";
 import { DancerModelInstance } from "./models/dancerModel";
 import { ScheduledDanceModelInstance } from "./models/scheduledDanceModel";
+import { ScheduleModelInstance } from "./models/scheduleModel";
 import { StudioModelInstance } from "./models/studioModel";
 import { TeacherModelInstance } from "./models/teacherModel";
 
@@ -63,6 +71,7 @@ class Api {
   teacherModel: ModelCtor<TeacherModelInstance>;
   scheduledDanceModel: ModelCtor<ScheduledDanceModelInstance>;
   dancerDancesModel: ModelCtor<DancerDancesModelInstance>;
+  scheduleModel: ModelCtor<ScheduleModelInstance>;
 
   constructor(sequelize: Sequelize) {
     this.sequelize = sequelize;
@@ -79,6 +88,8 @@ class Api {
       .ScheduledDance as ModelCtor<ScheduledDanceModelInstance>;
     this.dancerDancesModel = this.sequelize.models
       .DancerDances as ModelCtor<DancerDancesModelInstance>;
+    this.scheduleModel = this.sequelize.models
+      .Schedule as ModelCtor<ScheduleModelInstance>;
   }
 
   async getStudios(): Promise<TReturnDto<StudioModelInstance[]>> {
@@ -255,17 +266,20 @@ class Api {
     endAt,
     danceId,
     studioId,
+    scheduleId,
   }: {
     startAt: string;
     endAt: string;
     danceId: string;
     studioId: string;
+    scheduleId: string;
   }): Promise<TReturnDto<ScheduledDanceModelInstance[]>> {
     return await addScheduledDance(this.scheduledDanceModel, {
       startAt,
       endAt,
       danceId,
       studioId,
+      scheduleId,
     });
   }
 
@@ -288,6 +302,35 @@ class Api {
       scheduledDanceId,
       options
     );
+  }
+
+  async getSchedules(): Promise<TReturnDto<ScheduleModelInstance[]>> {
+    return await getSchedules(this.scheduleModel);
+  }
+
+  async getSchedule(
+    scheduleId: string
+  ): Promise<TReturnDto<ScheduleModelInstance[]>> {
+    return await getSchedule(this.scheduleModel, scheduleId);
+  }
+
+  async addSchedules(
+    schedules: string[]
+  ): Promise<TReturnDto<ScheduleModelInstance[]>> {
+    return await addSchedules(this.scheduleModel, schedules);
+  }
+
+  async updateSchedule(
+    scheduleId: string,
+    options: {
+      newScheduleName: string;
+    }
+  ): Promise<TReturnDto<number>> {
+    return await updateSchedule(this.scheduleModel, scheduleId, options);
+  }
+
+  async deleteSchedule(scheduleId: string): Promise<TReturnDto<number>> {
+    return await deleteSchedule(this.scheduleModel, scheduleId);
   }
 }
 

@@ -1,11 +1,13 @@
 import { TAddDancersDto } from "../models/TAddDancersDto";
 import { TAddDancesDto } from "../models/TAddDancesDto";
 import { TAddScheduledDanceDto } from "../models/TAddScheduledDanceDto";
+import { TAddSchedulesDto } from "../models/TAddScheduleDto";
 import { TAddStudiosDto } from "../models/TAddStudiosDto";
 import { TAddTeachersDto } from "../models/TAddTeachersDto";
 import { TUpdateDanceDto } from "../models/TUpdateDanceDto";
 import { TUpdateDancerDto } from "../models/TUpdateDancerDto";
 import { TUpdateScheduledDanceDto } from "../models/TUpdateScheduledDanceDto";
+import { TUpdateScheduleDto } from "../models/TUpdateScheduleDto";
 import { TUpdateStudioDto } from "../models/TUpdateStudioDto";
 import { TUpdateTeacherDto } from "../models/TUpdateTeacherDto";
 
@@ -83,13 +85,15 @@ export function mapToAddScheduledDanceDto(
   startAt: Date,
   endAt: Date,
   danceId: number,
-  studioId: number
+  studioId: number,
+  scheduleId: number
 ): TAddScheduledDanceDto {
   return {
     startAt,
     endAt,
     danceId,
     studioId,
+    scheduleId,
   };
 }
 
@@ -104,5 +108,19 @@ export function mapToUpdateScheduledDanceDto(
       endAt,
       studioId,
     },
+  };
+}
+
+export function mapToUpdateScheduleDto(name: string): TUpdateScheduleDto {
+  return {
+    options: {
+      newScheduleName: name,
+    },
+  };
+}
+
+export function mapToAddSchedulesDto(value: string): TAddSchedulesDto {
+  return {
+    schedules: value.split(",").map((value) => value.trim()),
   };
 }

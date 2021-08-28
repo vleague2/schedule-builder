@@ -1,11 +1,10 @@
-import { Container, CssBaseline, Grid } from "@material-ui/core";
+import { CssBaseline } from "@material-ui/core";
 import { useState, useEffect } from "react";
 import { MuiPickersUtilsProvider } from "@material-ui/pickers";
 import LuxonUtils from "@date-io/luxon";
 import "./index.css";
 
 import { AppMenu } from "./components/AppMenu";
-import { UnscheduledDanceColumn } from "./components/UnscheduledDanceColumn";
 import { TDance } from "./models/TDance";
 import { TDancer } from "./models/TDancer";
 import { TScheduledDance } from "./models/TScheduledDance";
@@ -16,7 +15,9 @@ import { getAllDances } from "./services/dancesService";
 import { getAllScheduledDances } from "./services/scheduledDancesService";
 import { getAllStudios } from "./services/studiosService";
 import { getAllTeachers } from "./services/teachersService";
-import { ScheduleTable } from "./components/ScheduleTable";
+import { ScheduleTabs } from "./components/ScheduleTabs";
+import { getAllSchedules } from "./services/scheduleService";
+import { TSchedule } from "./models/TSchedule";
 
 function App(): JSX.Element {
   const [teachers, setTeachers] = useState<TTeacher[] | undefined>(undefined);
@@ -26,13 +27,9 @@ function App(): JSX.Element {
   const [scheduledDances, setScheduledDances] = useState<
     TScheduledDance[] | undefined
   >(undefined);
-
-  const unscheduledDances =
-    dances?.filter((dance) => {
-      return !scheduledDances?.find(
-        (scheduledDance) => scheduledDance.DanceId === dance.id
-      );
-    }) || [];
+  const [schedules, setSchedules] = useState<TSchedule[] | undefined>(
+    undefined
+  );
 
   function fetchTeachers() {
     getAllTeachers().then((teachersResponse) => {
@@ -72,12 +69,19 @@ function App(): JSX.Element {
     });
   }
 
+  function fetchSchedules() {
+    getAllSchedules().then((schedulesResponse) => {
+      setSchedules(schedulesResponse.data);
+    });
+  }
+
   useEffect(() => {
     fetchTeachers();
     fetchStudios();
     fetchDancers();
     fetchDances();
     fetchScheduledDances();
+    fetchSchedules();
   }, []);
 
   return (
@@ -98,36 +102,16 @@ function App(): JSX.Element {
             dances: fetchDances,
           }}
         />
-        <Container maxWidth="lg" style={{ marginTop: 30 }}>
-          <Grid container justifyContent="center">
-            <Grid container item xs={8}>
-              {!studios || !dances ? (
-                <p>Add some studios and dances first!</p>
-              ) : (
-                <ScheduleTable
-                  studios={studios}
-                  teachers={teachers ?? []}
-                  dances={dances}
-                  scheduledDances={scheduledDances ?? []}
-                  refetch={fetchScheduledDances}
-                />
-              )}
-            </Grid>
-            <Grid item xs={1} />
-            <Grid container item xs={3}>
-              {unscheduledDances && teachers && dancers && studios && (
-                <UnscheduledDanceColumn
-                  scheduledDances={scheduledDances ?? []}
-                  unscheduledDances={unscheduledDances}
-                  teachers={teachers}
-                  dancers={dancers}
-                  refetch={fetchScheduledDances}
-                  studios={studios}
-                />
-              )}
-            </Grid>
-          </Grid>
-        </Container>
+        <ScheduleTabs
+          schedules={schedules ?? []}
+          dances={dances ?? []}
+          dancers={dancers ?? []}
+          scheduledDances={scheduledDances ?? []}
+          fetchScheduledDances={fetchScheduledDances}
+          fetchSchedules={fetchSchedules}
+          teachers={teachers ?? []}
+          studios={studios ?? []}
+        />
       </MuiPickersUtilsProvider>
     </div>
   );

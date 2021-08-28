@@ -21,13 +21,15 @@ export async function addScheduledDance(
   startAt: Date,
   endAt: Date,
   danceId: number,
-  studioId: number
+  studioId: number,
+  scheduleId: number
 ): Promise<TApiResponseDto<TScheduledDance[]>> {
   const mappedDto = mapToAddScheduledDanceDto(
     startAt,
     endAt,
     danceId,
-    studioId
+    studioId,
+    scheduleId
   );
 
   return await postScheduledDance(mappedDto);

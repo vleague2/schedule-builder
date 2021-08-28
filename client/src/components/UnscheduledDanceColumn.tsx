@@ -13,14 +13,21 @@ type TUnscheduledDanceColumnProps = {
   teachers: TTeacher[];
   dancers: TDancer[];
   studios: TStudio[];
+  scheduleId: number;
   refetch: () => void;
 };
 
 export function UnscheduledDanceColumn(
   props: TUnscheduledDanceColumnProps
 ): JSX.Element {
-  const { unscheduledDances, teachers, refetch, studios, scheduledDances } =
-    props;
+  const {
+    unscheduledDances,
+    teachers,
+    refetch,
+    studios,
+    scheduledDances,
+    scheduleId,
+  } = props;
 
   return (
     <div style={{ width: "100%" }}>
@@ -36,6 +43,7 @@ export function UnscheduledDanceColumn(
             )}
             refetch={refetch}
             studios={studios}
+            scheduleId={scheduleId}
           />
         </div>
       ))}

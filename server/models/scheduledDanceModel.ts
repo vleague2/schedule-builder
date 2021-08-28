@@ -5,6 +5,7 @@ export interface ScheduledDanceModelInstance extends Model {
   endAt: Date;
   DancerId: number;
   DanceId: number;
+  ScheduleId: number;
 }
 
 export function ScheduledDanceModel(sequelize: Sequelize) {
