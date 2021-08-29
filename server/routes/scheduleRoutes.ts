@@ -47,7 +47,7 @@ export function scheduleRouter(api: Api) {
   router.delete("/:scheduleId", (req, res) => {
     const { scheduleId } = req.params;
 
-    api.deleteStudio(scheduleId).then((returnVal) => {
+    api.deleteSchedule(scheduleId).then((returnVal) => {
       res.send(returnVal);
     });
   });

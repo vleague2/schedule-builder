@@ -71,7 +71,7 @@ function App(): JSX.Element {
 
   function fetchSchedules() {
     getAllSchedules().then((schedulesResponse) => {
-      setSchedules(schedulesResponse.data);
+      setSchedules(schedulesResponse.data.sort((a, b) => a.id - b.id));
     });
   }
 

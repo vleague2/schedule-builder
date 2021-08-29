@@ -7,6 +7,7 @@ import {
   TextField,
   Button,
 } from "@material-ui/core";
+import AddCircleIcon from "@material-ui/icons/AddCircle";
 import { ChangeEvent, useState } from "react";
 
 import { UnscheduledDanceColumn } from "./UnscheduledDanceColumn";
@@ -18,6 +19,7 @@ import { TDance } from "../models/TDance";
 import { TScheduledDance } from "../models/TScheduledDance";
 import { TTeacher } from "../models/TTeacher";
 import { addSchedules } from "../services/scheduleService";
+import { ScheduleName } from "./ScheduleName";
 
 type TTabPanelProps = {
   value: number;
@@ -101,7 +103,7 @@ export function ScheduleTabs(props: TScheduleTabsProps): JSX.Element {
             key={schedule.name}
           />
         ))}
-        <Tab label="+" {...a11yProps(schedules.length)} />
+        <Tab label={<AddCircleIcon />} {...a11yProps(schedules.length)} />
       </Tabs>
       {schedules.map((schedule, index) => {
         const dancesInThisSchedule = scheduledDances.filter(
@@ -115,10 +117,14 @@ export function ScheduleTabs(props: TScheduleTabsProps): JSX.Element {
         });
 
         return (
-          <TabPanel value={selectedTab} index={index}>
+          <TabPanel value={selectedTab} index={index} key={schedule.id}>
             <Container maxWidth="lg" style={{ marginTop: 30 }}>
               <Grid container justifyContent="center">
                 <Grid container item md={8} xs={12}>
+                  <ScheduleName schedule={schedule} refetch={fetchSchedules} />
+                  <br />
+                  <br />
+                  <br />
                   {studios.length === 0 || dances.length === 0 ? (
                     <p>Add some studios and dances first!</p>
                   ) : (

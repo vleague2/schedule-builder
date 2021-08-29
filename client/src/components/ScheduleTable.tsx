@@ -5,11 +5,12 @@ import { TDance } from "../models/TDance";
 import { TScheduledDance } from "../models/TScheduledDance";
 import { TStudio } from "../models/TStudio";
 import { TTeacher } from "../models/TTeacher";
+import { removeScheduledDance } from "../services/scheduledDancesService";
 import {
   calculateOccupiedTimeslots,
   getAllTimeslots,
 } from "../services/scheduleService";
-import { DeleteScheduledDanceDialog } from "./DeleteScheduledDanceDialog";
+import { DeleteConfirmationDialog } from "./DeleteConfirmationDialog";
 import { ScheduledDanceDialog } from "./ScheduledDanceDialog";
 import { TimeSlotRow } from "./TimeSlotRow";
 
@@ -43,6 +44,22 @@ export function ScheduleTable(props: TScheduleTableProps): JSX.Element {
     studios,
     scheduledDances
   );
+
+  function onClose() {
+    setSelectedScheduledDance(undefined);
+    setModalType(undefined);
+    refetch();
+  }
+
+  function deleteScheduledDance() {
+    if (!selectedScheduledDance) {
+      return;
+    }
+
+    removeScheduledDance(selectedScheduledDance.id).then(() => {
+      onClose();
+    });
+  }
 
   return (
     <>
@@ -103,15 +120,11 @@ export function ScheduleTable(props: TScheduleTableProps): JSX.Element {
         />
       )}
       {selectedDance && selectedScheduledDance && (
-        <DeleteScheduledDanceDialog
-          scheduledDanceId={selectedScheduledDance.id}
-          scheduledDanceName={selectedDance.name}
+        <DeleteConfirmationDialog
+          itemName={selectedDance.name}
           open={selectedScheduledDance !== undefined && modalType === "delete"}
-          onClose={() => {
-            setSelectedScheduledDance(undefined);
-            setModalType(undefined);
-            refetch();
-          }}
+          onClose={onClose}
+          onClick={deleteScheduledDance}
         />
       )}
     </>

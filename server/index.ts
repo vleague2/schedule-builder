@@ -7,6 +7,7 @@ import { TeacherModel } from "./models/teacherModel";
 import { DancerModel } from "./models/dancerModel";
 import { DanceModel } from "./models/danceModel";
 import { ScheduledDanceModel } from "./models/scheduledDanceModel";
+import { ScheduleModel } from "./models/scheduleModel";
 
 import Api from "./api";
 import { danceRouter } from "./routes/danceRoutes";
@@ -14,7 +15,6 @@ import { teacherRouter } from "./routes/teacherRoutes";
 import { dancerRouter } from "./routes/dancerRoutes";
 import { studioRouter } from "./routes/studioRoutes";
 import { scheduledDanceRouter } from "./routes/scheduledDanceRoutes";
-import { ScheduleModel } from "./models/scheduleModel";
 import { scheduleRouter } from "./routes/scheduleRoutes";
 
 if (process.env.NODE_ENV !== "production") {
@@ -25,16 +25,25 @@ const app = express();
 const port = process.env.PORT || 3001;
 
 async function start() {
-  const sequelize = new Sequelize(process.env.DATABASE_URL as string, {
-    dialect: "postgres",
-    ssl: true,
-    dialectOptions: {
-      ssl: {
-        require: true,
-        rejectUnauthorized: false,
+  let sequelizeOptions = {};
+
+  if (process.env.NODE_ENV === "production") {
+    sequelizeOptions = {
+      dialect: "postgres",
+      ssl: true,
+      dialectOptions: {
+        ssl: {
+          require: true,
+          rejectUnauthorized: false,
+        },
       },
-    },
-  });
+    };
+  }
+
+  const sequelize = new Sequelize(
+    process.env.DATABASE_URL as string,
+    sequelizeOptions
+  );
 
   try {
     await sequelize.authenticate();
