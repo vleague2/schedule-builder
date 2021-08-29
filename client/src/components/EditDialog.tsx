@@ -1,6 +1,7 @@
 import { Button, ButtonGroup, DialogTitle, TextField } from "@material-ui/core";
 import { Dialog } from "@material-ui/core";
 import { useEffect, useState } from "react";
+import { useOktaAuth } from "@okta/okta-react";
 
 import { TDance } from "../models/TDance";
 import { TDancer } from "../models/TDancer";
@@ -26,6 +27,8 @@ type TEditDialogProps = {
 
 export function EditDialog(props: TEditDialogProps): JSX.Element {
   const { open, onClose, onSuccess, dialogType, items, teachers } = props;
+  const { authState } = useOktaAuth();
+  const accessToken = authState?.accessToken;
 
   const [newValue, setNewValue] = useState<string>("");
   const [selectValue, setSelectValue] = useState<number>(0);
@@ -53,13 +56,18 @@ export function EditDialog(props: TEditDialogProps): JSX.Element {
     async function getApiCallBasedOnDialogType() {
       switch (dialogType) {
         case "studio":
-          return await updateStudio(newValue, selectValue);
+          return await updateStudio(newValue, selectValue, accessToken);
         case "teacher":
-          return await updateTeacher(newValue, selectValue);
+          return await updateTeacher(newValue, selectValue, accessToken);
         case "dancer":
-          return await updateDancer(newValue, selectValue);
+          return await updateDancer(newValue, selectValue, accessToken);
         case "dance":
-          return await updateDance(selectValue, newValue, selectedTeacher);
+          return await updateDance(
+            selectValue,
+            accessToken,
+            newValue,
+            selectedTeacher
+          );
         default:
           return undefined;
       }

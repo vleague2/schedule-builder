@@ -1,6 +1,7 @@
 import { IconButton, Typography } from "@material-ui/core";
 import EditIcon from "@material-ui/icons/Edit";
 import CancelIcon from "@material-ui/icons/Cancel";
+import { useOktaAuth } from "@okta/okta-react";
 
 import { TSchedule } from "../models/TSchedule";
 import { DeleteConfirmationDialog } from "./DeleteConfirmationDialog";
@@ -17,16 +18,18 @@ export function ScheduleName(props: TScheduleNameProps): JSX.Element {
   const { schedule, refetch } = props;
   const [deleteDialogOpen, setDeleteDialogOpen] = useState<boolean>(false);
   const [editDialogOpen, setEditDialogOpen] = useState<boolean>(false);
+  const { authState } = useOktaAuth();
+  const accessToken = authState?.accessToken;
 
   function onDelete(): void {
-    removeSchedule(schedule.id).then(() => {
+    removeSchedule(schedule.id, accessToken).then(() => {
       setDeleteDialogOpen(false);
       refetch();
     });
   }
 
   function editSchedule(value: string): void {
-    updateSchedule(value, schedule.id).then(() => {
+    updateSchedule(value, schedule.id, accessToken).then(() => {
       setEditDialogOpen(false);
       refetch();
     });

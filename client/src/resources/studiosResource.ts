@@ -1,3 +1,4 @@
+import { AccessToken } from "@okta/okta-auth-js";
 import { TAddStudiosDto } from "../models/TAddStudiosDto";
 import { TApiResponseDto } from "../models/TApiResponseDto";
 import { TStudio } from "../models/TStudio";
@@ -5,7 +6,9 @@ import { TUpdateStudioDto } from "../models/TUpdateStudioDto";
 
 const url = "/studios";
 
-export async function getStudios(): Promise<TApiResponseDto<TStudio[]>> {
+export async function getStudios(
+  accessToken: AccessToken | undefined
+): Promise<TApiResponseDto<TStudio[]>> {
   const response = await fetch(url, {
     method: "GET",
     mode: "cors",
@@ -13,6 +16,7 @@ export async function getStudios(): Promise<TApiResponseDto<TStudio[]>> {
     credentials: "same-origin",
     headers: {
       "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken?.accessToken}`,
     },
     redirect: "follow",
     referrerPolicy: "no-referrer",
@@ -23,7 +27,8 @@ export async function getStudios(): Promise<TApiResponseDto<TStudio[]>> {
 
 export async function patchStudio(
   studioId: number,
-  options: TUpdateStudioDto
+  options: TUpdateStudioDto,
+  accessToken: AccessToken | undefined
 ): Promise<TApiResponseDto<number>> {
   const requestUrl = `${url}/${studioId}`;
 
@@ -34,6 +39,7 @@ export async function patchStudio(
     credentials: "same-origin",
     headers: {
       "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken?.accessToken}`,
     },
     redirect: "follow",
     referrerPolicy: "no-referrer",
@@ -44,7 +50,8 @@ export async function patchStudio(
 }
 
 export async function postStudios(
-  studios: TAddStudiosDto
+  studios: TAddStudiosDto,
+  accessToken: AccessToken | undefined
 ): Promise<TApiResponseDto<TStudio[]>> {
   const response = await fetch(url, {
     method: "POST",
@@ -53,6 +60,7 @@ export async function postStudios(
     credentials: "same-origin",
     headers: {
       "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken?.accessToken}`,
     },
     redirect: "follow",
     referrerPolicy: "no-referrer",
@@ -63,7 +71,8 @@ export async function postStudios(
 }
 
 export async function deleteStudio(
-  studioId: number
+  studioId: number,
+  accessToken: AccessToken | undefined
 ): Promise<TApiResponseDto<number>> {
   const response = await fetch(`${url}/${studioId}`, {
     method: "DELETE",
@@ -72,6 +81,7 @@ export async function deleteStudio(
     credentials: "same-origin",
     headers: {
       "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken?.accessToken}`,
     },
     redirect: "follow",
     referrerPolicy: "no-referrer",

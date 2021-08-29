@@ -1,11 +1,12 @@
 import * as express from "express";
 import Api from "../api";
 
-export function dancerRouter(api: Api) {
+export function dancerRouter(api: Api, authenticationCheck) {
   const router = express.Router();
 
   router.get(
     "/:id?",
+    authenticationCheck,
     async (req, res, next) => {
       const {
         params: { id },
@@ -27,7 +28,7 @@ export function dancerRouter(api: Api) {
     }
   );
 
-  router.get("/:dancerId/dances", (req, res) => {
+  router.get("/:dancerId/dances", authenticationCheck, (req, res) => {
     const { dancerId } = req.params;
 
     api.getDancesForDancer(dancerId).then((returnVal) => {
@@ -35,7 +36,7 @@ export function dancerRouter(api: Api) {
     });
   });
 
-  router.post("/", (req, res) => {
+  router.post("/", authenticationCheck, (req, res) => {
     const { dancers }: { dancers: string[] } = req.body;
 
     api.addDancers(dancers).then((returnVal) => {
@@ -43,7 +44,7 @@ export function dancerRouter(api: Api) {
     });
   });
 
-  router.patch("/:dancerId", (req, res) => {
+  router.patch("/:dancerId", authenticationCheck, (req, res) => {
     const { dancerId } = req.params;
     const { options }: { options: { newDancerName: string } } = req.body;
 
@@ -52,7 +53,7 @@ export function dancerRouter(api: Api) {
     });
   });
 
-  router.delete("/:dancerId", (req, res) => {
+  router.delete("/:dancerId", authenticationCheck, (req, res) => {
     const { dancerId } = req.params;
 
     api.deleteDancer(dancerId).then((returnVal) => {

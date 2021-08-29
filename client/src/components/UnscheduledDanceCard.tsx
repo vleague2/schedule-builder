@@ -3,6 +3,7 @@ import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import ExpandLessIcon from "@material-ui/icons/ExpandLess";
 import AddCircleIcon from "@material-ui/icons/AddCircle";
 import { useEffect, useState } from "react";
+import { useOktaAuth } from "@okta/okta-react";
 
 import { TDance } from "../models/TDance";
 import { TDancer } from "../models/TDancer";
@@ -36,8 +37,11 @@ export function UnscheduledDanceCard(
   const [castOpen, setCastOpen] = useState<boolean>(false);
   const [modalOpen, setModalOpen] = useState<boolean>(false);
 
+  const { authState } = useOktaAuth();
+  const accessToken = authState?.accessToken;
+
   useEffect(() => {
-    getDancersInDance(unscheduledDance.id).then((dancers) => {
+    getDancersInDance(unscheduledDance.id, accessToken).then((dancers) => {
       setCast(dancers.data.sort((a, b) => a.name.localeCompare(b.name)));
     });
   }, [unscheduledDance]);

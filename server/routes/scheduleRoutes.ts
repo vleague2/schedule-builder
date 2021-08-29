@@ -1,11 +1,12 @@
 import * as express from "express";
 import Api from "../api";
 
-export function scheduleRouter(api: Api) {
+export function scheduleRouter(api: Api, authenticationCheck) {
   const router = express.Router();
 
   router.get(
     "/:id?",
+    authenticationCheck,
     async (req, res, next) => {
       const {
         params: { id },
@@ -27,7 +28,7 @@ export function scheduleRouter(api: Api) {
     }
   );
 
-  router.post("/", (req, res) => {
+  router.post("/", authenticationCheck, (req, res) => {
     const { schedules }: { schedules: string[] } = req.body;
 
     api.addSchedules(schedules).then((returnVal) => {
@@ -35,7 +36,7 @@ export function scheduleRouter(api: Api) {
     });
   });
 
-  router.patch("/:scheduleId", (req, res) => {
+  router.patch("/:scheduleId", authenticationCheck, (req, res) => {
     const { scheduleId } = req.params;
     const { options }: { options: { newScheduleName: string } } = req.body;
 
@@ -44,7 +45,7 @@ export function scheduleRouter(api: Api) {
     });
   });
 
-  router.delete("/:scheduleId", (req, res) => {
+  router.delete("/:scheduleId", authenticationCheck, (req, res) => {
     const { scheduleId } = req.params;
 
     api.deleteSchedule(scheduleId).then((returnVal) => {

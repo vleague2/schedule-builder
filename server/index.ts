@@ -1,6 +1,7 @@
 import { Sequelize } from "sequelize";
 import * as express from "express";
 import * as path from "path";
+import * as OktaJwtVerifier from "@okta/jwt-verifier";
 
 import { StudioModel } from "./models/studioModel";
 import { TeacherModel } from "./models/teacherModel";
@@ -16,6 +17,7 @@ import { dancerRouter } from "./routes/dancerRoutes";
 import { studioRouter } from "./routes/studioRoutes";
 import { scheduledDanceRouter } from "./routes/scheduledDanceRoutes";
 import { scheduleRouter } from "./routes/scheduleRoutes";
+import { authenticationRequired } from "./routes/authentication";
 
 if (process.env.NODE_ENV !== "production") {
   require("dotenv").config();
@@ -79,12 +81,19 @@ async function start() {
   const api = new Api(sequelize);
 
   app.use(express.json());
-  app.use("/dances", danceRouter(api));
-  app.use("/teachers", teacherRouter(api));
-  app.use("/dancers", dancerRouter(api));
-  app.use("/studios", studioRouter(api));
-  app.use("/scheduledDances", scheduledDanceRouter(api));
-  app.use("/schedules", scheduleRouter(api));
+
+  const oktaJwtVerifier = new OktaJwtVerifier({
+    issuer: `${process.env.OKTA_ORG_URL}/oauth2/default`,
+  });
+
+  const authenticationCheck = authenticationRequired(oktaJwtVerifier);
+
+  app.use("/dances", danceRouter(api, authenticationCheck));
+  app.use("/teachers", teacherRouter(api, authenticationCheck));
+  app.use("/dancers", dancerRouter(api, authenticationCheck));
+  app.use("/studios", studioRouter(api, authenticationCheck));
+  app.use("/scheduledDances", scheduledDanceRouter(api, authenticationCheck));
+  app.use("/schedules", scheduleRouter(api, authenticationCheck));
 
   app.use(express.static(path.resolve(__dirname, "../client/build")));
 

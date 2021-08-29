@@ -1,3 +1,4 @@
+import { AccessToken } from "@okta/okta-auth-js";
 import { TApiResponseDto } from "../models/TApiResponseDto";
 import { TTeacher } from "../models/TTeacher";
 import {
@@ -8,29 +9,34 @@ import {
 } from "../resources/teachersResource";
 import { mapToAddTeachersDto, mapToUpdateTeacherDto } from "./mapToDtoService";
 
-export async function getAllTeachers(): Promise<TApiResponseDto<TTeacher[]>> {
-  return await getTeachers();
+export async function getAllTeachers(
+  accessToken: AccessToken | undefined
+): Promise<TApiResponseDto<TTeacher[]>> {
+  return await getTeachers(accessToken);
 }
 
 export async function updateTeacher(
   value: string,
-  teacherId: number
+  teacherId: number,
+  accessToken: AccessToken | undefined
 ): Promise<TApiResponseDto<number>> {
   const mappedData = mapToUpdateTeacherDto(value);
 
-  return await patchTeacher(teacherId, mappedData);
+  return await patchTeacher(teacherId, mappedData, accessToken);
 }
 
 export async function addTeachers(
-  value: string
+  value: string,
+  accessToken: AccessToken | undefined
 ): Promise<TApiResponseDto<TTeacher[]>> {
   const mappedData = mapToAddTeachersDto(value);
 
-  return await postTeachers(mappedData);
+  return await postTeachers(mappedData, accessToken);
 }
 
 export async function deleteTeacher(
-  teacherId: number
+  teacherId: number,
+  accessToken: AccessToken | undefined
 ): Promise<TApiResponseDto<number>> {
-  return await deleteTeacherApi(teacherId);
+  return await deleteTeacherApi(teacherId, accessToken);
 }

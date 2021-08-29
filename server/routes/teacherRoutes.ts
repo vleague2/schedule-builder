@@ -1,11 +1,12 @@
 import * as express from "express";
 import Api from "../api";
 
-export function teacherRouter(api: Api) {
+export function teacherRouter(api: Api, authenticationCheck) {
   const router = express.Router();
 
   router.get(
     "/:id?",
+    authenticationCheck,
     async (req, res, next) => {
       const {
         params: { id },
@@ -27,7 +28,7 @@ export function teacherRouter(api: Api) {
     }
   );
 
-  router.post("/", (req, res) => {
+  router.post("/", authenticationCheck, (req, res) => {
     const { teachers }: { teachers: string[] } = req.body;
 
     api.addTeachers(teachers).then((returnVal) => {
@@ -35,7 +36,7 @@ export function teacherRouter(api: Api) {
     });
   });
 
-  router.patch("/:teacherId", (req, res) => {
+  router.patch("/:teacherId", authenticationCheck, (req, res) => {
     const { teacherId } = req.params;
     const { options }: { options: { newTeacherName: string } } = req.body;
 
@@ -44,7 +45,7 @@ export function teacherRouter(api: Api) {
     });
   });
 
-  router.delete("/:teacherId", (req, res) => {
+  router.delete("/:teacherId", authenticationCheck, (req, res) => {
     const { teacherId } = req.params;
 
     api.deleteTeacher(teacherId).then((returnVal) => {

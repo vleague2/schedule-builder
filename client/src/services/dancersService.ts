@@ -1,3 +1,4 @@
+import { AccessToken } from "@okta/okta-auth-js";
 import { TApiResponseDto } from "../models/TApiResponseDto";
 import { TDancer } from "../models/TDancer";
 import {
@@ -8,29 +9,34 @@ import {
 } from "../resources/dancersResource";
 import { mapToAddDancersDto, mapToUpdateDancerDto } from "./mapToDtoService";
 
-export async function getAllDancers(): Promise<TApiResponseDto<TDancer[]>> {
-  return await getDancers();
+export async function getAllDancers(
+  accessToken: AccessToken | undefined
+): Promise<TApiResponseDto<TDancer[]>> {
+  return await getDancers(accessToken);
 }
 
 export async function updateDancer(
   value: string,
-  dancerId: number
+  dancerId: number,
+  accessToken: AccessToken | undefined
 ): Promise<TApiResponseDto<number>> {
   const mappedData = mapToUpdateDancerDto(value);
 
-  return await patchDancer(dancerId, mappedData);
+  return await patchDancer(dancerId, mappedData, accessToken);
 }
 
 export async function addDancers(
-  value: string
+  value: string,
+  accessToken: AccessToken | undefined
 ): Promise<TApiResponseDto<TDancer[]>> {
   const mappedData = mapToAddDancersDto(value);
 
-  return await postDancers(mappedData);
+  return await postDancers(mappedData, accessToken);
 }
 
 export async function deleteDancer(
-  dancerId: number
+  dancerId: number,
+  accessToken: AccessToken | undefined
 ): Promise<TApiResponseDto<number>> {
-  return await deleteDancerApi(dancerId);
+  return await deleteDancerApi(dancerId, accessToken);
 }

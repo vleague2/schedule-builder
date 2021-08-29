@@ -1,3 +1,4 @@
+import { AccessToken } from "@okta/okta-auth-js";
 import { TAddScheduledDanceDto } from "../models/TAddScheduledDanceDto";
 import { TApiResponseDto } from "../models/TApiResponseDto";
 import { TScheduledDance } from "../models/TScheduledDance";
@@ -5,9 +6,9 @@ import { TUpdateScheduledDanceDto } from "../models/TUpdateScheduledDanceDto";
 
 const url = "/scheduledDances";
 
-export async function getScheduledDances(): Promise<
-  TApiResponseDto<TScheduledDance[]>
-> {
+export async function getScheduledDances(
+  accessToken: AccessToken | undefined
+): Promise<TApiResponseDto<TScheduledDance[]>> {
   const response = await fetch(url, {
     method: "GET",
     mode: "cors",
@@ -15,6 +16,7 @@ export async function getScheduledDances(): Promise<
     credentials: "same-origin",
     headers: {
       "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken?.accessToken}`,
     },
     redirect: "follow",
     referrerPolicy: "no-referrer",
@@ -24,7 +26,8 @@ export async function getScheduledDances(): Promise<
 }
 
 export async function postScheduledDance(
-  scheduledDance: TAddScheduledDanceDto
+  scheduledDance: TAddScheduledDanceDto,
+  accessToken: AccessToken | undefined
 ): Promise<TApiResponseDto<TScheduledDance[]>> {
   console.log(scheduledDance);
   const response = await fetch(url, {
@@ -34,6 +37,7 @@ export async function postScheduledDance(
     credentials: "same-origin",
     headers: {
       "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken?.accessToken}`,
     },
     redirect: "follow",
     referrerPolicy: "no-referrer",
@@ -45,7 +49,8 @@ export async function postScheduledDance(
 
 export async function patchScheduledDance(
   scheduledDanceId: number,
-  options: TUpdateScheduledDanceDto
+  options: TUpdateScheduledDanceDto,
+  accessToken: AccessToken | undefined
 ): Promise<TApiResponseDto<number>> {
   const requestUrl = `${url}/${scheduledDanceId}`;
 
@@ -56,6 +61,7 @@ export async function patchScheduledDance(
     credentials: "same-origin",
     headers: {
       "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken?.accessToken}`,
     },
     redirect: "follow",
     referrerPolicy: "no-referrer",
@@ -66,7 +72,8 @@ export async function patchScheduledDance(
 }
 
 export async function deleteScheduledDance(
-  scheduledDanceId: number
+  scheduledDanceId: number,
+  accessToken: AccessToken | undefined
 ): Promise<TApiResponseDto<number>> {
   const response = await fetch(`${url}/${scheduledDanceId}`, {
     method: "DELETE",
@@ -75,6 +82,7 @@ export async function deleteScheduledDance(
     credentials: "same-origin",
     headers: {
       "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken?.accessToken}`,
     },
     redirect: "follow",
     referrerPolicy: "no-referrer",

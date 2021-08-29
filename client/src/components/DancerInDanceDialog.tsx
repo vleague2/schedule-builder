@@ -9,6 +9,7 @@ import {
 } from "@material-ui/core";
 import { Dialog } from "@material-ui/core";
 import { useEffect, useState } from "react";
+import { useOktaAuth } from "@okta/okta-react";
 
 import { TDance } from "../models/TDance";
 import { TDancer } from "../models/TDancer";
@@ -34,6 +35,8 @@ export function DancerInDanceDialog(
   props: TDancerInDanceDialogProps
 ): JSX.Element {
   const { open, dialogAction, onClose, onSuccess, dances, dancers } = props;
+  const { authState } = useOktaAuth();
+  const accessToken = authState?.accessToken;
 
   const [selectedDance, setSelectedDance] = useState<number>(0);
   const [selectedDancers, setSelectedDancers] = useState<number[]>([]);
@@ -63,11 +66,15 @@ export function DancerInDanceDialog(
   async function saveData() {
     async function getApiCallBasedOnDialogType() {
       if (dialogAction === "add") {
-        return addDancersToDance(selectedDance, selectedDancers);
+        return addDancersToDance(selectedDance, selectedDancers, accessToken);
       }
 
       if (dialogAction === "delete") {
-        return removeDancersFromDance(selectedDance, selectedDancers);
+        return removeDancersFromDance(
+          selectedDance,
+          selectedDancers,
+          accessToken
+        );
       }
     }
 
@@ -96,7 +103,7 @@ export function DancerInDanceDialog(
 
   useEffect(() => {
     if (selectedDance > 0) {
-      getDancersInDance(selectedDance).then((dancersResponse) => {
+      getDancersInDance(selectedDance, accessToken).then((dancersResponse) => {
         setDancersInDance(
           dancersResponse.data.sort((a, b) => a.name.localeCompare(b.name))
         );

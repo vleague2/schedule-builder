@@ -1,3 +1,4 @@
+import { AccessToken } from "@okta/okta-auth-js";
 import { TAddSchedulesDto } from "../models/TAddScheduleDto";
 import { TApiResponseDto } from "../models/TApiResponseDto";
 import { TSchedule } from "../models/TSchedule";
@@ -5,7 +6,9 @@ import { TUpdateScheduleDto } from "../models/TUpdateScheduleDto";
 
 const url = "/schedules";
 
-export async function getSchedules(): Promise<TApiResponseDto<TSchedule[]>> {
+export async function getSchedules(
+  accessToken: AccessToken | undefined
+): Promise<TApiResponseDto<TSchedule[]>> {
   const response = await fetch(url, {
     method: "GET",
     mode: "cors",
@@ -13,6 +16,7 @@ export async function getSchedules(): Promise<TApiResponseDto<TSchedule[]>> {
     credentials: "same-origin",
     headers: {
       "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken?.accessToken}`,
     },
     redirect: "follow",
     referrerPolicy: "no-referrer",
@@ -23,7 +27,8 @@ export async function getSchedules(): Promise<TApiResponseDto<TSchedule[]>> {
 
 export async function patchSchedule(
   scheduleId: number,
-  options: TUpdateScheduleDto
+  options: TUpdateScheduleDto,
+  accessToken: AccessToken | undefined
 ): Promise<TApiResponseDto<number>> {
   const requestUrl = `${url}/${scheduleId}`;
 
@@ -34,6 +39,7 @@ export async function patchSchedule(
     credentials: "same-origin",
     headers: {
       "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken?.accessToken}`,
     },
     redirect: "follow",
     referrerPolicy: "no-referrer",
@@ -44,7 +50,8 @@ export async function patchSchedule(
 }
 
 export async function postSchedules(
-  schedules: TAddSchedulesDto
+  schedules: TAddSchedulesDto,
+  accessToken: AccessToken | undefined
 ): Promise<TApiResponseDto<TSchedule[]>> {
   const response = await fetch(url, {
     method: "POST",
@@ -53,6 +60,7 @@ export async function postSchedules(
     credentials: "same-origin",
     headers: {
       "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken?.accessToken}`,
     },
     redirect: "follow",
     referrerPolicy: "no-referrer",
@@ -63,7 +71,8 @@ export async function postSchedules(
 }
 
 export async function deleteSchedule(
-  scheduleId: number
+  scheduleId: number,
+  accessToken: AccessToken | undefined
 ): Promise<TApiResponseDto<number>> {
   const response = await fetch(`${url}/${scheduleId}`, {
     method: "DELETE",
@@ -72,6 +81,7 @@ export async function deleteSchedule(
     credentials: "same-origin",
     headers: {
       "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken?.accessToken}`,
     },
     redirect: "follow",
     referrerPolicy: "no-referrer",

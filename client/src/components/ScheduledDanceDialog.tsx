@@ -8,6 +8,7 @@ import {
 import { useState } from "react";
 import { TimePicker } from "@material-ui/pickers";
 import { DateTime } from "luxon";
+import { useOktaAuth } from "@okta/okta-react";
 
 import { useErrorHandling } from "../hooks/useErrorHandling";
 import { TDance } from "../models/TDance";
@@ -59,6 +60,9 @@ export function ScheduledDanceDialog(
     useErrorHandling();
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
 
+  const { authState } = useOktaAuth();
+  const accessToken = authState?.accessToken;
+
   function onCloseHandler() {
     resetApiResponseState();
     setValidationErrors([]);
@@ -94,7 +98,8 @@ export function ScheduledDanceDialog(
         DanceId: dance.id,
       },
       scheduledDances,
-      scheduleId
+      scheduleId,
+      accessToken
     );
 
     if (errors.length > 0) {
@@ -104,10 +109,25 @@ export function ScheduledDanceDialog(
 
     const getApiCall =
       modalType === "add"
-        ? () => addScheduledDance(startAt, endAt, dance.id, studio, scheduleId)
-        : // eslint-disable-next-line
-          // @ts-ignore typescript is stupid sometimes
-          () => editScheduledDance(scheduledDance.id, startAt, endAt, studio);
+        ? () =>
+            addScheduledDance(
+              startAt,
+              endAt,
+              dance.id,
+              studio,
+              scheduleId,
+              accessToken
+            )
+        : () =>
+            editScheduledDance(
+              // eslint-disable-next-line
+              // @ts-ignore typescript is stupid sometimes
+              scheduledDance.id,
+              startAt,
+              endAt,
+              studio,
+              accessToken
+            );
 
     await makeApiCall(getApiCall, () => {
       onCloseHandler();

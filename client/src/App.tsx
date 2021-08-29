@@ -2,6 +2,7 @@ import { CssBaseline } from "@material-ui/core";
 import { useState, useEffect } from "react";
 import { MuiPickersUtilsProvider } from "@material-ui/pickers";
 import LuxonUtils from "@date-io/luxon";
+import { useOktaAuth } from "@okta/okta-react";
 import "./index.css";
 
 import { AppMenu } from "./components/AppMenu";
@@ -31,8 +32,11 @@ function App(): JSX.Element {
     undefined
   );
 
+  const { authState } = useOktaAuth();
+  const accessToken = authState?.accessToken;
+
   function fetchTeachers() {
-    getAllTeachers().then((teachersResponse) => {
+    getAllTeachers(accessToken).then((teachersResponse) => {
       setTeachers(
         teachersResponse.data.sort((a, b) => a.name.localeCompare(b.name))
       );
@@ -40,7 +44,7 @@ function App(): JSX.Element {
   }
 
   function fetchStudios() {
-    getAllStudios().then((studiosResponse) => {
+    getAllStudios(accessToken).then((studiosResponse) => {
       setStudios(
         studiosResponse.data.sort((a, b) => a.name.localeCompare(b.name))
       );
@@ -48,7 +52,7 @@ function App(): JSX.Element {
   }
 
   function fetchDancers() {
-    getAllDancers().then((dancersResponse) => {
+    getAllDancers(accessToken).then((dancersResponse) => {
       setDancers(
         dancersResponse.data.sort((a, b) => a.name.localeCompare(b.name))
       );
@@ -56,7 +60,7 @@ function App(): JSX.Element {
   }
 
   function fetchDances() {
-    getAllDances().then((dancesResponse) => {
+    getAllDances(accessToken).then((dancesResponse) => {
       setDances(
         dancesResponse.data.sort((a, b) => a.name.localeCompare(b.name))
       );
@@ -64,13 +68,13 @@ function App(): JSX.Element {
   }
 
   function fetchScheduledDances() {
-    getAllScheduledDances().then((scheduledDancesResponse) => {
+    getAllScheduledDances(accessToken).then((scheduledDancesResponse) => {
       setScheduledDances(scheduledDancesResponse.data);
     });
   }
 
   function fetchSchedules() {
-    getAllSchedules().then((schedulesResponse) => {
+    getAllSchedules(accessToken).then((schedulesResponse) => {
       setSchedules(schedulesResponse.data.sort((a, b) => a.id - b.id));
     });
   }

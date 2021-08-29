@@ -1,3 +1,4 @@
+import { AccessToken } from "@okta/okta-auth-js";
 import { DateTime } from "luxon";
 import { TApiResponseDto } from "../models/TApiResponseDto";
 import { TDance } from "../models/TDance";
@@ -22,31 +23,36 @@ type TScheduledDancePartial = Pick<
   "StudioId" | "endAt" | "startAt" | "DanceId"
 >;
 
-export async function getAllSchedules(): Promise<TApiResponseDto<TSchedule[]>> {
-  return await getSchedules();
+export async function getAllSchedules(
+  accessToken: AccessToken | undefined
+): Promise<TApiResponseDto<TSchedule[]>> {
+  return await getSchedules(accessToken);
 }
 
 export async function updateSchedule(
   value: string,
-  scheduleId: number
+  scheduleId: number,
+  accessToken: AccessToken | undefined
 ): Promise<TApiResponseDto<number>> {
   const mappedData = mapToUpdateScheduleDto(value);
 
-  return await patchSchedule(scheduleId, mappedData);
+  return await patchSchedule(scheduleId, mappedData, accessToken);
 }
 
 export async function addSchedules(
-  value: string
+  value: string,
+  accessToken: AccessToken | undefined
 ): Promise<TApiResponseDto<TStudio[]>> {
   const mappedData = mapToAddSchedulesDto(value);
 
-  return await postSchedules(mappedData);
+  return await postSchedules(mappedData, accessToken);
 }
 
 export async function removeSchedule(
-  scheduleId: number
+  scheduleId: number,
+  accessToken: AccessToken | undefined
 ): Promise<TApiResponseDto<number>> {
-  return await deleteSchedule(scheduleId);
+  return await deleteSchedule(scheduleId, accessToken);
 }
 
 export function getAllTimeslots(): DateTime[] {
@@ -203,7 +209,8 @@ function isScheduledDance(
 export async function valiateScheduledDance(
   scheduledDance: TScheduledDancePartial | TScheduledDance,
   scheduledDances: TScheduledDance[],
-  scheduleId: number
+  scheduleId: number,
+  accessToken: AccessToken | undefined
 ): Promise<string[]> {
   const { StudioId } = scheduledDance;
 
@@ -224,7 +231,8 @@ export async function valiateScheduledDance(
   const dancersDoubleBookedErrors = await getDancersWhoAreDoubleBooked(
     scheduledDancesFiltered,
     scheduledDance,
-    scheduleId
+    scheduleId,
+    accessToken
   );
 
   return [...dancesAtSameTimeErrors, ...dancersDoubleBookedErrors];
@@ -300,12 +308,14 @@ function getStartAndEndStamp(
 async function getDancersWhoAreDoubleBooked(
   scheduledDances: TScheduledDance[],
   newScheduledDance: TScheduledDancePartial,
-  scheduleId: number
+  scheduleId: number,
+  accessToken: AccessToken | undefined
 ): Promise<string[]> {
   const errors: string[] = [];
 
-  const dancersInNewDance = (await getDancersInDance(newScheduledDance.DanceId))
-    .data;
+  const dancersInNewDance = (
+    await getDancersInDance(newScheduledDance.DanceId, accessToken)
+  ).data;
 
   const { startStamp, endStamp } = getStartAndEndStamp(newScheduledDance);
 
@@ -327,7 +337,7 @@ async function getDancersWhoAreDoubleBooked(
 
   for (const danceAtSameTime of dancesAtSameTime) {
     const dancersInDanceAtSameTime = (
-      await getDancersInDance(danceAtSameTime.DanceId)
+      await getDancersInDance(danceAtSameTime.DanceId, accessToken)
     ).data;
 
     const dancersInBothDances = dancersInNewDance.filter((dancer) => {

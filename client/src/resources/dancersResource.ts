@@ -1,3 +1,4 @@
+import { AccessToken } from "@okta/okta-auth-js";
 import { TAddDancersDto } from "../models/TAddDancersDto";
 import { TApiResponseDto } from "../models/TApiResponseDto";
 import { TDancer } from "../models/TDancer";
@@ -5,7 +6,9 @@ import { TUpdateDancerDto } from "../models/TUpdateDancerDto";
 
 const url = "/dancers";
 
-export async function getDancers(): Promise<TApiResponseDto<TDancer[]>> {
+export async function getDancers(
+  accessToken: AccessToken | undefined
+): Promise<TApiResponseDto<TDancer[]>> {
   const response = await fetch(url, {
     method: "GET",
     mode: "cors",
@@ -13,6 +16,7 @@ export async function getDancers(): Promise<TApiResponseDto<TDancer[]>> {
     credentials: "same-origin",
     headers: {
       "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken?.accessToken}`,
     },
     redirect: "follow",
     referrerPolicy: "no-referrer",
@@ -23,7 +27,8 @@ export async function getDancers(): Promise<TApiResponseDto<TDancer[]>> {
 
 export async function patchDancer(
   dancerId: number,
-  options: TUpdateDancerDto
+  options: TUpdateDancerDto,
+  accessToken: AccessToken | undefined
 ): Promise<TApiResponseDto<number>> {
   const requestUrl = `${url}/${dancerId}`;
 
@@ -34,6 +39,7 @@ export async function patchDancer(
     credentials: "same-origin",
     headers: {
       "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken?.accessToken}`,
     },
     redirect: "follow",
     referrerPolicy: "no-referrer",
@@ -44,7 +50,8 @@ export async function patchDancer(
 }
 
 export async function postDancers(
-  dancers: TAddDancersDto
+  dancers: TAddDancersDto,
+  accessToken: AccessToken | undefined
 ): Promise<TApiResponseDto<TDancer[]>> {
   const response = await fetch(url, {
     method: "POST",
@@ -53,6 +60,7 @@ export async function postDancers(
     credentials: "same-origin",
     headers: {
       "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken?.accessToken}`,
     },
     redirect: "follow",
     referrerPolicy: "no-referrer",
@@ -63,7 +71,8 @@ export async function postDancers(
 }
 
 export async function deleteDancer(
-  dancerId: number
+  dancerId: number,
+  accessToken: AccessToken | undefined
 ): Promise<TApiResponseDto<number>> {
   const response = await fetch(`${url}/${dancerId}`, {
     method: "DELETE",
@@ -72,6 +81,7 @@ export async function deleteDancer(
     credentials: "same-origin",
     headers: {
       "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken?.accessToken}`,
     },
     redirect: "follow",
     referrerPolicy: "no-referrer",

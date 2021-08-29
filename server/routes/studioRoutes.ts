@@ -1,11 +1,12 @@
 import * as express from "express";
 import Api from "../api";
 
-export function studioRouter(api: Api) {
+export function studioRouter(api: Api, authenticationCheck) {
   const router = express.Router();
 
   router.get(
     "/:id?",
+    authenticationCheck,
     async (req, res, next) => {
       const {
         params: { id },
@@ -27,7 +28,7 @@ export function studioRouter(api: Api) {
     }
   );
 
-  router.post("/", (req, res) => {
+  router.post("/", authenticationCheck, (req, res) => {
     const { studios }: { studios: string[] } = req.body;
 
     api.addStudios(studios).then((returnVal) => {
@@ -35,7 +36,7 @@ export function studioRouter(api: Api) {
     });
   });
 
-  router.patch("/:studioId", (req, res) => {
+  router.patch("/:studioId", authenticationCheck, (req, res) => {
     const { studioId } = req.params;
     const { options }: { options: { newStudioName: string } } = req.body;
 
@@ -44,7 +45,7 @@ export function studioRouter(api: Api) {
     });
   });
 
-  router.delete("/:studioId", (req, res) => {
+  router.delete("/:studioId", authenticationCheck, (req, res) => {
     const { studioId } = req.params;
 
     api.deleteStudio(studioId).then((returnVal) => {

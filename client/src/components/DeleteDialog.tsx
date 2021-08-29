@@ -1,6 +1,7 @@
 import { Button, ButtonGroup, DialogTitle, TextField } from "@material-ui/core";
 import { Dialog } from "@material-ui/core";
 import { useState } from "react";
+import { useOktaAuth } from "@okta/okta-react";
 
 import { TDance } from "../models/TDance";
 import { TDancer } from "../models/TDancer";
@@ -24,6 +25,8 @@ type TDeleteDialogProps = {
 
 export function DeleteDialog(props: TDeleteDialogProps): JSX.Element {
   const { open, onClose, onSuccess, dialogType, items } = props;
+  const { authState } = useOktaAuth();
+  const accessToken = authState?.accessToken;
 
   const [selectValue, setSelectValue] = useState<number>(0);
 
@@ -44,13 +47,13 @@ export function DeleteDialog(props: TDeleteDialogProps): JSX.Element {
     async function getApiCallBasedOnDialogType() {
       switch (dialogType) {
         case "studio":
-          return await deleteStudio(selectValue);
+          return await deleteStudio(selectValue, accessToken);
         case "teacher":
-          return await deleteTeacher(selectValue);
+          return await deleteTeacher(selectValue, accessToken);
         case "dancer":
-          return await deleteDancer(selectValue);
+          return await deleteDancer(selectValue, accessToken);
         case "dance":
-          return await deleteDance(selectValue);
+          return await deleteDance(selectValue, accessToken);
         default:
           return undefined;
       }

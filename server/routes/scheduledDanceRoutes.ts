@@ -1,16 +1,16 @@
 import * as express from "express";
 import Api from "../api";
 
-export function scheduledDanceRouter(api: Api) {
+export function scheduledDanceRouter(api: Api, authenticationCheck) {
   const router = express.Router();
 
-  router.get("/", (req, res) => {
+  router.get("/", authenticationCheck, (req, res) => {
     api.getScheduledDances().then((returnVal) => {
       res.send(returnVal);
     });
   });
 
-  router.post("/", (req, res) => {
+  router.post("/", authenticationCheck, (req, res) => {
     const { startAt, endAt, danceId, studioId, scheduleId } = req.body;
 
     api
@@ -20,7 +20,7 @@ export function scheduledDanceRouter(api: Api) {
       });
   });
 
-  router.patch("/:scheduledDanceId", (req, res) => {
+  router.patch("/:scheduledDanceId", authenticationCheck, (req, res) => {
     const { scheduledDanceId } = req.params;
     const {
       options: { startAt, endAt, studioId },
@@ -34,7 +34,7 @@ export function scheduledDanceRouter(api: Api) {
       });
   });
 
-  router.delete("/:scheduledDanceId", (req, res) => {
+  router.delete("/:scheduledDanceId", authenticationCheck, (req, res) => {
     const { scheduledDanceId } = req.params;
 
     api.deleteScheduledDance(scheduledDanceId).then((returnVal) => {

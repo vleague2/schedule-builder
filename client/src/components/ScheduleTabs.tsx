@@ -9,6 +9,7 @@ import {
 } from "@material-ui/core";
 import AddCircleIcon from "@material-ui/icons/AddCircle";
 import { ChangeEvent, useState } from "react";
+import { useOktaAuth } from "@okta/okta-react";
 
 import { UnscheduledDanceColumn } from "./UnscheduledDanceColumn";
 import { ScheduleTable } from "./ScheduleTable";
@@ -67,6 +68,9 @@ export function ScheduleTabs(props: TScheduleTabsProps): JSX.Element {
   const [selectedTab, setSelectedTab] = useState<number>(0);
   const [newScheduleName, setNewScheduleName] = useState<string>("");
 
+  const { authState } = useOktaAuth();
+  const accessToken = authState?.accessToken;
+
   const {
     schedules,
     studios,
@@ -83,7 +87,7 @@ export function ScheduleTabs(props: TScheduleTabsProps): JSX.Element {
   }
 
   async function createNewSchedule() {
-    await addSchedules(newScheduleName);
+    await addSchedules(newScheduleName, accessToken);
     fetchSchedules();
   }
 

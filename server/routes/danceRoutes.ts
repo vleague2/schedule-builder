@@ -1,11 +1,12 @@
 import * as express from "express";
 import Api from "../api";
 
-export function danceRouter(api: Api) {
+export function danceRouter(api: Api, authenticationCheck) {
   const router = express.Router();
 
   router.get(
     "/:id?",
+    authenticationCheck,
     async (req, res, next) => {
       const {
         params: { id },
@@ -29,7 +30,7 @@ export function danceRouter(api: Api) {
     }
   );
 
-  router.get("/:danceId/dancers", (req, res) => {
+  router.get("/:danceId/dancers", authenticationCheck, (req, res) => {
     const { danceId } = req.params;
 
     api.getDancersForDance(danceId).then((returnVal) => {
@@ -37,7 +38,7 @@ export function danceRouter(api: Api) {
     });
   });
 
-  router.post("/", (req, res) => {
+  router.post("/", authenticationCheck, (req, res) => {
     const { dances }: { dances: { danceName: string; teacherId: string }[] } =
       req.body;
 
@@ -46,7 +47,7 @@ export function danceRouter(api: Api) {
     });
   });
 
-  router.post("/:danceId/dancers", (req, res) => {
+  router.post("/:danceId/dancers", authenticationCheck, (req, res) => {
     const { danceId } = req.params;
 
     const { dancerIds }: { dancerIds: string[] } = req.body;
@@ -56,7 +57,7 @@ export function danceRouter(api: Api) {
     });
   });
 
-  router.patch("/:danceId", (req, res) => {
+  router.patch("/:danceId", authenticationCheck, (req, res) => {
     const { danceId } = req.params;
     const {
       options,
@@ -67,7 +68,7 @@ export function danceRouter(api: Api) {
     });
   });
 
-  router.delete("/:danceId", (req, res) => {
+  router.delete("/:danceId", authenticationCheck, (req, res) => {
     const { danceId } = req.params;
 
     api.deleteDance(danceId).then((returnVal) => {
@@ -75,7 +76,7 @@ export function danceRouter(api: Api) {
     });
   });
 
-  router.delete("/:danceId/dancers", (req, res) => {
+  router.delete("/:danceId/dancers", authenticationCheck, (req, res) => {
     const { danceId } = req.params;
     const { dancerIds }: { dancerIds: string[] } = req.body;
 

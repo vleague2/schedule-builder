@@ -1,6 +1,7 @@
 import { Button, ButtonGroup, DialogTitle, TextField } from "@material-ui/core";
 import { Dialog } from "@material-ui/core";
 import { useState } from "react";
+import { useOktaAuth } from "@okta/okta-react";
 
 import { TTeacher } from "../models/TTeacher";
 import { addDancers } from "../services/dancersService";
@@ -22,6 +23,8 @@ type TAddDialogProps = {
 
 export function AddDialog(props: TAddDialogProps): JSX.Element {
   const { open, onClose, onSuccess, dialogType, teachers } = props;
+  const { authState } = useOktaAuth();
+  const accessToken = authState?.accessToken;
 
   const [value, setValue] = useState<string>("");
   const [teacherSelectValue, setTeacherSelectValue] = useState<number>(0);
@@ -48,14 +51,14 @@ export function AddDialog(props: TAddDialogProps): JSX.Element {
     async function getApiCallBasedOnDialogType() {
       switch (dialogType) {
         case "studio":
-          return await addStudios(value);
+          return await addStudios(value, accessToken);
         case "teacher":
-          return await addTeachers(value);
+          return await addTeachers(value, accessToken);
         case "dancer":
-          return await addDancers(value);
+          return await addDancers(value, accessToken);
         case "dance":
           if (teacherSelectValue > 0) {
-            return await addDances(value, teacherSelectValue);
+            return await addDances(value, teacherSelectValue, accessToken);
           }
 
           return undefined;
