@@ -1,3 +1,4 @@
+import { Card, Container, Typography, Button } from "@material-ui/core";
 import { useOktaAuth } from "@okta/okta-react";
 
 export function Login(): JSX.Element {
@@ -13,17 +14,35 @@ export function Login(): JSX.Element {
 
   if (!authState.isAuthenticated) {
     return (
-      <div>
-        <p>Not Logged in yet</p>
-        <button onClick={login}>Login</button>
-      </div>
+      <Container maxWidth="xs" style={{ textAlign: "center" }}>
+        <Card
+          style={{ padding: 40, backgroundColor: "#efefef", marginTop: 80 }}
+        >
+          <Typography variant="h5" component="h1">
+            Log in to UPAC Schedule Builder
+          </Typography>
+          <br />
+          <br />
+          <Button variant="contained" color="primary" onClick={login}>
+            Login
+          </Button>
+        </Card>
+      </Container>
     );
   }
 
   return (
-    <div>
-      <p>Logged in!</p>
-      <button onClick={logout}>Logout</button>
-    </div>
+    <Container maxWidth="xs" style={{ textAlign: "center" }}>
+      <Card style={{ padding: 40, backgroundColor: "#efefef", marginTop: 80 }}>
+        <Typography variant="h5" component="h1">
+          You are logged into UPAC Schedule Builder
+        </Typography>
+        <br />
+        <br />
+        <Button variant="contained" color="primary" onClick={logout}>
+          Logout
+        </Button>
+      </Card>
+    </Container>
   );
 }
