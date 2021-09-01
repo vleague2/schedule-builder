@@ -152,6 +152,7 @@ export function ScheduleTabs(props: TScheduleTabsProps): JSX.Element {
                     refetch={fetchScheduledDances}
                     studios={studios}
                     scheduleId={schedule.id}
+                    dances={dances}
                   />
                 </Grid>
               </Grid>

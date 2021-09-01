@@ -23,6 +23,7 @@ import { valiateScheduledDance } from "../services/scheduleService";
 
 type TScheduledDanceDialogProps = {
   dance: TDance;
+  dances: TDance[];
   open: boolean;
   onClose: () => void;
   studios: TStudio[];
@@ -40,6 +41,7 @@ export function ScheduledDanceDialog(
 ): JSX.Element {
   const {
     dance,
+    dances,
     open,
     onClose,
     studios,
@@ -91,14 +93,17 @@ export function ScheduledDanceDialog(
     setValidationErrors([]);
 
     const errors = await valiateScheduledDance(
-      scheduledDance || {
+      {
         startAt,
         endAt,
         StudioId: studio,
         DanceId: dance.id,
+        id: scheduledDance?.id,
       },
       scheduledDances,
+      dances,
       scheduleId,
+      dance.TeacherId,
       accessToken
     );
 

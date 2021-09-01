@@ -209,7 +209,9 @@ function isScheduledDance(
 export async function valiateScheduledDance(
   scheduledDance: TScheduledDancePartial | TScheduledDance,
   scheduledDances: TScheduledDance[],
+  dances: TDance[],
   scheduleId: number,
+  teacherId: number,
   accessToken: AccessToken | undefined
 ): Promise<string[]> {
   const { StudioId } = scheduledDance;
@@ -228,12 +230,15 @@ export async function valiateScheduledDance(
     scheduleId
   );
 
-  const dancersDoubleBookedErrors = await getDancersWhoAreDoubleBooked(
-    scheduledDancesFiltered,
-    scheduledDance,
-    scheduleId,
-    accessToken
-  );
+  const dancersDoubleBookedErrors =
+    await getDancersAndTeachersWhoAreDoubleBooked(
+      scheduledDancesFiltered,
+      scheduledDance,
+      scheduleId,
+      teacherId,
+      dances,
+      accessToken
+    );
 
   return [...dancesAtSameTimeErrors, ...dancersDoubleBookedErrors];
 }
@@ -305,10 +310,12 @@ function getStartAndEndStamp(
   return { startStamp, endStamp };
 }
 
-async function getDancersWhoAreDoubleBooked(
+async function getDancersAndTeachersWhoAreDoubleBooked(
   scheduledDances: TScheduledDance[],
   newScheduledDance: TScheduledDancePartial,
   scheduleId: number,
+  teacherId: number,
+  dances: TDance[],
   accessToken: AccessToken | undefined
 ): Promise<string[]> {
   const errors: string[] = [];
@@ -350,6 +357,14 @@ async function getDancersWhoAreDoubleBooked(
       dancersInBothDances.forEach((dancer) =>
         errors.push(`${dancer.name} is in a dance scheduled at the same time`)
       );
+    }
+
+    const teacherOfDance = dances.find(
+      (dance) => dance.id === danceAtSameTime.DanceId
+    )?.TeacherId;
+
+    if (teacherOfDance === teacherId) {
+      errors.push("This teacher is already teaching at this time");
     }
   }
 

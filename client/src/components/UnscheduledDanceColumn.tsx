@@ -12,6 +12,7 @@ type TUnscheduledDanceColumnProps = {
   scheduledDances: TScheduledDance[];
   teachers: TTeacher[];
   dancers: TDancer[];
+  dances: TDance[];
   studios: TStudio[];
   scheduleId: number;
   refetch: () => void;
@@ -27,6 +28,7 @@ export function UnscheduledDanceColumn(
     studios,
     scheduledDances,
     scheduleId,
+    dances,
   } = props;
 
   return (
@@ -43,6 +45,7 @@ export function UnscheduledDanceColumn(
             )}
             refetch={refetch}
             studios={studios}
+            dances={dances}
             scheduleId={scheduleId}
           />
         </div>

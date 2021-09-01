@@ -116,6 +116,7 @@ export function ScheduleTable(props: TScheduleTableProps): JSX.Element {
             refetch();
           }}
           dance={selectedDance}
+          dances={dances}
           scheduledDances={scheduledDances}
           scheduledDance={selectedScheduledDance}
           studios={studios}

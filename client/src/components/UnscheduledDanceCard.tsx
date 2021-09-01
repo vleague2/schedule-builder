@@ -18,6 +18,7 @@ type TUnscheduledDanceCardProps = {
   scheduledDances: TScheduledDance[];
   refetch: () => void;
   studios: TStudio[];
+  dances: TDance[];
   scheduleId: number;
   teacher?: TTeacher;
 };
@@ -32,6 +33,7 @@ export function UnscheduledDanceCard(
     studios,
     scheduledDances,
     scheduleId,
+    dances,
   } = props;
   const [cast, setCast] = useState<TDancer[] | undefined>(undefined);
   const [castOpen, setCastOpen] = useState<boolean>(false);
@@ -89,6 +91,7 @@ export function UnscheduledDanceCard(
           refetch();
         }}
         dance={unscheduledDance}
+        dances={dances}
         studios={studios}
         modalType="add"
         scheduledDances={scheduledDances}
