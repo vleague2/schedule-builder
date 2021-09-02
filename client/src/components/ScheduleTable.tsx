@@ -67,7 +67,7 @@ export function ScheduleTable(props: TScheduleTableProps): JSX.Element {
 
   return (
     <>
-      <div style={{ width: "100%" }}>
+      <div style={{ width: "100%" }} id="tableDiv">
         <table
           style={{
             width: "100%",

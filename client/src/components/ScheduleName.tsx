@@ -1,6 +1,7 @@
 import { IconButton, Typography } from "@material-ui/core";
 import EditIcon from "@material-ui/icons/Edit";
 import CancelIcon from "@material-ui/icons/Cancel";
+import SaveAltIcon from "@material-ui/icons/SaveAlt";
 import { useOktaAuth } from "@okta/okta-react";
 
 import { TSchedule } from "../models/TSchedule";
@@ -35,6 +36,30 @@ export function ScheduleName(props: TScheduleNameProps): JSX.Element {
     });
   }
 
+  function savePdf() {
+    const printMe = window.open("") as Window;
+    printMe.document.write(
+      `<html><head><style>th,
+      tr,
+      td {
+        border: 1px solid gray;
+      }</style></head><body><h1 style="text-align: center">${
+        schedule.name
+      }</h1>${document.getElementById("tableDiv")?.innerHTML}</body></html>`
+    );
+
+    const iconButtons = printMe.document.querySelectorAll(".iconButton");
+
+    const iconButtonsArray = Array.from(iconButtons);
+
+    iconButtonsArray.forEach((iconButton) => iconButton.remove());
+
+    printMe.print();
+    printMe.close();
+
+    return true;
+  }
+
   return (
     <>
       <div
@@ -59,6 +84,9 @@ export function ScheduleName(props: TScheduleNameProps): JSX.Element {
         </IconButton>
         <IconButton size="small" onClick={() => setDeleteDialogOpen(true)}>
           <CancelIcon style={{ fontSize: 16 }} />
+        </IconButton>
+        <IconButton size="small" onClick={() => savePdf()}>
+          <SaveAltIcon style={{ fontSize: 16 }} />
         </IconButton>
       </div>
       <EditScheduleDialog

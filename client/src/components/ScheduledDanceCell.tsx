@@ -82,18 +82,25 @@ export function ScheduledDanceCell(props: TScheduledDanceCell): JSX.Element {
           {startAtDate.toFormat("h:mm a")} - {endAtDate.toFormat("h:mm a")}
         </Typography>
         <br />
-        <IconButton size="small" onClick={handleClick} component="button">
+        <IconButton
+          size="small"
+          onClick={handleClick}
+          component="button"
+          className="iconButton"
+        >
           <InfoIcon style={{ fontSize: 16 }} />
         </IconButton>
         <IconButton
           size="small"
           onClick={() => editScheduledDance(scheduledDance, "edit")}
+          className="iconButton"
         >
           <EditIcon style={{ fontSize: 16 }} />
         </IconButton>
         <IconButton
           size="small"
           onClick={() => editScheduledDance(scheduledDance, "delete")}
+          className="iconButton"
         >
           <CancelIcon style={{ fontSize: 16 }} />
         </IconButton>
