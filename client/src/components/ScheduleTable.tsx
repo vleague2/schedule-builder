@@ -77,11 +77,11 @@ export function ScheduleTable(props: TScheduleTableProps): JSX.Element {
         >
           <thead>
             <tr>
-              <th>Time</th>
+              <th style={{ width: "10%" }}>Time</th>
               {studios.map((studio) => (
-                <td key={studio.id}>
+                <th key={studio.id} style={{ width: "18%" }}>
                   <Typography variant="body2">{studio.name}</Typography>
-                </td>
+                </th>
               ))}
             </tr>
           </thead>
