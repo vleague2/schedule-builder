@@ -124,7 +124,13 @@ export function ScheduleTabs(props: TScheduleTabsProps): JSX.Element {
           <TabPanel value={selectedTab} index={index} key={schedule.id}>
             <Container maxWidth="lg" style={{ marginTop: 30 }}>
               <Grid container justifyContent="center">
-                <Grid container item md={8} xs={12}>
+                <Grid
+                  container
+                  item
+                  md={8}
+                  xs={12}
+                  style={{ alignContent: "flex-start" }}
+                >
                   <ScheduleName schedule={schedule} refetch={fetchSchedules} />
                   <br />
                   <br />
