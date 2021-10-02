@@ -1,11 +1,6 @@
-import {
-  Button,
-  ButtonGroup,
-  Dialog,
-  TextField,
-  Typography,
-} from "@material-ui/core";
+import { TextField } from "@material-ui/core";
 import { useState } from "react";
+import { Dialog } from "./Dialog";
 
 type TEditScheduleDialogProps = {
   itemName: string;
@@ -31,25 +26,20 @@ export function EditScheduleDialog(
   }
 
   return (
-    <Dialog open={open} onClose={onClose}>
-      <div style={{ padding: 40, width: 600 }}>
-        <Typography>Edit {itemName}</Typography>
-        <br />
-        <TextField
-          variant="outlined"
-          label="Enter a new name"
-          value={value}
-          onChange={(e) => setValue(e.target.value)}
-        />
-        <br />
-        <br />
-        <ButtonGroup style={{ marginTop: 30 }}>
-          <Button color="primary" variant="contained" onClick={onClickHandler}>
-            Save
-          </Button>
-          <Button onClick={onCloseHandler}>Cancel</Button>
-        </ButtonGroup>
-      </div>
+    <Dialog
+      open={open}
+      onClose={onCloseHandler}
+      dialogTitle={`Edit ${itemName}`}
+      primaryButtonDisabled={value === ""}
+      primaryButtonLabel="Save"
+      primaryButtonOnClick={onClickHandler}
+    >
+      <TextField
+        variant="outlined"
+        label="Enter a new name"
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+      />
     </Dialog>
   );
 }

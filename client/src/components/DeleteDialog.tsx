@@ -1,5 +1,3 @@
-import { Button, ButtonGroup, DialogTitle, TextField } from "@material-ui/core";
-import { Dialog } from "@material-ui/core";
 import { useState } from "react";
 import { useOktaAuth } from "@okta/okta-react";
 
@@ -14,6 +12,8 @@ import { deleteDance } from "../services/dancesService";
 import { TAdminDialogType } from "../models/TAdminDialogType";
 import { useErrorHandling } from "../hooks/useErrorHandling";
 import { DialogErrorMessage } from "./DialogErrorMessage";
+import { Dropdown } from "./Dropdown";
+import { Dialog } from "./Dialog";
 
 type TDeleteDialogProps = {
   open: boolean;
@@ -34,7 +34,7 @@ export function DeleteDialog(props: TDeleteDialogProps): JSX.Element {
     useErrorHandling();
 
   function buttonIsDisabled() {
-    return selectValue === 0;
+    return !selectValue;
   }
 
   function onCloseHandler() {
@@ -45,6 +45,10 @@ export function DeleteDialog(props: TDeleteDialogProps): JSX.Element {
 
   async function saveData() {
     async function getApiCallBasedOnDialogType() {
+      if (selectValue === 0 || !dialogType) {
+        return;
+      }
+
       switch (dialogType) {
         case "studio":
           return await deleteStudio(selectValue, accessToken);
@@ -59,57 +63,35 @@ export function DeleteDialog(props: TDeleteDialogProps): JSX.Element {
       }
     }
 
-    if (dialogType !== undefined) {
-      await makeApiCall(getApiCallBasedOnDialogType, (count: number) => {
-        onSuccess(`Successfully deleted ${count} ${dialogType}(s)`);
-        onCloseHandler();
-      });
-    }
+    await makeApiCall(getApiCallBasedOnDialogType, (count: number) => {
+      onSuccess(`Successfully deleted ${count} ${dialogType}(s)`);
+      onCloseHandler();
+    });
   }
 
   return (
-    <Dialog open={open} onClose={onCloseHandler}>
-      <div style={{ padding: 40, width: 600 }}>
-        <DialogTitle style={{ marginBottom: 15 }}>
-          Delete a {dialogType}
-        </DialogTitle>
-        <DialogErrorMessage
-          errors={apiResponseState.errors}
-          successCount={apiResponseState.successes}
-          dialogType={dialogType}
-        />
-        <TextField
-          select
-          fullWidth
-          variant="outlined"
-          label={`Select the ${dialogType} you want to delete`}
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-            setSelectValue(parseInt(event.target.value));
-          }}
-          style={{ marginBottom: 20 }}
-          value={selectValue}
-        >
-          <option value={0} selected disabled>
-            Select a {dialogType}
-          </option>
-          {items.map((item) => (
-            <option value={item.id} key={item.id}>
-              {item.name}
-            </option>
-          ))}
-        </TextField>
-        <ButtonGroup style={{ marginTop: 30 }}>
-          <Button
-            color="primary"
-            variant="contained"
-            onClick={saveData}
-            disabled={buttonIsDisabled()}
-          >
-            Delete
-          </Button>
-          <Button onClick={onCloseHandler}>Cancel</Button>
-        </ButtonGroup>
-      </div>
+    <Dialog
+      open={open}
+      onClose={onCloseHandler}
+      dialogTitle={`Delete a ${dialogType}`}
+      primaryButtonOnClick={saveData}
+      primaryButtonLabel="Delete"
+      primaryButtonDisabled={buttonIsDisabled()}
+    >
+      <DialogErrorMessage
+        errors={apiResponseState.errors}
+        successCount={apiResponseState.successes}
+        dialogType={dialogType}
+      />
+      <Dropdown
+        label={`Select the ${dialogType} you want to delete`}
+        setValue={(value: string) => setSelectValue(parseInt(value))}
+        value={selectValue.toString()}
+        dropdownItems={items.map((item) => ({
+          label: item.name,
+          value: item.id.toString(),
+        }))}
+      />
     </Dialog>
   );
 }

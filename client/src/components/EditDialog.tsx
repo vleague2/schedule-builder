@@ -1,5 +1,4 @@
-import { Button, ButtonGroup, DialogTitle, TextField } from "@material-ui/core";
-import { Dialog } from "@material-ui/core";
+import { TextField } from "@material-ui/core";
 import { useEffect, useState } from "react";
 import { useOktaAuth } from "@okta/okta-react";
 
@@ -14,6 +13,8 @@ import { updateDance } from "../services/dancesService";
 import { TAdminDialogType } from "../models/TAdminDialogType";
 import { useErrorHandling } from "../hooks/useErrorHandling";
 import { DialogErrorMessage } from "./DialogErrorMessage";
+import { Dialog } from "./Dialog";
+import { Dropdown } from "./Dropdown";
 
 type TEditDialogProps = {
   open: boolean;
@@ -94,82 +95,54 @@ export function EditDialog(props: TEditDialogProps): JSX.Element {
   }, [selectValue]);
 
   return (
-    <Dialog open={open} onClose={onCloseHandler}>
-      <div style={{ padding: 40, width: 600 }}>
-        <DialogTitle style={{ marginBottom: 15 }}>
-          Edit existing {dialogType}
-        </DialogTitle>
-        <DialogErrorMessage
-          errors={apiResponseState.errors}
-          successCount={apiResponseState.successes}
-          dialogType={dialogType}
-        />
-        <TextField
-          select
-          fullWidth
-          variant="outlined"
-          label={`Select the ${dialogType} you want to edit`}
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-            setSelectValue(parseInt(event.target.value));
+    <Dialog
+      open={open}
+      onClose={onCloseHandler}
+      dialogTitle={`Edit existing ${dialogType}`}
+      primaryButtonOnClick={saveData}
+      primaryButtonLabel="Save"
+      primaryButtonDisabled={buttonIsDisabled()}
+    >
+      <DialogErrorMessage
+        errors={apiResponseState.errors}
+        successCount={apiResponseState.successes}
+        dialogType={dialogType}
+      />
+      <Dropdown
+        label={`Select the ${dialogType} you want to edit`}
+        setValue={(value: string) => setSelectValue(parseInt(value))}
+        value={selectValue.toString()}
+        dropdownItems={items.map((item) => ({
+          label: item.name,
+          value: item.id.toString(),
+        }))}
+      />
+      <TextField
+        variant="outlined"
+        fullWidth
+        label={
+          dialogType === "dance"
+            ? `Enter new ${dialogType} name (optional)`
+            : `Enter new ${dialogType} name`
+        }
+        value={newValue}
+        onChange={(e) => setNewValue(e.target.value)}
+      />
+      <br />
+      <br />
+      {dialogType === "dance" && teachers && (
+        <Dropdown
+          label="Select a new teacher for this dance (optional)"
+          setValue={(value: string) => {
+            setSelectedTeacher(parseInt(value));
           }}
-          style={{ marginBottom: 20 }}
-          value={selectValue}
-        >
-          <option value={0} selected disabled>
-            Select a {dialogType}
-          </option>
-          {items.map((item) => (
-            <option value={item.id} key={item.id}>
-              {item.name}
-            </option>
-          ))}
-        </TextField>
-        <TextField
-          variant="outlined"
-          fullWidth
-          label={
-            dialogType === "dance"
-              ? `Enter new ${dialogType} name (optional)`
-              : `Enter new ${dialogType} name`
-          }
-          value={newValue}
-          onChange={(e) => setNewValue(e.target.value)}
+          value={selectedTeacher.toString()}
+          dropdownItems={teachers.map((teacher) => ({
+            label: teacher.name,
+            value: teacher.id.toString(),
+          }))}
         />
-        {dialogType === "dance" && teachers && (
-          <TextField
-            select
-            fullWidth
-            variant="outlined"
-            label="Select a new teacher for this dance (optional)"
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-              setSelectedTeacher(parseInt(event.target.value));
-            }}
-            style={{ marginBottom: 20, marginTop: 20 }}
-            value={selectedTeacher}
-          >
-            {teachers.map((teacher) => (
-              <option
-                value={teacher.id}
-                key={teacher.id}
-                selected={teacher.id === selectedTeacher}
-              >
-                {teacher.name}
-              </option>
-            ))}
-          </TextField>
-        )}
-        <ButtonGroup style={{ marginTop: 30 }}>
-          <Button
-            color="primary"
-            variant="contained"
-            onClick={saveData}
-            disabled={buttonIsDisabled()}
-          >
-            Save
-          </Button>
-          <Button onClick={onCloseHandler}>Cancel</Button>
-        </ButtonGroup>
-      </div>
+      )}
     </Dialog>
   );
 }

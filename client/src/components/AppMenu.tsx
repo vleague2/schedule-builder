@@ -17,10 +17,10 @@ import { DancerInDanceDialog } from "./DancerInDanceDialog";
 
 type TAppMenuProps = {
   state: {
-    teachers: TTeacher[] | undefined;
-    dancers: TDancer[] | undefined;
-    dances: TDance[] | undefined;
-    studios: TStudio[] | undefined;
+    teachers: TTeacher[];
+    dancers: TDancer[];
+    dances: TDance[];
+    studios: TStudio[];
   };
   refetch: {
     teachers: () => void;
@@ -34,7 +34,6 @@ export function AppMenu(props: TAppMenuProps): JSX.Element {
   const { state, refetch } = props;
 
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
-  const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
   const [snackbarMessage, setSnackbarMessage] = useState<string | undefined>(
     undefined
   );
@@ -56,12 +55,11 @@ export function AppMenu(props: TAppMenuProps): JSX.Element {
       return;
     }
 
-    setSnackbarOpen(false);
+    setSnackbarMessage(undefined);
   }
 
   function onDialogSuccess(message: string): void {
     setSnackbarMessage(message);
-    setSnackbarOpen(true);
   }
 
   function openDialog(
@@ -144,7 +142,7 @@ export function AppMenu(props: TAppMenuProps): JSX.Element {
           onClose={closeDialog}
           onSuccess={onDialogSuccess}
           dialogType={dialogOpen.type}
-          items={mapDialogTypeToState[dialogOpen.type] ?? []}
+          items={mapDialogTypeToState[dialogOpen.type]}
           teachers={state.teachers}
         />
       )}
@@ -155,7 +153,7 @@ export function AppMenu(props: TAppMenuProps): JSX.Element {
           onClose={closeDialog}
           onSuccess={onDialogSuccess}
           dialogType={dialogOpen.type}
-          items={mapDialogTypeToState[dialogOpen.type] ?? []}
+          items={mapDialogTypeToState[dialogOpen.type]}
         />
       )}
 
@@ -164,19 +162,17 @@ export function AppMenu(props: TAppMenuProps): JSX.Element {
           open={true}
           onClose={closeDialog}
           onSuccess={onDialogSuccess}
-          dances={state.dances ?? []}
-          dancers={state.dancers ?? []}
+          dances={state.dances}
+          dancers={state.dancers}
           dialogAction={dancerInDanceDialogOpen}
         />
       )}
 
-      {snackbarMessage && (
-        <Snackbar
-          open={snackbarOpen}
-          message={snackbarMessage}
-          onClose={handleSnackbarClose}
-        />
-      )}
+      <Snackbar
+        open={!!snackbarMessage}
+        message={snackbarMessage}
+        onClose={handleSnackbarClose}
+      />
     </>
   );
 }

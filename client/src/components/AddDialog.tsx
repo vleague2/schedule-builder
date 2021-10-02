@@ -1,5 +1,3 @@
-import { Button, ButtonGroup, DialogTitle, TextField } from "@material-ui/core";
-import { Dialog } from "@material-ui/core";
 import { useState } from "react";
 import { useOktaAuth } from "@okta/okta-react";
 
@@ -11,6 +9,9 @@ import { addTeachers } from "../services/teachersService";
 import { TAdminDialogType } from "../models/TAdminDialogType";
 import { useErrorHandling } from "../hooks/useErrorHandling";
 import { DialogErrorMessage } from "./DialogErrorMessage";
+import { Dialog } from "./Dialog";
+import { Dropdown } from "./Dropdown";
+import { TextField } from "@material-ui/core";
 
 type TAddDialogProps = {
   open: boolean;
@@ -76,59 +77,39 @@ export function AddDialog(props: TAddDialogProps): JSX.Element {
   }
 
   return (
-    <Dialog open={open} onClose={() => onCloseHandler()}>
-      <div style={{ padding: 40, width: 600 }}>
-        <DialogTitle style={{ marginBottom: 15 }}>
-          Add {dialogType}s to database
-        </DialogTitle>
-        <DialogErrorMessage
-          dialogType={dialogType}
-          errors={apiResponseState.errors}
-          successCount={apiResponseState.successes}
+    <Dialog
+      open={open}
+      onClose={onCloseHandler}
+      dialogTitle={`Add ${dialogType}s to database`}
+      primaryButtonDisabled={buttonIsDisabled()}
+      primaryButtonLabel="Save"
+      primaryButtonOnClick={saveData}
+    >
+      <DialogErrorMessage
+        dialogType={dialogType}
+        errors={apiResponseState.errors}
+        successCount={apiResponseState.successes}
+      />
+      {dialogType === "dance" && teachers && (
+        <Dropdown
+          label="Select the teacher of these dances"
+          setValue={(value: string) => setTeacherSelectValue(parseInt(value))}
+          value={teacherSelectValue.toString()}
+          dropdownItems={teachers.map((teacher) => ({
+            value: teacher.id.toString(),
+            label: teacher.name,
+          }))}
         />
-        {dialogType === "dance" && teachers && (
-          <TextField
-            select
-            fullWidth
-            variant="outlined"
-            label="Select the teacher of these dances"
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-              setTeacherSelectValue(parseInt(event.target.value));
-            }}
-            style={{ marginBottom: 20 }}
-            value={teacherSelectValue}
-          >
-            <option value={0} selected disabled>
-              Select a teacher
-            </option>
-            {teachers.map((teacher) => (
-              <option value={teacher.id} key={teacher.id}>
-                {teacher.name}
-              </option>
-            ))}
-          </TextField>
-        )}
-        <TextField
-          multiline
-          rows={5}
-          variant="outlined"
-          fullWidth
-          label={`Enter ${dialogType} names (comma separated)`}
-          value={value}
-          onChange={(e) => setValue(e.target.value)}
-        />
-        <ButtonGroup style={{ marginTop: 30 }}>
-          <Button
-            color="primary"
-            disabled={buttonIsDisabled()}
-            variant="contained"
-            onClick={saveData}
-          >
-            Save
-          </Button>
-          <Button onClick={onCloseHandler}>Cancel</Button>
-        </ButtonGroup>
-      </div>
+      )}
+      <TextField
+        multiline
+        rows={5}
+        variant="outlined"
+        fullWidth
+        label={`Enter ${dialogType} names (comma separated)`}
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+      />
     </Dialog>
   );
 }

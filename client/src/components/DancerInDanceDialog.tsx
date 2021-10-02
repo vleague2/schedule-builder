@@ -1,13 +1,4 @@
-import {
-  Button,
-  ButtonGroup,
-  Checkbox,
-  DialogTitle,
-  FormControlLabel,
-  TextField,
-  Typography,
-} from "@material-ui/core";
-import { Dialog } from "@material-ui/core";
+import { Checkbox, FormControlLabel, Typography } from "@material-ui/core";
 import { useEffect, useState } from "react";
 import { useOktaAuth } from "@okta/okta-react";
 
@@ -21,6 +12,8 @@ import {
 import { useErrorHandling } from "../hooks/useErrorHandling";
 import { DialogErrorMessage } from "./DialogErrorMessage";
 import { TAdminDialogAction } from "../models/TAdminDialogAction";
+import { Dialog } from "./Dialog";
+import { Dropdown } from "./Dropdown";
 
 type TDancerInDanceDialogProps = {
   open: boolean;
@@ -112,96 +105,77 @@ export function DancerInDanceDialog(
   }, [selectedDance]);
 
   return (
-    <Dialog open={open} onClose={onCloseHandler}>
-      <div style={{ padding: 40, width: 600 }}>
-        <DialogTitle style={{ marginBottom: 15 }}>
-          {dialogAction === "add"
-            ? "Add dancers to a dance"
-            : "Remove dancers from a dance"}
-        </DialogTitle>
-        <DialogErrorMessage
-          errors={apiResponseState.errors}
-          successCount={apiResponseState.successes}
-          dialogType="dancer"
-        />
-        <TextField
-          select
-          fullWidth
-          variant="outlined"
-          label="Select the dance you want to modify"
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-            setSelectedDance(parseInt(event.target.value));
-          }}
-          style={{ marginBottom: 20 }}
-          value={selectedDance}
-        >
-          <option value={0} selected disabled>
-            Select a dance
-          </option>
-          {dances.map((dance) => (
-            <option value={dance.id} key={dance.id}>
-              {dance.name}
-            </option>
-          ))}
-        </TextField>
-        {selectedDance > 0 && (
-          <>
-            {dialogAction === "add" && (
-              <>
-                <Typography>Current cast:</Typography>
-                <Typography style={{ fontSize: 14 }}>
-                  {dancersInDance.map((dancerInDance) => (
-                    <span key={dancerInDance.name}>{dancerInDance.name}, </span>
-                  ))}
-                </Typography>
-                <br />
-              </>
-            )}
-            <Typography>
-              Choose what dancers to{" "}
-              {dialogAction === "add" ? dialogAction : "remove"}:
-            </Typography>
-            {dialogAction === "add" &&
-              dancersNotInDance.map((dancerNotInDance) => (
-                <FormControlLabel
-                  key={dancerNotInDance.name}
-                  control={
-                    <Checkbox
-                      onChange={onCheckboxChange}
-                      value={dancerNotInDance.id}
-                    />
-                  }
-                  label={dancerNotInDance.name}
-                />
-              ))}
-            {dialogAction === "delete" &&
-              dancersInDance.map((dancerInDance) => (
-                <FormControlLabel
-                  key={dancerInDance.name}
-                  control={
-                    <Checkbox
-                      onChange={onCheckboxChange}
-                      value={dancerInDance.id}
-                    />
-                  }
-                  label={dancerInDance.name}
-                />
-              ))}
-          </>
-        )}
-        <br />
-        <ButtonGroup style={{ marginTop: 30 }}>
-          <Button
-            color="primary"
-            variant="contained"
-            onClick={saveData}
-            disabled={buttonIsDisabled()}
-          >
-            {dialogAction === "add" ? "Save" : "Delete"}
-          </Button>
-          <Button onClick={onCloseHandler}>Cancel</Button>
-        </ButtonGroup>
-      </div>
+    <Dialog
+      open={open}
+      onClose={onCloseHandler}
+      dialogTitle={
+        dialogAction === "add"
+          ? "Add dancers to a dance"
+          : "Remove dancers from a dance"
+      }
+      primaryButtonLabel={dialogAction === "add" ? "Save" : "Remove"}
+      primaryButtonDisabled={buttonIsDisabled()}
+      primaryButtonOnClick={saveData}
+    >
+      <DialogErrorMessage
+        errors={apiResponseState.errors}
+        successCount={apiResponseState.successes}
+        dialogType="dancer"
+      />
+      <Dropdown
+        label="Select the dance you want to modify"
+        setValue={(value: string) => setSelectedDance(parseInt(value))}
+        value={selectedDance.toString()}
+        dropdownItems={dances.map((dance) => ({
+          label: dance.name,
+          value: dance.id.toString(),
+        }))}
+      />
+      {selectedDance > 0 && (
+        <>
+          {dialogAction === "add" && (
+            <>
+              <Typography>Current cast:</Typography>
+              <Typography style={{ fontSize: 14 }}>
+                {dancersInDance.map((dancerInDance) => (
+                  <span key={dancerInDance.name}>{dancerInDance.name}, </span>
+                ))}
+              </Typography>
+              <br />
+            </>
+          )}
+          <Typography>
+            Choose what dancers to{" "}
+            {dialogAction === "add" ? dialogAction : "remove"}:
+          </Typography>
+          {dialogAction === "add" &&
+            dancersNotInDance.map((dancerNotInDance) => (
+              <FormControlLabel
+                key={dancerNotInDance.name}
+                control={
+                  <Checkbox
+                    onChange={onCheckboxChange}
+                    value={dancerNotInDance.id}
+                  />
+                }
+                label={dancerNotInDance.name}
+              />
+            ))}
+          {dialogAction === "delete" &&
+            dancersInDance.map((dancerInDance) => (
+              <FormControlLabel
+                key={dancerInDance.name}
+                control={
+                  <Checkbox
+                    onChange={onCheckboxChange}
+                    value={dancerInDance.id}
+                  />
+                }
+                label={dancerInDance.name}
+              />
+            ))}
+        </>
+      )}
     </Dialog>
   );
 }

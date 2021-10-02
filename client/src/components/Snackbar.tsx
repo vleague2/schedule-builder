@@ -9,7 +9,7 @@ type TSnackbarProps = {
     event: SyntheticEvent<any, Event> | MouseEventHandler<HTMLButtonElement>,
     reason?: string
   ) => void;
-  message: string;
+  message?: string;
 };
 
 export function Snackbar(props: TSnackbarProps): JSX.Element {

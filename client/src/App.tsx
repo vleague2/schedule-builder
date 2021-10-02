@@ -94,10 +94,10 @@ function App(): JSX.Element {
         <CssBaseline />
         <AppMenu
           state={{
-            teachers,
-            dancers,
-            dances,
-            studios,
+            teachers: teachers ?? [],
+            dancers: dancers ?? [],
+            dances: dances ?? [],
+            studios: studios ?? [],
           }}
           refetch={{
             teachers: fetchTeachers,
