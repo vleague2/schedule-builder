@@ -1,9 +1,8 @@
 import { Popover, Typography } from "@material-ui/core";
 import { useEffect, useState } from "react";
-import { useOktaAuth } from "@okta/okta-react";
 
 import { TDancer } from "../models/TDancer";
-import { getDancersInDance } from "../resources/dancesResource";
+import { useHttpContext } from "../hooks/httpContext";
 
 type TCastPopoverProps = {
   danceId: number;
@@ -14,13 +13,12 @@ type TCastPopoverProps = {
 
 export function CastPopover(props: TCastPopoverProps): JSX.Element {
   const { danceId, open, anchorEl, handleClose } = props;
-  const { authState } = useOktaAuth();
-  const accessToken = authState?.accessToken;
+  const { httpService } = useHttpContext();
 
   const [cast, setCast] = useState<TDancer[] | undefined>(undefined);
 
   useEffect(() => {
-    getDancersInDance(danceId, accessToken).then((dancers) => {
+    httpService.httpDancersInDance("GET", { danceId }).then((dancers) => {
       setCast(dancers.data.sort((a, b) => a.name.localeCompare(b.name)));
     });
   }, [danceId]);

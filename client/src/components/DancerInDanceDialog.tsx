@@ -1,19 +1,14 @@
 import { Checkbox, FormControlLabel, Typography } from "@material-ui/core";
 import { useEffect, useState } from "react";
-import { useOktaAuth } from "@okta/okta-react";
 
 import { TDance } from "../models/TDance";
 import { TDancer } from "../models/TDancer";
-import {
-  addDancersToDance,
-  getDancersInDance,
-  removeDancersFromDance,
-} from "../services/dancesService";
 import { useErrorHandling } from "../hooks/useErrorHandling";
 import { DialogErrorMessage } from "./DialogErrorMessage";
 import { TAdminDialogAction } from "../models/TAdminDialogAction";
 import { Dialog } from "./Dialog";
 import { Dropdown } from "./Dropdown";
+import { useHttpContext } from "../hooks/httpContext";
 
 type TDancerInDanceDialogProps = {
   open: boolean;
@@ -28,8 +23,7 @@ export function DancerInDanceDialog(
   props: TDancerInDanceDialogProps
 ): JSX.Element {
   const { open, dialogAction, onClose, onSuccess, dances, dancers } = props;
-  const { authState } = useOktaAuth();
-  const accessToken = authState?.accessToken;
+  const { httpService } = useHttpContext();
 
   const [selectedDance, setSelectedDance] = useState<number>(0);
   const [selectedDancers, setSelectedDancers] = useState<number[]>([]);
@@ -58,17 +52,12 @@ export function DancerInDanceDialog(
 
   async function saveData() {
     async function getApiCallBasedOnDialogType() {
-      if (dialogAction === "add") {
-        return addDancersToDance(selectedDance, selectedDancers, accessToken);
-      }
+      const requestType = dialogAction === "add" ? "POST" : "DELETE";
 
-      if (dialogAction === "delete") {
-        return removeDancersFromDance(
-          selectedDance,
-          selectedDancers,
-          accessToken
-        );
-      }
+      return httpService.httpDancersInDance(requestType, {
+        danceId: selectedDance,
+        dancerIds: selectedDancers,
+      });
     }
 
     await makeApiCall(getApiCallBasedOnDialogType, (count: number) => {
@@ -96,11 +85,13 @@ export function DancerInDanceDialog(
 
   useEffect(() => {
     if (selectedDance > 0) {
-      getDancersInDance(selectedDance, accessToken).then((dancersResponse) => {
-        setDancersInDance(
-          dancersResponse.data.sort((a, b) => a.name.localeCompare(b.name))
-        );
-      });
+      httpService
+        .httpDancersInDance("GET", { danceId: selectedDance })
+        .then((dancersResponse) => {
+          setDancersInDance(
+            dancersResponse.data.sort((a, b) => a.name.localeCompare(b.name))
+          );
+        });
     }
   }, [selectedDance]);
 

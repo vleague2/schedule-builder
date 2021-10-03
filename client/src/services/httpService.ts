@@ -35,6 +35,16 @@ type TPostBody =
   | TAddStudiosDto
   | TAddTeachersDto;
 
+type THttpDancersInDanceArgs<T> = T extends "GET"
+  ? {
+      danceId: number;
+      dancerIds?: never;
+    }
+  : {
+      danceId: number;
+      dancerIds: number[];
+    };
+
 const resourceTypeUrlMap = {
   dancers: "/dancers",
   dances: "/dances",
@@ -57,23 +67,26 @@ type TReturnType<T extends keyof typeof resourceTypeUrlMap> =
     ? TStudio[]
     : TScheduledDance[];
 
+type TDancersInDanceReturnType<T extends "GET" | "POST" | "DELETE"> =
+  T extends "GET" ? TDancer[] : number;
+
 export class HttpService {
   authorizationToken: AccessToken;
-  defaultRequestParams = {
-    mode: "cors" as const,
-    cache: "no-cache" as const,
-    credentials: "same-origin" as const,
-    headers: {
-      "Content-Type": "application/json" as const,
-      Authorization: "Bearer",
-    },
-    redirect: "follow" as const,
-    referrerPolicy: "no-referrer" as const,
-  };
+  defaultRequestParams: RequestInit;
 
   constructor(authorizationToken: AccessToken) {
     this.authorizationToken = authorizationToken;
-    this.defaultRequestParams.headers.Authorization = `Bearer ${this.authorizationToken.accessToken}`;
+    this.defaultRequestParams = {
+      mode: "cors" as const,
+      cache: "no-cache" as const,
+      credentials: "same-origin" as const,
+      headers: {
+        "Content-Type": "application/json" as const,
+        Authorization: `Bearer ${this.authorizationToken.accessToken}`,
+      },
+      redirect: "follow" as const,
+      referrerPolicy: "no-referrer" as const,
+    };
   }
 
   async httpGet<T extends keyof typeof resourceTypeUrlMap>(
@@ -130,6 +143,24 @@ export class HttpService {
       ...this.defaultRequestParams,
       method: "DELETE",
     };
+
+    return (await fetch(url, requestParams)).json();
+  }
+
+  async httpDancersInDance<T extends "GET" | "POST" | "DELETE">(
+    requestType: T,
+    args: THttpDancersInDanceArgs<T>
+  ): Promise<TApiResponseDto<TDancersInDanceReturnType<T>>> {
+    const url = `${resourceTypeUrlMap["dances"]}/${args.danceId}/dancers`;
+
+    const requestParams: RequestInit = {
+      ...this.defaultRequestParams,
+      method: requestType,
+    };
+
+    if (requestType !== "GET") {
+      requestParams.body = JSON.stringify({ dancerIds: args.dancerIds });
+    }
 
     return (await fetch(url, requestParams)).json();
   }

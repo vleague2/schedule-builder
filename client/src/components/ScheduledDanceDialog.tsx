@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { TimePicker } from "@material-ui/pickers";
 import { DateTime } from "luxon";
-import { useOktaAuth } from "@okta/okta-react";
 
 import { useErrorHandling } from "../hooks/useErrorHandling";
 import { TDance } from "../models/TDance";
@@ -58,9 +57,6 @@ export function ScheduledDanceDialog(
     useErrorHandling();
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
 
-  const { authState } = useOktaAuth();
-  const accessToken = authState?.accessToken;
-
   const { httpService } = useHttpContext();
 
   function onCloseHandler() {
@@ -102,7 +98,7 @@ export function ScheduledDanceDialog(
       dances,
       scheduleId,
       dance.TeacherId,
-      accessToken
+      httpService
     );
 
     if (errors.length > 0) {

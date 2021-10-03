@@ -3,15 +3,14 @@ import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import ExpandLessIcon from "@material-ui/icons/ExpandLess";
 import AddCircleIcon from "@material-ui/icons/AddCircle";
 import { useEffect, useState } from "react";
-import { useOktaAuth } from "@okta/okta-react";
 
 import { TDance } from "../models/TDance";
 import { TDancer } from "../models/TDancer";
 import { TTeacher } from "../models/TTeacher";
-import { getDancersInDance } from "../services/dancesService";
 import { ScheduledDanceDialog } from "./ScheduledDanceDialog";
 import { TStudio } from "../models/TStudio";
 import { TScheduledDance } from "../models/TScheduledDance";
+import { useHttpContext } from "../hooks/httpContext";
 
 type TUnscheduledDanceCardProps = {
   unscheduledDance: TDance;
@@ -39,13 +38,14 @@ export function UnscheduledDanceCard(
   const [castOpen, setCastOpen] = useState<boolean>(false);
   const [modalOpen, setModalOpen] = useState<boolean>(false);
 
-  const { authState } = useOktaAuth();
-  const accessToken = authState?.accessToken;
+  const { httpService } = useHttpContext();
 
   useEffect(() => {
-    getDancersInDance(unscheduledDance.id, accessToken).then((dancers) => {
-      setCast(dancers.data.sort((a, b) => a.name.localeCompare(b.name)));
-    });
+    httpService
+      .httpDancersInDance("GET", { danceId: unscheduledDance.id })
+      .then((dancers) => {
+        setCast(dancers.data.sort((a, b) => a.name.localeCompare(b.name)));
+      });
   }, [unscheduledDance]);
 
   return (

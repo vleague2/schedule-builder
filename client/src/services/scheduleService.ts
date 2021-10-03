@@ -1,10 +1,9 @@
-import { AccessToken } from "@okta/okta-auth-js";
 import { DateTime } from "luxon";
 import { TDance } from "../models/TDance";
 import { TScheduledDance } from "../models/TScheduledDance";
 import { TStudio } from "../models/TStudio";
 import { TTeacher } from "../models/TTeacher";
-import { getDancersInDance } from "./dancesService";
+import { HttpService } from "./httpService";
 
 type TScheduledDancePartial = Pick<
   TScheduledDance,
@@ -192,7 +191,7 @@ export async function valiateScheduledDance(
   dances: TDance[],
   scheduleId: number,
   teacherId: number,
-  accessToken: AccessToken | undefined
+  httpService: HttpService
 ): Promise<string[]> {
   const { StudioId } = scheduledDance;
 
@@ -217,7 +216,7 @@ export async function valiateScheduledDance(
       scheduleId,
       teacherId,
       dances,
-      accessToken
+      httpService
     );
 
   return [...dancesAtSameTimeErrors, ...dancersDoubleBookedErrors];
@@ -296,12 +295,14 @@ async function getDancersAndTeachersWhoAreDoubleBooked(
   scheduleId: number,
   teacherId: number,
   dances: TDance[],
-  accessToken: AccessToken | undefined
+  httpService: HttpService
 ): Promise<string[]> {
   const errors: string[] = [];
 
   const dancersInNewDance = (
-    await getDancersInDance(newScheduledDance.DanceId, accessToken)
+    await httpService.httpDancersInDance("GET", {
+      danceId: newScheduledDance.DanceId,
+    })
   ).data;
 
   const { startStamp, endStamp } = getStartAndEndStamp(newScheduledDance);
@@ -324,7 +325,9 @@ async function getDancersAndTeachersWhoAreDoubleBooked(
 
   for (const danceAtSameTime of dancesAtSameTime) {
     const dancersInDanceAtSameTime = (
-      await getDancersInDance(danceAtSameTime.DanceId, accessToken)
+      await httpService.httpDancersInDance("GET", {
+        danceId: danceAtSameTime.DanceId,
+      })
     ).data;
 
     const dancersInBothDances = dancersInNewDance.filter((dancer) => {
