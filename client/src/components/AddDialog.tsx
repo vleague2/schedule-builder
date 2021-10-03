@@ -1,17 +1,19 @@
 import { useState } from "react";
-import { useOktaAuth } from "@okta/okta-react";
 
 import { TTeacher } from "../models/TTeacher";
-import { addDancers } from "../services/dancersService";
-import { addDances } from "../services/dancesService";
-import { addStudios } from "../services/studiosService";
-import { addTeachers } from "../services/teachersService";
 import { TAdminDialogType } from "../models/TAdminDialogType";
 import { useErrorHandling } from "../hooks/useErrorHandling";
 import { DialogErrorMessage } from "./DialogErrorMessage";
 import { Dialog } from "./Dialog";
 import { Dropdown } from "./Dropdown";
 import { TextField } from "@material-ui/core";
+import { useHttpContext } from "../hooks/httpContext";
+import {
+  mapToAddDancersDto,
+  mapToAddDancesDto,
+  mapToAddStudiosDto,
+  mapToAddTeachersDto,
+} from "../services/mapToDtoService";
 
 type TAddDialogProps = {
   open: boolean;
@@ -24,8 +26,8 @@ type TAddDialogProps = {
 
 export function AddDialog(props: TAddDialogProps): JSX.Element {
   const { open, onClose, onSuccess, dialogType, teachers } = props;
-  const { authState } = useOktaAuth();
-  const accessToken = authState?.accessToken;
+
+  const { httpService } = useHttpContext();
 
   const [value, setValue] = useState<string>("");
   const [teacherSelectValue, setTeacherSelectValue] = useState<number>(0);
@@ -51,18 +53,26 @@ export function AddDialog(props: TAddDialogProps): JSX.Element {
   async function saveData() {
     async function getApiCallBasedOnDialogType() {
       switch (dialogType) {
-        case "studio":
-          return await addStudios(value, accessToken);
-        case "teacher":
-          return await addTeachers(value, accessToken);
-        case "dancer":
-          return await addDancers(value, accessToken);
-        case "dance":
+        case "studio": {
+          const dto = mapToAddStudiosDto(value);
+          return await httpService.httpPost("studios", dto);
+        }
+        case "teacher": {
+          const dto = mapToAddTeachersDto(value);
+          return await httpService.httpPost("teachers", dto);
+        }
+        case "dancer": {
+          const dto = mapToAddDancersDto(value);
+          return await httpService.httpPost("dancers", dto);
+        }
+        case "dance": {
           if (teacherSelectValue > 0) {
-            return await addDances(value, teacherSelectValue, accessToken);
+            const dto = mapToAddDancesDto(value, teacherSelectValue);
+            return await httpService.httpPost("dances", dto);
           }
 
           return undefined;
+        }
         default:
           return undefined;
       }

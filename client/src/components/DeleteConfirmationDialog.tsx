@@ -16,7 +16,7 @@ export function DeleteConfirmationDialog(
     <Dialog
       open={open}
       onClose={onClose}
-      dialogTitle={`Are you sure you want to remove ${itemName} from this schedule?`}
+      dialogTitle={`Are you sure you want to remove ${itemName}?`}
       primaryButtonOnClick={onClick}
       primaryButtonLabel="Yes"
       primaryButtonDisabled={false}

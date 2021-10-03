@@ -1,19 +1,15 @@
 import { useState } from "react";
-import { useOktaAuth } from "@okta/okta-react";
 
 import { TDance } from "../models/TDance";
 import { TDancer } from "../models/TDancer";
 import { TStudio } from "../models/TStudio";
 import { TTeacher } from "../models/TTeacher";
-import { deleteTeacher } from "../services/teachersService";
-import { deleteStudio } from "../services/studiosService";
-import { deleteDancer } from "../services/dancersService";
-import { deleteDance } from "../services/dancesService";
 import { TAdminDialogType } from "../models/TAdminDialogType";
 import { useErrorHandling } from "../hooks/useErrorHandling";
 import { DialogErrorMessage } from "./DialogErrorMessage";
 import { Dropdown } from "./Dropdown";
 import { Dialog } from "./Dialog";
+import { useHttpContext } from "../hooks/httpContext";
 
 type TDeleteDialogProps = {
   open: boolean;
@@ -25,8 +21,7 @@ type TDeleteDialogProps = {
 
 export function DeleteDialog(props: TDeleteDialogProps): JSX.Element {
   const { open, onClose, onSuccess, dialogType, items } = props;
-  const { authState } = useOktaAuth();
-  const accessToken = authState?.accessToken;
+  const { httpService } = useHttpContext();
 
   const [selectValue, setSelectValue] = useState<number>(0);
 
@@ -51,13 +46,13 @@ export function DeleteDialog(props: TDeleteDialogProps): JSX.Element {
 
       switch (dialogType) {
         case "studio":
-          return await deleteStudio(selectValue, accessToken);
+          return await httpService.httpDelete("studios", selectValue);
         case "teacher":
-          return await deleteTeacher(selectValue, accessToken);
+          return await httpService.httpDelete("teachers", selectValue);
         case "dancer":
-          return await deleteDancer(selectValue, accessToken);
+          return await httpService.httpDelete("dancers", selectValue);
         case "dance":
-          return await deleteDance(selectValue, accessToken);
+          return await httpService.httpDelete("dances", selectValue);
         default:
           return undefined;
       }

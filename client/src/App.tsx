@@ -11,14 +11,11 @@ import { TDancer } from "./models/TDancer";
 import { TScheduledDance } from "./models/TScheduledDance";
 import { TStudio } from "./models/TStudio";
 import { TTeacher } from "./models/TTeacher";
-import { getAllDancers } from "./services/dancersService";
-import { getAllDances } from "./services/dancesService";
-import { getAllScheduledDances } from "./services/scheduledDancesService";
-import { getAllStudios } from "./services/studiosService";
-import { getAllTeachers } from "./services/teachersService";
 import { ScheduleTabs } from "./components/ScheduleTabs";
-import { getAllSchedules } from "./services/scheduleService";
 import { TSchedule } from "./models/TSchedule";
+import { HttpProvider } from "./hooks/httpContext";
+import { HttpService } from "./services/httpService";
+import { Redirect } from "react-router-dom";
 
 function App(): JSX.Element {
   const [teachers, setTeachers] = useState<TTeacher[] | undefined>(undefined);
@@ -35,8 +32,14 @@ function App(): JSX.Element {
   const { authState } = useOktaAuth();
   const accessToken = authState?.accessToken;
 
+  if (!accessToken) {
+    return <Redirect to="/" />;
+  }
+
+  const httpService = new HttpService(accessToken);
+
   function fetchTeachers() {
-    getAllTeachers(accessToken).then((teachersResponse) => {
+    httpService.httpGet("teachers").then((teachersResponse) => {
       setTeachers(
         teachersResponse.data.sort((a, b) => a.name.localeCompare(b.name))
       );
@@ -44,7 +47,7 @@ function App(): JSX.Element {
   }
 
   function fetchStudios() {
-    getAllStudios(accessToken).then((studiosResponse) => {
+    httpService.httpGet("studios").then((studiosResponse) => {
       setStudios(
         studiosResponse.data.sort((a, b) => a.name.localeCompare(b.name))
       );
@@ -52,7 +55,7 @@ function App(): JSX.Element {
   }
 
   function fetchDancers() {
-    getAllDancers(accessToken).then((dancersResponse) => {
+    httpService.httpGet("dancers").then((dancersResponse) => {
       setDancers(
         dancersResponse.data.sort((a, b) => a.name.localeCompare(b.name))
       );
@@ -60,7 +63,7 @@ function App(): JSX.Element {
   }
 
   function fetchDances() {
-    getAllDances(accessToken).then((dancesResponse) => {
+    httpService.httpGet("dances").then((dancesResponse) => {
       setDances(
         dancesResponse.data.sort((a, b) => a.name.localeCompare(b.name))
       );
@@ -68,13 +71,13 @@ function App(): JSX.Element {
   }
 
   function fetchScheduledDances() {
-    getAllScheduledDances(accessToken).then((scheduledDancesResponse) => {
+    httpService.httpGet("scheduledDances").then((scheduledDancesResponse) => {
       setScheduledDances(scheduledDancesResponse.data);
     });
   }
 
   function fetchSchedules() {
-    getAllSchedules(accessToken).then((schedulesResponse) => {
+    httpService.httpGet("schedules").then((schedulesResponse) => {
       setSchedules(schedulesResponse.data.sort((a, b) => a.id - b.id));
     });
   }
@@ -89,7 +92,7 @@ function App(): JSX.Element {
   }, []);
 
   return (
-    <div>
+    <HttpProvider httpService={httpService}>
       <MuiPickersUtilsProvider utils={LuxonUtils}>
         <CssBaseline />
         <AppMenu
@@ -117,7 +120,7 @@ function App(): JSX.Element {
           studios={studios ?? []}
         />
       </MuiPickersUtilsProvider>
-    </div>
+    </HttpProvider>
   );
 }
 

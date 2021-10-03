@@ -9,7 +9,6 @@ import {
 } from "@material-ui/core";
 import AddCircleIcon from "@material-ui/icons/AddCircle";
 import { ChangeEvent, useState } from "react";
-import { useOktaAuth } from "@okta/okta-react";
 
 import { UnscheduledDanceColumn } from "./UnscheduledDanceColumn";
 import { ScheduleTable } from "./ScheduleTable";
@@ -19,8 +18,9 @@ import { TDancer } from "../models/TDancer";
 import { TDance } from "../models/TDance";
 import { TScheduledDance } from "../models/TScheduledDance";
 import { TTeacher } from "../models/TTeacher";
-import { addSchedules } from "../services/scheduleService";
 import { ScheduleName } from "./ScheduleName";
+import { useHttpContext } from "../hooks/httpContext";
+import { mapToAddSchedulesDto } from "../services/mapToDtoService";
 
 type TTabPanelProps = {
   value: number;
@@ -68,8 +68,7 @@ export function ScheduleTabs(props: TScheduleTabsProps): JSX.Element {
   const [selectedTab, setSelectedTab] = useState<number>(0);
   const [newScheduleName, setNewScheduleName] = useState<string>("");
 
-  const { authState } = useOktaAuth();
-  const accessToken = authState?.accessToken;
+  const { httpService } = useHttpContext();
 
   const {
     schedules,
@@ -87,7 +86,10 @@ export function ScheduleTabs(props: TScheduleTabsProps): JSX.Element {
   }
 
   async function createNewSchedule() {
-    await addSchedules(newScheduleName, accessToken);
+    const dto = mapToAddSchedulesDto(newScheduleName);
+
+    await httpService.httpPost("schedules", dto);
+
     fetchSchedules();
   }
 

@@ -1,58 +1,38 @@
 import { AccessToken } from "@okta/okta-auth-js";
 import { DateTime } from "luxon";
-import { TApiResponseDto } from "../models/TApiResponseDto";
 import { TDance } from "../models/TDance";
-import { TSchedule } from "../models/TSchedule";
 import { TScheduledDance } from "../models/TScheduledDance";
 import { TStudio } from "../models/TStudio";
 import { TTeacher } from "../models/TTeacher";
-import {
-  deleteSchedule,
-  getSchedules,
-  patchSchedule,
-  postSchedules,
-} from "../resources/schedulesResource";
 import { getDancersInDance } from "./dancesService";
-import {
-  mapToAddSchedulesDto,
-  mapToUpdateScheduleDto,
-} from "./mapToDtoService";
 
 type TScheduledDancePartial = Pick<
   TScheduledDance,
   "StudioId" | "endAt" | "startAt" | "DanceId"
 >;
 
-export async function getAllSchedules(
-  accessToken: AccessToken | undefined
-): Promise<TApiResponseDto<TSchedule[]>> {
-  return await getSchedules(accessToken);
-}
+export function savePdf(scheduleName: string): boolean {
+  const printMe = window.open("") as Window;
+  printMe.document.write(
+    `<html><head><style>th,
+    tr,
+    td {
+      border: 1px solid gray;
+    }</style></head><body><h1 style="text-align: center">${scheduleName}</h1>${
+      document.getElementById("tableDiv")?.innerHTML
+    }</body></html>`
+  );
 
-export async function updateSchedule(
-  value: string,
-  scheduleId: number,
-  accessToken: AccessToken | undefined
-): Promise<TApiResponseDto<number>> {
-  const mappedData = mapToUpdateScheduleDto(value);
+  const iconButtons = printMe.document.querySelectorAll(".iconButton");
 
-  return await patchSchedule(scheduleId, mappedData, accessToken);
-}
+  const iconButtonsArray = Array.from(iconButtons);
 
-export async function addSchedules(
-  value: string,
-  accessToken: AccessToken | undefined
-): Promise<TApiResponseDto<TStudio[]>> {
-  const mappedData = mapToAddSchedulesDto(value);
+  iconButtonsArray.forEach((iconButton) => iconButton.remove());
 
-  return await postSchedules(mappedData, accessToken);
-}
+  printMe.print();
+  printMe.close();
 
-export async function removeSchedule(
-  scheduleId: number,
-  accessToken: AccessToken | undefined
-): Promise<TApiResponseDto<number>> {
-  return await deleteSchedule(scheduleId, accessToken);
+  return true;
 }
 
 export function getAllTimeslots(): DateTime[] {

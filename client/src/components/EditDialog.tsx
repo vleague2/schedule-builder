@@ -1,20 +1,22 @@
 import { TextField } from "@material-ui/core";
 import { useEffect, useState } from "react";
-import { useOktaAuth } from "@okta/okta-react";
 
 import { TDance } from "../models/TDance";
 import { TDancer } from "../models/TDancer";
 import { TStudio } from "../models/TStudio";
 import { TTeacher } from "../models/TTeacher";
-import { updateTeacher } from "../services/teachersService";
-import { updateStudio } from "../services/studiosService";
-import { updateDancer } from "../services/dancersService";
-import { updateDance } from "../services/dancesService";
 import { TAdminDialogType } from "../models/TAdminDialogType";
 import { useErrorHandling } from "../hooks/useErrorHandling";
 import { DialogErrorMessage } from "./DialogErrorMessage";
 import { Dialog } from "./Dialog";
 import { Dropdown } from "./Dropdown";
+import { useHttpContext } from "../hooks/httpContext";
+import {
+  mapToUpdateDanceDto,
+  mapToUpdateDancerDto,
+  mapToUpdateStudioDto,
+  mapToUpdateTeacherDto,
+} from "../services/mapToDtoService";
 
 type TEditDialogProps = {
   open: boolean;
@@ -28,8 +30,8 @@ type TEditDialogProps = {
 
 export function EditDialog(props: TEditDialogProps): JSX.Element {
   const { open, onClose, onSuccess, dialogType, items, teachers } = props;
-  const { authState } = useOktaAuth();
-  const accessToken = authState?.accessToken;
+
+  const { httpService } = useHttpContext();
 
   const [newValue, setNewValue] = useState<string>("");
   const [selectValue, setSelectValue] = useState<number>(0);
@@ -56,19 +58,26 @@ export function EditDialog(props: TEditDialogProps): JSX.Element {
   async function saveData() {
     async function getApiCallBasedOnDialogType() {
       switch (dialogType) {
-        case "studio":
-          return await updateStudio(newValue, selectValue, accessToken);
-        case "teacher":
-          return await updateTeacher(newValue, selectValue, accessToken);
-        case "dancer":
-          return await updateDancer(newValue, selectValue, accessToken);
-        case "dance":
-          return await updateDance(
-            selectValue,
-            accessToken,
-            newValue,
-            selectedTeacher
-          );
+        case "studio": {
+          const dto = mapToUpdateStudioDto(newValue);
+
+          return await httpService.httpPatch("studios", selectValue, dto);
+        }
+        case "teacher": {
+          const dto = mapToUpdateTeacherDto(newValue);
+
+          return await httpService.httpPatch("teachers", selectValue, dto);
+        }
+        case "dancer": {
+          const dto = mapToUpdateDancerDto(newValue);
+
+          return await httpService.httpPatch("dancers", selectValue, dto);
+        }
+        case "dance": {
+          const dto = mapToUpdateDanceDto(newValue, selectedTeacher);
+
+          return await httpService.httpPatch("dances", selectValue, dto);
+        }
         default:
           return undefined;
       }

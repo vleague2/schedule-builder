@@ -1,12 +1,11 @@
 import { Typography } from "@material-ui/core";
-import { useOktaAuth } from "@okta/okta-react";
 import { useState } from "react";
+import { useHttpContext } from "../hooks/httpContext";
 
 import { TDance } from "../models/TDance";
 import { TScheduledDance } from "../models/TScheduledDance";
 import { TStudio } from "../models/TStudio";
 import { TTeacher } from "../models/TTeacher";
-import { removeScheduledDance } from "../services/scheduledDancesService";
 import {
   calculateOccupiedTimeslots,
   getAllTimeslots,
@@ -35,8 +34,7 @@ export function ScheduleTable(props: TScheduleTableProps): JSX.Element {
     undefined
   );
 
-  const { authState } = useOktaAuth();
-  const accessToken = authState?.accessToken;
+  const { httpService } = useHttpContext();
 
   const selectedDance = dances.find(
     (dance) => dance.id === selectedScheduledDance?.DanceId
@@ -60,9 +58,11 @@ export function ScheduleTable(props: TScheduleTableProps): JSX.Element {
       return;
     }
 
-    removeScheduledDance(selectedScheduledDance.id, accessToken).then(() => {
-      onClose();
-    });
+    httpService
+      .httpDelete("scheduledDances", selectedScheduledDance.id)
+      .then(() => {
+        onClose();
+      });
   }
 
   return (

@@ -7,14 +7,15 @@ import { useErrorHandling } from "../hooks/useErrorHandling";
 import { TDance } from "../models/TDance";
 import { TStudio } from "../models/TStudio";
 import { DialogErrorMessage } from "./DialogErrorMessage";
-import {
-  addScheduledDance,
-  editScheduledDance,
-} from "../services/scheduledDancesService";
 import { TScheduledDance } from "../models/TScheduledDance";
 import { valiateScheduledDance } from "../services/scheduleService";
 import { Dialog } from "./Dialog";
 import { Dropdown } from "./Dropdown";
+import {
+  mapToAddScheduledDanceDto,
+  mapToUpdateScheduledDanceDto,
+} from "../services/mapToDtoService";
+import { useHttpContext } from "../hooks/httpContext";
 
 type TScheduledDanceDialogProps = {
   dance: TDance;
@@ -59,6 +60,8 @@ export function ScheduledDanceDialog(
 
   const { authState } = useOktaAuth();
   const accessToken = authState?.accessToken;
+
+  const { httpService } = useHttpContext();
 
   function onCloseHandler() {
     resetApiResponseState();
@@ -109,25 +112,28 @@ export function ScheduledDanceDialog(
 
     const getApiCall =
       modalType === "add"
-        ? () =>
-            addScheduledDance(
+        ? () => {
+            const dto = mapToAddScheduledDanceDto(
               startAt,
               endAt,
               dance.id,
               studio,
-              scheduleId,
-              accessToken
-            )
-        : () =>
-            editScheduledDance(
+              scheduleId
+            );
+
+            return httpService.httpPost("scheduledDances", dto);
+          }
+        : () => {
+            const dto = mapToUpdateScheduledDanceDto(startAt, endAt, studio);
+
+            return httpService.httpPatch(
+              "scheduledDances",
               // eslint-disable-next-line
               // @ts-ignore typescript is stupid sometimes
               scheduledDance.id,
-              startAt,
-              endAt,
-              studio,
-              accessToken
+              dto
             );
+          };
 
     await makeApiCall(getApiCall, () => {
       onCloseHandler();
