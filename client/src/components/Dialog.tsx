@@ -5,7 +5,7 @@ import {
   Dialog as MuiDialog,
 } from "@material-ui/core";
 
-type TDialogProps = {
+export type TDialogProps = {
   open: boolean;
   onClose: () => void;
   dialogTitle: string;

@@ -15,13 +15,12 @@ import {
   mapToAddTeachersDto,
 } from "../services/mapToDtoService";
 
-type TAddDialogProps = {
+export type TAddDialogProps = {
   open: boolean;
   onClose: () => void;
   onSuccess: (message: string) => void;
   dialogType: TAdminDialogType;
-  // Required if dialogType is 'dance'
-  teachers?: TTeacher[];
+  teachers: TTeacher[];
 };
 
 export function AddDialog(props: TAddDialogProps): JSX.Element {
@@ -30,14 +29,14 @@ export function AddDialog(props: TAddDialogProps): JSX.Element {
   const { httpService } = useHttpContext();
 
   const [value, setValue] = useState<string>("");
-  const [teacherSelectValue, setTeacherSelectValue] = useState<number>(0);
+  const [teacherSelectValue, setTeacherSelectValue] = useState<number>(teachers[0]?.id ?? 0);
 
   const { apiResponseState, resetApiResponseState, makeApiCall } =
     useErrorHandling();
 
   function buttonIsDisabled() {
     if (dialogType === "dance") {
-      return teacherSelectValue === 0 || value === "";
+      return teachers.length === 0 || value === "";
     }
 
     return value === "";
@@ -66,7 +65,7 @@ export function AddDialog(props: TAddDialogProps): JSX.Element {
           return await httpService.httpPost("dancers", dto);
         }
         case "dance": {
-          if (teacherSelectValue > 0) {
+          if (teachers.length > 0) {
             const dto = mapToAddDancesDto(value, teacherSelectValue);
             return await httpService.httpPost("dances", dto);
           }
@@ -100,7 +99,7 @@ export function AddDialog(props: TAddDialogProps): JSX.Element {
         errors={apiResponseState.errors}
         successCount={apiResponseState.successes}
       />
-      {dialogType === "dance" && teachers && (
+      {dialogType === "dance" && (
         <Dropdown
           label="Select the teacher of these dances"
           setValue={(value: string) => setTeacherSelectValue(parseInt(value))}
