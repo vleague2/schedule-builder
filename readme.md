@@ -29,15 +29,15 @@ Example of a scheduling validation error
 To run this locally, you'll need to install a SQL client (I used Postgres). You'll also need to have an Okta account set up. 
 
 After you pull down the project and install both the client and server packages, you'll need to create a `/server/.env` file with the following values:
-* DATABASE_URL={your database URL here; check Sequelize's docs for structure}
-* OKTA_CLIENT_SECRET={Okta will provide this}
-* APP_SECRET={Okta will provide this}
-* OKTA_TOKEN={Okta will provide this}
-* OKTA_ORG_URL={Okta will provide this}
+* `DATABASE_URL={your database URL here; check Sequelize's docs for structure}`
+* `OKTA_CLIENT_SECRET={Okta will provide this}`
+* `APP_SECRET={Okta will provide this}`
+* `OKTA_TOKEN={Okta will provide this}`
+* `OKTA_ORG_URL={Okta will provide this}`
 
 You'll also need to create a `/client/.env` file with the following values:
-* REACT_APP_OKTA_ORG_URL={Okta will provide this; it's the same as the OKTA_ORG_URL from the server file}
-* REACT_APP_OKTA_CLIENT_ID={Okta will provide this}
+* `REACT_APP_OKTA_ORG_URL={Okta will provide this; it's the same as the OKTA_ORG_URL from the server file}`
+* `REACT_APP_OKTA_CLIENT_ID={Okta will provide this}`
 
 Then, you can run `npm run start` in the `/server` folder and in the `/client` folder. 
 
@@ -65,4 +65,4 @@ UI:
 * __Double-booked warnings__: If a dance's cast is adjusted after the dance has been scheduled, the application does not re-validate that the existing schedule contains no double-bookings. To some extent this is designed behavior, as past/expired schedules should not prevent a cast list from changing. Perhaps affected dances should display in the schedule with a warning icon that the cast list has changed and may now contain conflicts, and if they want to, the user is able to re-run validation.
 * __Print/download__: The font/appearance of the downloadable version could use some improvements.
 * __In-app guide__: The application can be confusing to use for the first time, so new users should have access to a guide that explains how to use the application.
-* __Redirect if already logged __in__: If the user is already logged in, they currently see the option to logout. The application should redirect them to `/protected` so they can use the app.
+* __Redirect if already logged in__: If the user is already logged in, they currently see the option to logout. The application should redirect them to `/protected` so they can use the app.
