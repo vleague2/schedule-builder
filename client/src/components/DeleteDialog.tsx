@@ -7,8 +7,8 @@ import { TTeacher } from "../models/TTeacher";
 import { TAdminDialogType } from "../models/TAdminDialogType";
 import { useErrorHandling } from "../hooks/useErrorHandling";
 import { DialogErrorMessage } from "./DialogErrorMessage";
-import { Dropdown } from "./Dropdown";
-import { Dialog } from "./Dialog";
+import { Dropdown } from "./presentational/Dropdown/Dropdown";
+import { Dialog } from "./presentational/Dialog/Dialog";
 import { useHttpContext } from "../hooks/httpContext";
 
 type TDeleteDialogProps = {

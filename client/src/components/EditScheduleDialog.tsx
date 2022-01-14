@@ -1,6 +1,6 @@
 import { TextField } from "@material-ui/core";
 import { useState } from "react";
-import { Dialog } from "./Dialog";
+import { Dialog } from "./presentational/Dialog/Dialog";
 
 type TEditScheduleDialogProps = {
   itemName: string;

@@ -1,5 +1,5 @@
 import { TAdminDialogType } from "../models/TAdminDialogType";
-import { MessageBox } from "./MessageBox";
+import { MessageBox } from "./presentational/MessageBox/MessageBox";
 
 type TDialogErrorMessageProps = {
   errors: string[];

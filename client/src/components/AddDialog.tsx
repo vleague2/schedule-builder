@@ -4,8 +4,8 @@ import { TTeacher } from "../models/TTeacher";
 import { TAdminDialogType } from "../models/TAdminDialogType";
 import { useErrorHandling } from "../hooks/useErrorHandling";
 import { DialogErrorMessage } from "./DialogErrorMessage";
-import { Dialog } from "./Dialog";
-import { Dropdown } from "./Dropdown";
+import { Dialog } from "./presentational/Dialog/Dialog";
+import { Dropdown } from "./presentational/Dropdown/Dropdown";
 import { TextField } from "@material-ui/core";
 import { useHttpContext } from "../hooks/httpContext";
 import {

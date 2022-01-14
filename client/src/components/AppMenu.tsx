@@ -11,7 +11,7 @@ import { EditDialog } from "./EditDialog";
 import { TAdminDialogType } from "../models/TAdminDialogType";
 import { TAdminDialogAction } from "../models/TAdminDialogAction";
 import { AdminDrawer } from "./AdminDrawer";
-import { Snackbar } from "./Snackbar";
+import { Snackbar } from "./presentational/Snackbar/Snackbar";
 import { DeleteDialog } from "./DeleteDialog";
 import { DancerInDanceDialog } from "./DancerInDanceDialog";
 

@@ -210,4 +210,50 @@ describe(`<${AddDialog.name} />`, () => {
       expect(saveButton.getAttribute("disabled")).toBe(null);
     });
   });
+
+  describe.only("clicking Save", () => {
+    it.each([
+      "studio" as const,
+      // "teacher" as const,
+      // "dancer" as const,
+      // "dance" as const,
+    ])(
+      "when dialogType is '%s', it calls httpPost with the correct route ",
+      async (dialogType: TAddDialogProps["dialogType"]) => {
+        const mockHttpPost = jest.fn().mockResolvedValue({ error: null, data: []});
+
+        jest.spyOn(HttpContext, "useHttpContext").mockReturnValue({
+          httpService: {
+            ...getMockHttpContextService({ httpPost: mockHttpPost }),
+          },
+        });
+
+        const { getByRole } = render(
+          <AddDialog
+            {...getAddDialogProps({
+              dialogType,
+              teachers: [
+                { name: "teacher1", id: 1 },
+                { name: "teacher2", id: 2 },
+              ],
+            })}
+          />
+        );
+
+        // enable the save button
+        const textField = getByRole("textbox");
+        fireEvent.change(textField, { target: { value: "something" } });
+
+        const saveButton = getByRole("button", { name: "Save" });
+
+        expect(mockHttpPost).toHaveBeenCalledTimes(0);
+
+        fireEvent.click(saveButton);
+
+        await waitFor(() => {
+          expect(mockHttpPost).toHaveBeenCalledTimes(1);
+        });
+      }
+    );
+  });
 });

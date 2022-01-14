@@ -6,8 +6,8 @@ import { TDancer } from "../models/TDancer";
 import { useErrorHandling } from "../hooks/useErrorHandling";
 import { DialogErrorMessage } from "./DialogErrorMessage";
 import { TAdminDialogAction } from "../models/TAdminDialogAction";
-import { Dialog } from "./Dialog";
-import { Dropdown } from "./Dropdown";
+import { Dialog } from "./presentational/Dialog/Dialog";
+import { Dropdown } from "./presentational/Dropdown/Dropdown";
 import { useHttpContext } from "../hooks/httpContext";
 
 type TDancerInDanceDialogProps = {

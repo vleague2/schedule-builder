@@ -8,8 +8,8 @@ import { TStudio } from "../models/TStudio";
 import { DialogErrorMessage } from "./DialogErrorMessage";
 import { TScheduledDance } from "../models/TScheduledDance";
 import { valiateScheduledDance } from "../services/scheduleService";
-import { Dialog } from "./Dialog";
-import { Dropdown } from "./Dropdown";
+import { Dialog } from "./presentational/Dialog/Dialog";
+import { Dropdown } from "./presentational/Dropdown/Dropdown";
 import {
   mapToAddScheduledDanceDto,
   mapToUpdateScheduledDanceDto,
