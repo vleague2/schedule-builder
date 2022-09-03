@@ -8,7 +8,7 @@ import {
   Button,
 } from "@material-ui/core";
 import AddCircleIcon from "@material-ui/icons/AddCircle";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useCallback, useRef, useState } from "react";
 
 import { UnscheduledDanceColumn } from "./UnscheduledDanceColumn";
 import { ScheduleTable } from "./ScheduleTable";
@@ -67,6 +67,12 @@ function a11yProps(index: number): {
 export function ScheduleTabs(props: TScheduleTabsProps): JSX.Element {
   const [selectedTab, setSelectedTab] = useState<number>(0);
   const [newScheduleName, setNewScheduleName] = useState<string>("");
+  const [tableHeight, setTableHeight] = useState<number | undefined>(undefined);
+  const tableRef = useCallback((node: HTMLDivElement) => {
+    if (node !== null) {
+      setTableHeight(node.clientHeight);
+    }
+  }, []);
 
   const { httpService } = useHttpContext();
 
@@ -150,6 +156,7 @@ export function ScheduleTabs(props: TScheduleTabsProps): JSX.Element {
                       scheduledDances={dancesInThisSchedule}
                       refetch={fetchScheduledDances}
                       scheduleId={schedule.id}
+                      ref={tableRef}
                     />
                   )}
                 </Grid>
@@ -164,6 +171,7 @@ export function ScheduleTabs(props: TScheduleTabsProps): JSX.Element {
                     studios={studios}
                     scheduleId={schedule.id}
                     dances={dances}
+                    height={tableHeight}
                   />
                 </Grid>
               </Grid>

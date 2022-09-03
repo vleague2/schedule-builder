@@ -16,6 +16,7 @@ type TUnscheduledDanceColumnProps = {
   studios: TStudio[];
   scheduleId: number;
   refetch: () => void;
+  height?: number;
 };
 
 export function UnscheduledDanceColumn(
@@ -29,10 +30,10 @@ export function UnscheduledDanceColumn(
     scheduledDances,
     scheduleId,
     dances,
+    height,
   } = props;
 
-  // TODO use a ref instead
-  const tableHeight = document.getElementById("tableDiv")?.clientHeight;
+  console.log(height);
 
   return (
     <div style={{ width: "100%" }}>
@@ -40,7 +41,7 @@ export function UnscheduledDanceColumn(
       <br />
       <div
         style={{
-          height: tableHeight ?? "100%",
+          height: height ?? "100%",
           overflow: "scroll",
           paddingRight: 15,
         }}
