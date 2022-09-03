@@ -93,9 +93,6 @@ export function ScheduleTabs(props: TScheduleTabsProps): JSX.Element {
     fetchSchedules();
   }
 
-  // TODO use a ref instead
-  const tableHeight = document.getElementById("tableDiv")?.clientHeight;
-
   return (
     <>
       <Tabs
@@ -167,7 +164,6 @@ export function ScheduleTabs(props: TScheduleTabsProps): JSX.Element {
                     studios={studios}
                     scheduleId={schedule.id}
                     dances={dances}
-                    height={tableHeight}
                   />
                 </Grid>
               </Grid>
