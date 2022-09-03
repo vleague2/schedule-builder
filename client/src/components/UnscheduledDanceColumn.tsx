@@ -16,6 +16,7 @@ type TUnscheduledDanceColumnProps = {
   studios: TStudio[];
   scheduleId: number;
   refetch: () => void;
+  height?: number;
 };
 
 export function UnscheduledDanceColumn(
@@ -29,27 +30,41 @@ export function UnscheduledDanceColumn(
     scheduledDances,
     scheduleId,
     dances,
+    height,
   } = props;
 
   return (
     <div style={{ width: "100%" }}>
       <Typography align="center">Dances To Be Scheduled</Typography>
       <br />
-      {unscheduledDances.map((unscheduledDance) => (
-        <div key={unscheduledDance.name} style={{ marginBottom: 20 }}>
-          <UnscheduledDanceCard
-            scheduledDances={scheduledDances}
-            unscheduledDance={unscheduledDance}
-            teacher={teachers.find(
-              (teacher) => teacher.id === unscheduledDance.TeacherId
-            )}
-            refetch={refetch}
-            studios={studios}
-            dances={dances}
-            scheduleId={scheduleId}
-          />
-        </div>
-      ))}
+      <div
+        style={{
+          height: height ?? "100%",
+          overflow: "scroll",
+          paddingRight: 15,
+        }}
+      >
+        {unscheduledDances.map((unscheduledDance) => (
+          <div
+            key={unscheduledDance.name}
+            style={{
+              marginBottom: 20,
+            }}
+          >
+            <UnscheduledDanceCard
+              scheduledDances={scheduledDances}
+              unscheduledDance={unscheduledDance}
+              teacher={teachers.find(
+                (teacher) => teacher.id === unscheduledDance.TeacherId
+              )}
+              refetch={refetch}
+              studios={studios}
+              dances={dances}
+              scheduleId={scheduleId}
+            />
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

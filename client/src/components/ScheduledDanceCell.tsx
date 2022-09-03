@@ -74,14 +74,14 @@ export function ScheduledDanceCell(props: TScheduledDanceCell): JSX.Element {
         </Typography>
         {teacher && (
           <>
-            <Typography variant="caption">{teacher.name}</Typography>
-            <br />
+            <Typography variant="caption" component="p">
+              {teacher.name}
+            </Typography>
           </>
         )}
-        <Typography variant="caption">
+        <Typography variant="caption" component="p">
           {startAtDate.toFormat("h:mm a")} - {endAtDate.toFormat("h:mm a")}
         </Typography>
-        <br />
         <IconButton
           size="small"
           onClick={handleClick}

@@ -93,6 +93,9 @@ export function ScheduleTabs(props: TScheduleTabsProps): JSX.Element {
     fetchSchedules();
   }
 
+  // TODO use a ref instead
+  const tableHeight = document.getElementById("tableDiv")?.clientHeight;
+
   return (
     <>
       <Tabs
@@ -124,7 +127,10 @@ export function ScheduleTabs(props: TScheduleTabsProps): JSX.Element {
 
         return (
           <TabPanel value={selectedTab} index={index} key={schedule.id}>
-            <Container maxWidth="lg" style={{ marginTop: 30 }}>
+            <Container
+              maxWidth="lg"
+              style={{ marginTop: 30, marginBottom: 30 }}
+            >
               <Grid container justifyContent="center">
                 <Grid
                   container
@@ -151,7 +157,7 @@ export function ScheduleTabs(props: TScheduleTabsProps): JSX.Element {
                   )}
                 </Grid>
                 <Grid item xs={12} md={1} />
-                <Grid container item md={3} xs={12}>
+                <Grid container item md={3} xs={12} style={{ marginTop: 20 }}>
                   <UnscheduledDanceColumn
                     scheduledDances={dancesInThisSchedule}
                     unscheduledDances={unscheduledDances}
@@ -161,6 +167,7 @@ export function ScheduleTabs(props: TScheduleTabsProps): JSX.Element {
                     studios={studios}
                     scheduleId={schedule.id}
                     dances={dances}
+                    height={tableHeight}
                   />
                 </Grid>
               </Grid>

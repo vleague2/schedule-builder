@@ -17,7 +17,13 @@ export function savePdf(scheduleName: string): boolean {
     tr,
     td {
       border: 1px solid gray;
-    }</style></head><body><h1 style="text-align: center">${scheduleName}</h1>${
+      padding: 6px;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      font-size: 10px;
+    }
+    </style></head><body><h1 style="text-align: center">${scheduleName}</h1>${
       document.getElementById("tableDiv")?.innerHTML
     }</body></html>`
   );
