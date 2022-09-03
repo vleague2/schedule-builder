@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { AddDialog, TAddDialogProps } from "./AddDialog";
 import * as HttpContext from "../hooks/httpContext";
 
@@ -220,7 +220,9 @@ describe(`<${AddDialog.name} />`, () => {
     ])(
       "when dialogType is '%s', it calls httpPost with the correct route ",
       async (dialogType: TAddDialogProps["dialogType"]) => {
-        const mockHttpPost = jest.fn().mockResolvedValue({ error: null, data: []});
+        const mockHttpPost = jest
+          .fn()
+          .mockResolvedValue({ error: null, data: [] });
 
         jest.spyOn(HttpContext, "useHttpContext").mockReturnValue({
           httpService: {
