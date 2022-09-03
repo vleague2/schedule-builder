@@ -28,10 +28,14 @@ export function MessageBox(props: TMessageBox): JSX.Element {
     >
       <Grid container>
         <Grid item xs={1} style={{ textAlign: "center" }}>
-          {style === "error" ? <ErrorIcon /> : <WarningIcon />}
+          {style === "error" ? (
+            <ErrorIcon data-testid="errorIcon" />
+          ) : (
+            <WarningIcon data-testid="warningIcon" />
+          )}
         </Grid>
         <Grid item xs={11}>
-          <Typography>{capitalize(style)}s:</Typography>
+          <Typography>{capitalize(style)}:</Typography>
           <ul>
             {messages.map((message) => (
               <li key={message}>

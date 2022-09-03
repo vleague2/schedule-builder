@@ -1,4 +1,4 @@
-import { Dialog } from "./Dialog";
+import { Dialog } from "./presentational/Dialog/Dialog";
 
 type TDeleteScheduledDanceDialogProps = {
   itemName: string;
