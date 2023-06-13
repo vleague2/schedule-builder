@@ -4,6 +4,7 @@ import { TScheduledDance } from "../models/TScheduledDance";
 import { TStudio } from "../models/TStudio";
 import { TTeacher } from "../models/TTeacher";
 import { HttpService } from "./httpService";
+import { TScheduleDanceError } from "../models/TScheduleDanceError";
 
 type TScheduledDancePartial = Pick<
   TScheduledDance,
@@ -198,7 +199,7 @@ export async function valiateScheduledDance(
   scheduleId: number,
   teacherId: number,
   httpService: HttpService
-): Promise<string[]> {
+): Promise<TScheduleDanceError[]> {
   const { StudioId } = scheduledDance;
 
   const { startStamp, endStamp } = getStartAndEndStamp(scheduledDance);
@@ -234,8 +235,8 @@ function getDancesAtSameTimeInSameStudio(
   startStamp: number,
   endStamp: number,
   scheduleId: number
-): string[] {
-  const errors: string[] = [];
+): TScheduleDanceError[] {
+  const errors: TScheduleDanceError[] = [];
 
   const dancesInSameStudio = scheduledDances.filter(
     (dance) => dance.StudioId === studioId && scheduleId === dance.ScheduleId
@@ -256,7 +257,10 @@ function getDancesAtSameTimeInSameStudio(
       )
     ) {
       errors.push(
-        "There is already another dance scheduled in this studio during this timeslot. Try a different time."
+        {
+          studioId,
+          errorMessage: "There is already another dance scheduled in this studio during this timeslot. Try a different time."
+        }
       );
     }
   });
@@ -302,8 +306,8 @@ async function getDancersAndTeachersWhoAreDoubleBooked(
   teacherId: number,
   dances: TDance[],
   httpService: HttpService
-): Promise<string[]> {
-  const errors: string[] = [];
+): Promise<TScheduleDanceError[]> {
+  const errors: TScheduleDanceError[] = [];
 
   const dancersInNewDance = (
     await httpService.httpDancersInDance("GET", {
@@ -344,7 +348,11 @@ async function getDancersAndTeachersWhoAreDoubleBooked(
 
     if (dancersInBothDances) {
       dancersInBothDances.forEach((dancer) =>
-        errors.push(`${dancer.name} is in a dance scheduled at the same time`)
+        errors.push({ 
+          dancerId: dancer.id,
+          errorMessage: `${dancer.name} is in a dance scheduled at the same time`,
+          dancesWithConflict: [newScheduledDance.DanceId, danceAtSameTime.DanceId]
+        })
       );
     }
 
@@ -353,7 +361,11 @@ async function getDancersAndTeachersWhoAreDoubleBooked(
     )?.TeacherId;
 
     if (teacherOfDance === teacherId) {
-      errors.push("This teacher is already teaching at this time");
+      errors.push({
+        errorMessage: `This teacher is already teaching at this time`,
+        teacherId,
+        dancesWithConflict: [newScheduledDance.DanceId, danceAtSameTime.DanceId]
+      });
     }
   }
 

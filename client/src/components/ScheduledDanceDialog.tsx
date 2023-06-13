@@ -102,7 +102,11 @@ export function ScheduledDanceDialog(
     );
 
     if (errors.length > 0) {
-      setValidationErrors(errors);
+      // TODO: if presented with the option to continue scheduling even with errors, then
+      // we'd store these validation errors (related to the scheduleId)
+      // (except you cant continue scheduling if there are studio errors)
+      
+      setValidationErrors(errors.map((error) => error.errorMessage ));
       return;
     }
 

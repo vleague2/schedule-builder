@@ -46,6 +46,8 @@ You'll also need to create a `/client/.env` file with the following values:
 
 Then, you can run `npm run start` in the `/server` folder and in the `/client` folder.
 
+To access the database via a tool like pgAdmin 4, you'll need to utilize the information you added to the `DATABASE_URL`. Postgres runs on port 5432.
+
 ## Login
 
 To actually log into the application, you'll need to set up an account in Okta. The Schedule Builder application does not allow you to create an account, so you'll need to set it up in Okta first and then use that to login.
