@@ -13,6 +13,7 @@ export type TDialogProps = {
   primaryButtonOnClick: () => void;
   primaryButtonLabel: string;
   primaryButtonDisabled: boolean;
+  primaryButtonColor?: "primary" | "secondary";
 };
 
 export function Dialog(props: TDialogProps): JSX.Element {
@@ -24,6 +25,7 @@ export function Dialog(props: TDialogProps): JSX.Element {
     primaryButtonDisabled,
     primaryButtonLabel,
     dialogTitle,
+    primaryButtonColor = "primary",
   } = props;
 
   return (
@@ -33,7 +35,7 @@ export function Dialog(props: TDialogProps): JSX.Element {
         {children}
         <ButtonGroup style={{ marginTop: 30, display: "block" }}>
           <Button
-            color="primary"
+            color={primaryButtonColor}
             variant="contained"
             onClick={primaryButtonOnClick}
             disabled={primaryButtonDisabled}

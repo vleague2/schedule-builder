@@ -5,12 +5,13 @@ type TDialogErrorMessageProps = {
   errors: string[];
   successCount: number;
   dialogType: TAdminDialogType;
+  style?: "warning" | "error";
 };
 
 export function DialogErrorMessage(
   props: TDialogErrorMessageProps
 ): JSX.Element {
-  const { errors, successCount, dialogType } = props;
+  const { errors, successCount, dialogType, style = "error" } = props;
 
   return (
     <>
@@ -22,7 +23,7 @@ export function DialogErrorMessage(
       )}
       {errors.length > 0 && (
         <div style={{ marginBottom: 30 }}>
-          <MessageBox style="error" messages={errors} />
+          <MessageBox style={style} messages={errors} />
         </div>
       )}
     </>

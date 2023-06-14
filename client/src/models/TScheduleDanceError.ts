@@ -21,3 +21,11 @@ export type TScheduleDanceStudioError = {
   studioId: TStudio['id'];
   errorMessage: string;
 }
+
+export function isTeacherError(error: TScheduleDanceError): error is TScheduleDanceTeacherError {
+  return (error as TScheduleDanceTeacherError).teacherId !== undefined;
+}
+
+export function isStudioError(error: TScheduleDanceError): error is TScheduleDanceStudioError {
+  return (error as TScheduleDanceStudioError).studioId !== undefined;
+}

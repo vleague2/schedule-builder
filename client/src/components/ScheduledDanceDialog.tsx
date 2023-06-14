@@ -15,6 +15,11 @@ import {
   mapToUpdateScheduledDanceDto,
 } from "../services/mapToDtoService";
 import { useHttpContext } from "../hooks/httpContext";
+import {
+  TScheduleDanceError,
+  isStudioError,
+  isTeacherError,
+} from "../models/TScheduleDanceError";
 
 type TScheduledDanceDialogProps = {
   dance: TDance;
@@ -51,11 +56,15 @@ export function ScheduledDanceDialog(
   const [endAt, setEndAt] = useState<Date | undefined>(
     scheduledDance?.endAt ?? defaultDate
   );
-  const [studio, setStudio] = useState<number>(scheduledDance?.StudioId ?? 0);
+  const [studio, setStudio] = useState<number>(scheduledDance?.StudioId ?? 1);
 
   const { apiResponseState, resetApiResponseState, makeApiCall } =
     useErrorHandling();
+
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
+  const [validationWarnings, setValidationWarnings] = useState<
+    TScheduleDanceError[]
+  >([]);
 
   const { httpService } = useHttpContext();
 
@@ -70,8 +79,15 @@ export function ScheduledDanceDialog(
       studio === 0 ||
       endAt === undefined ||
       startAt === undefined ||
-      endAt <= startAt
+      endAt <= startAt ||
+      validationErrors.length > 0
     );
+  }
+
+  function resetErrorsAndWarnings() {
+    resetApiResponseState();
+    setValidationErrors([]);
+    setValidationWarnings([]);
   }
 
   async function saveData() {
@@ -82,9 +98,6 @@ export function ScheduledDanceDialog(
     if (modalType === "edit" && scheduledDance === undefined) {
       return;
     }
-
-    resetApiResponseState();
-    setValidationErrors([]);
 
     const errors = await valiateScheduledDance(
       {
@@ -102,13 +115,25 @@ export function ScheduledDanceDialog(
     );
 
     if (errors.length > 0) {
-      // TODO: if presented with the option to continue scheduling even with errors, then
-      // we'd store these validation errors (related to the scheduleId)
-      // (except you cant continue scheduling if there are studio errors)
-      
-      setValidationErrors(errors.map((error) => error.errorMessage ));
-      return;
+      const studioAndTeacherErrors = errors.filter(
+        (error) => isStudioError(error) || isTeacherError(error)
+      );
+
+      if (studioAndTeacherErrors.length > 0) {
+        // present only the blocking errors first
+        setValidationErrors(
+          studioAndTeacherErrors.map((error) => error.errorMessage)
+        );
+        return;
+        // if we already have validation warnings, that means they're proceeding with saving with warnings.
+        // if not, this is our first time calculating them
+      } else if (validationWarnings.length === 0) {
+        setValidationWarnings(errors);
+        return;
+      }
     }
+
+    // TODO create table for schedule warnings, save them here, and display them
 
     const getApiCall =
       modalType === "add"
@@ -151,16 +176,30 @@ export function ScheduledDanceDialog(
       }
       primaryButtonOnClick={saveData}
       primaryButtonDisabled={buttonIsDisabled()}
-      primaryButtonLabel="Save"
+      primaryButtonLabel={
+        validationWarnings.length > 0 ? "Save with warnings" : "Save"
+      }
+      primaryButtonColor={
+        validationWarnings.length > 0 ? "secondary" : "primary"
+      }
     >
       <DialogErrorMessage
         dialogType="dance"
         errors={[...apiResponseState.errors, ...validationErrors]}
         successCount={apiResponseState.successes}
       />
+      <DialogErrorMessage
+        dialogType="dance"
+        errors={validationWarnings.map((warning) => warning.errorMessage)}
+        successCount={0}
+        style="warning"
+      />
       <Dropdown
         label="Select the studio"
-        setValue={(value: string) => setStudio(parseInt(value))}
+        setValue={(value: string) => {
+          setStudio(parseInt(value));
+          resetErrorsAndWarnings();
+        }}
         value={studio.toString()}
         dropdownItems={studios.map((studio) => ({
           label: studio.name,
@@ -171,14 +210,20 @@ export function ScheduledDanceDialog(
         label="Choose a start time"
         value={startAt}
         minutesStep={15}
-        onChange={(date) => setStartAt(date?.toJSDate())}
+        onChange={(date) => {
+          setStartAt(date?.toJSDate());
+          resetErrorsAndWarnings();
+        }}
         style={{ marginRight: 30 }}
       />
       <TimePicker
         label="Choose an end time"
         value={endAt}
         minutesStep={15}
-        onChange={(date) => setEndAt(date?.toJSDate())}
+        onChange={(date) => {
+          setEndAt(date?.toJSDate());
+          resetErrorsAndWarnings();
+        }}
       />
     </Dialog>
   );
