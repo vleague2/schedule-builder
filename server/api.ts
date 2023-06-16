@@ -1,4 +1,4 @@
-import { ModelCtor, Sequelize } from "sequelize";
+import { ModelStatic, Sequelize } from "sequelize";
 import {
   addDancersToDance,
   addDances,
@@ -51,6 +51,18 @@ import { ScheduledDanceModelInstance } from "./models/scheduledDanceModel";
 import { ScheduleModelInstance } from "./models/scheduleModel";
 import { StudioModelInstance } from "./models/studioModel";
 import { TeacherModelInstance } from "./models/teacherModel";
+import {
+  ScheduleWarningModelInstance,
+} from "./models/scheduleWarningModel";
+import {
+  DanceWithConflictModelInstance,
+} from "./models/danceWithConflictModel";
+import {
+  TScheduleWarningWithDances,
+  addScheduleWarnings,
+  deleteScheduleWarning,
+  getWarningsForSchedule,
+} from "./managers/scheduleWarningManager";
 
 type TReturnDto<Data> = {
   data?: Data | undefined;
@@ -65,31 +77,37 @@ type TDance = {
 class Api {
   sequelize: Sequelize;
   context: any;
-  danceModel: ModelCtor<DanceModelInstance>;
-  dancerModel: ModelCtor<DancerModelInstance>;
-  studioModel: ModelCtor<StudioModelInstance>;
-  teacherModel: ModelCtor<TeacherModelInstance>;
-  scheduledDanceModel: ModelCtor<ScheduledDanceModelInstance>;
-  dancerDancesModel: ModelCtor<DancerDancesModelInstance>;
-  scheduleModel: ModelCtor<ScheduleModelInstance>;
+  danceModel: ModelStatic<DanceModelInstance>;
+  dancerModel: ModelStatic<DancerModelInstance>;
+  studioModel: ModelStatic<StudioModelInstance>;
+  teacherModel: ModelStatic<TeacherModelInstance>;
+  scheduledDanceModel: ModelStatic<ScheduledDanceModelInstance>;
+  dancerDancesModel: ModelStatic<DancerDancesModelInstance>;
+  scheduleModel: ModelStatic<ScheduleModelInstance>;
+  scheduleWarningModel: ModelStatic<ScheduleWarningModelInstance>;
+  danceWithConflictModel: ModelStatic<DanceWithConflictModelInstance>;
 
   constructor(sequelize: Sequelize) {
     this.sequelize = sequelize;
 
     this.danceModel = this.sequelize.models
-      .Dance as ModelCtor<DanceModelInstance>;
+      .Dance as ModelStatic<DanceModelInstance>;
     this.dancerModel = this.sequelize.models
-      .Dancer as ModelCtor<DancerModelInstance>;
+      .Dancer as ModelStatic<DancerModelInstance>;
     this.studioModel = this.sequelize.models
-      .Studio as ModelCtor<StudioModelInstance>;
+      .Studio as ModelStatic<StudioModelInstance>;
     this.teacherModel = this.sequelize.models
-      .Teacher as ModelCtor<TeacherModelInstance>;
+      .Teacher as ModelStatic<TeacherModelInstance>;
     this.scheduledDanceModel = this.sequelize.models
-      .ScheduledDance as ModelCtor<ScheduledDanceModelInstance>;
+      .ScheduledDance as ModelStatic<ScheduledDanceModelInstance>;
     this.dancerDancesModel = this.sequelize.models
-      .DancerDances as ModelCtor<DancerDancesModelInstance>;
+      .DancerDances as ModelStatic<DancerDancesModelInstance>;
     this.scheduleModel = this.sequelize.models
-      .Schedule as ModelCtor<ScheduleModelInstance>;
+      .Schedule as ModelStatic<ScheduleModelInstance>;
+    this.scheduleWarningModel = this.sequelize.models
+      .ScheduleWarning as ModelStatic<ScheduleWarningModelInstance>;
+    this.danceWithConflictModel = this.sequelize.models
+      .DanceWithConflict as ModelStatic<DanceWithConflictModelInstance>;
   }
 
   async getStudios(): Promise<TReturnDto<StudioModelInstance[]>> {
@@ -331,6 +349,39 @@ class Api {
 
   async deleteSchedule(scheduleId: string): Promise<TReturnDto<number>> {
     return await deleteSchedule(this.scheduleModel, scheduleId);
+  }
+
+  async getWarningsForSchedule(
+    scheduleId: string
+  ): Promise<TReturnDto<TScheduleWarningWithDances[]>> {
+    return await getWarningsForSchedule(
+      this.scheduleWarningModel,
+      this.danceWithConflictModel,
+      scheduleId
+    );
+  }
+
+  async addScheduleWarnings(scheduleWarnings: {
+    conflictObjectId: string | number;
+    warningType: string;
+    errorMessage: string;
+    scheduleId: string | number;
+    conflictDanceIds: string[] | number[];
+  }[]): Promise<TReturnDto<TScheduleWarningWithDances[]>> {
+    return await addScheduleWarnings(
+      this.scheduleWarningModel,
+      this.danceWithConflictModel,
+      scheduleWarnings
+    );
+  }
+
+  async deleteScheduleWarning(
+    scheduleWarningId: string
+  ): Promise<TReturnDto<number>> {
+    return await deleteScheduleWarning(
+      this.scheduleWarningModel,
+      scheduleWarningId
+    );
   }
 }
 

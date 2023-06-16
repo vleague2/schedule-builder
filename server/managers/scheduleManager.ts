@@ -1,9 +1,9 @@
-import { ModelCtor, ValidationError } from "sequelize/types";
+import { ModelStatic, ValidationError } from "sequelize/types";
 import { ScheduleModelInstance } from "../models/scheduleModel";
 import { TReturnDto } from "../types";
 
 export async function getSchedules(
-  scheduleModel: ModelCtor<ScheduleModelInstance>
+  scheduleModel: ModelStatic<ScheduleModelInstance>
 ): Promise<TReturnDto<ScheduleModelInstance[]>> {
   const res: TReturnDto<ScheduleModelInstance[]> = {
     data: [],
@@ -22,7 +22,7 @@ export async function getSchedules(
 }
 
 export async function getSchedule(
-  scheduleModel: ModelCtor<ScheduleModelInstance>,
+  scheduleModel: ModelStatic<ScheduleModelInstance>,
   scheduleId: string
 ): Promise<TReturnDto<ScheduleModelInstance[]>> {
   if (!scheduleId) {
@@ -31,7 +31,7 @@ export async function getSchedule(
 
   const parsedScheduleId = parseInt(scheduleId);
 
-  if (parsedScheduleId === NaN) {
+  if (Number.isNaN(parsedScheduleId)) {
     return {
       data: [],
       error: ["Must provide a number as the schedule ID"],
@@ -61,7 +61,7 @@ export async function getSchedule(
 }
 
 export async function addSchedule(
-  scheduleModel: ModelCtor<ScheduleModelInstance>,
+  scheduleModel: ModelStatic<ScheduleModelInstance>,
   scheduleName: string
 ): Promise<ScheduleModelInstance> {
   if (!scheduleName) {
@@ -82,7 +82,7 @@ export async function addSchedule(
 }
 
 export async function addSchedules(
-  scheduleModel: ModelCtor<ScheduleModelInstance>,
+  scheduleModel: ModelStatic<ScheduleModelInstance>,
   schedules: string[]
 ): Promise<TReturnDto<ScheduleModelInstance[]>> {
   if (schedules.length < 1) {
@@ -113,7 +113,7 @@ export async function addSchedules(
 }
 
 export async function updateSchedule(
-  scheduleModel: ModelCtor<ScheduleModelInstance>,
+  scheduleModel: ModelStatic<ScheduleModelInstance>,
   scheduleId: string,
   options: {
     newScheduleName: string;
@@ -130,7 +130,7 @@ export async function updateSchedule(
 
   const parsedScheduleId = parseInt(scheduleId);
 
-  if (parsedScheduleId === NaN) {
+  if (Number.isNaN(parsedScheduleId)) {
     return {
       data: 0,
       error: ["Must provide a number as the schedule ID"],
@@ -165,7 +165,7 @@ export async function updateSchedule(
 }
 
 export async function deleteSchedule(
-  scheduleModel: ModelCtor<ScheduleModelInstance>,
+  scheduleModel: ModelStatic<ScheduleModelInstance>,
   scheduleId: string
 ): Promise<TReturnDto<number>> {
   if (!scheduleId) {
@@ -174,7 +174,7 @@ export async function deleteSchedule(
 
   const parsedScheduleId = parseInt(scheduleId);
 
-  if (parsedScheduleId === NaN) {
+  if (Number.isNaN(parsedScheduleId)) {
     return {
       data: 0,
       error: ["Must provide a number as the schedule ID"],

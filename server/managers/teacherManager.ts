@@ -1,9 +1,9 @@
-import { ModelCtor, ValidationError } from "sequelize/types";
+import { ModelStatic, ValidationError } from "sequelize/types";
 import { TeacherModelInstance } from "../models/teacherModel";
 import { TReturnDto } from "../types";
 
 export async function getTeachers(
-  teacherModel: ModelCtor<TeacherModelInstance>
+  teacherModel: ModelStatic<TeacherModelInstance>
 ): Promise<TReturnDto<TeacherModelInstance[]>> {
   const res: TReturnDto<TeacherModelInstance[]> = {
     data: [],
@@ -24,7 +24,7 @@ export async function getTeachers(
 }
 
 export async function getTeacher(
-  teacherModel: ModelCtor<TeacherModelInstance>,
+  teacherModel: ModelStatic<TeacherModelInstance>,
   teacherId: string
 ): Promise<TReturnDto<TeacherModelInstance[]>> {
   if (!teacherId) {
@@ -33,7 +33,7 @@ export async function getTeacher(
 
   const parsedId = parseInt(teacherId);
 
-  if (parsedId === NaN) {
+  if (Number.isNaN(parsedId)) {
     return { data: [], error: ["ID must be a number"] };
   }
 
@@ -60,7 +60,7 @@ export async function getTeacher(
 }
 
 export async function addTeachers(
-  teacherModel: ModelCtor<TeacherModelInstance>,
+  teacherModel: ModelStatic<TeacherModelInstance>,
   teachers: string[]
 ): Promise<TReturnDto<TeacherModelInstance[]>> {
   if (teachers.length < 1) {
@@ -91,7 +91,7 @@ export async function addTeachers(
 }
 
 export async function addTeacher(
-  teacherModel: ModelCtor<TeacherModelInstance>,
+  teacherModel: ModelStatic<TeacherModelInstance>,
   teacherName: string
 ): Promise<TeacherModelInstance> {
   if (!teacherName) {
@@ -112,7 +112,7 @@ export async function addTeacher(
 }
 
 export async function updateTeacher(
-  teacherModel: ModelCtor<TeacherModelInstance>,
+  teacherModel: ModelStatic<TeacherModelInstance>,
   teacherId: string,
   options: {
     newTeacherName: string;
@@ -126,7 +126,7 @@ export async function updateTeacher(
 
   const parsedTeacherId = parseInt(teacherId);
 
-  if (parsedTeacherId === NaN) {
+  if (Number.isNaN(parsedTeacherId)) {
     return {
       data: 0,
       error: ["Must provide a number as the teacher ID"],
@@ -161,7 +161,7 @@ export async function updateTeacher(
 }
 
 export async function deleteTeacher(
-  teacherModel: ModelCtor<TeacherModelInstance>,
+  teacherModel: ModelStatic<TeacherModelInstance>,
   teacherId: string
 ): Promise<TReturnDto<number>> {
   if (!teacherId) {
@@ -170,7 +170,7 @@ export async function deleteTeacher(
 
   const parsedTeacherId = parseInt(teacherId);
 
-  if (parsedTeacherId === NaN) {
+  if (Number.isNaN(parsedTeacherId)) {
     return {
       data: 0,
       error: ["Must provide a number as the teacher ID"],

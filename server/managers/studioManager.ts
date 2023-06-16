@@ -1,9 +1,9 @@
-import { ModelCtor, ValidationError } from "sequelize/types";
+import { ModelStatic, ValidationError } from "sequelize/types";
 import { StudioModelInstance } from "../models/studioModel";
 import { TReturnDto } from "../types";
 
 export async function getStudios(
-  studioModel: ModelCtor<StudioModelInstance>
+  studioModel: ModelStatic<StudioModelInstance>
 ): Promise<TReturnDto<StudioModelInstance[]>> {
   const res: TReturnDto<StudioModelInstance[]> = {
     data: [],
@@ -22,7 +22,7 @@ export async function getStudios(
 }
 
 export async function getStudio(
-  studioModel: ModelCtor<StudioModelInstance>,
+  studioModel: ModelStatic<StudioModelInstance>,
   studioId: string
 ): Promise<TReturnDto<StudioModelInstance[]>> {
   if (!studioId) {
@@ -31,7 +31,7 @@ export async function getStudio(
 
   const parsedStudioId = parseInt(studioId);
 
-  if (parsedStudioId === NaN) {
+  if (Number.isNaN(parsedStudioId)) {
     return {
       data: [],
       error: ["Must provide a number as the studio ID"],
@@ -61,7 +61,7 @@ export async function getStudio(
 }
 
 export async function addStudio(
-  studioModel: ModelCtor<StudioModelInstance>,
+  studioModel: ModelStatic<StudioModelInstance>,
   studioName: string
 ): Promise<StudioModelInstance> {
   if (!studioName) {
@@ -82,7 +82,7 @@ export async function addStudio(
 }
 
 export async function addStudios(
-  studioModel: ModelCtor<StudioModelInstance>,
+  studioModel: ModelStatic<StudioModelInstance>,
   studios: string[]
 ): Promise<TReturnDto<StudioModelInstance[]>> {
   if (studios.length < 1) {
@@ -113,7 +113,7 @@ export async function addStudios(
 }
 
 export async function updateStudio(
-  studioModel: ModelCtor<StudioModelInstance>,
+  studioModel: ModelStatic<StudioModelInstance>,
   studioId: string,
   options: {
     newStudioName: string;
@@ -127,7 +127,7 @@ export async function updateStudio(
 
   const parsedStudioId = parseInt(studioId);
 
-  if (parsedStudioId === NaN) {
+  if (Number.isNaN(parsedStudioId)) {
     return {
       data: 0,
       error: ["Must provide a number as the studio ID"],
@@ -162,7 +162,7 @@ export async function updateStudio(
 }
 
 export async function deleteStudio(
-  studioModel: ModelCtor<StudioModelInstance>,
+  studioModel: ModelStatic<StudioModelInstance>,
   studioId: string
 ): Promise<TReturnDto<number>> {
   if (!studioId) {
@@ -171,7 +171,7 @@ export async function deleteStudio(
 
   const parsedStudioId = parseInt(studioId);
 
-  if (parsedStudioId === NaN) {
+  if (Number.isNaN(parsedStudioId)) {
     return {
       data: 0,
       error: ["Must provide a number as the studio ID"],

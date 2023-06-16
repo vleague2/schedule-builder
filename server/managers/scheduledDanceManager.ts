@@ -1,9 +1,9 @@
-import { ModelCtor, ValidationError } from "sequelize/types";
+import { ModelStatic, ValidationError } from "sequelize/types";
 import { ScheduledDanceModelInstance } from "../models/scheduledDanceModel";
 import { TReturnDto } from "../types";
 
 export async function getScheduledDances(
-  scheduledDanceModel: ModelCtor<ScheduledDanceModelInstance>
+  scheduledDanceModel: ModelStatic<ScheduledDanceModelInstance>
 ): Promise<TReturnDto<ScheduledDanceModelInstance[]>> {
   const res: TReturnDto<ScheduledDanceModelInstance[]> = {
     data: [],
@@ -22,7 +22,7 @@ export async function getScheduledDances(
 }
 
 export async function addScheduledDance(
-  scheduledDanceModel: ModelCtor<ScheduledDanceModelInstance>,
+  scheduledDanceModel: ModelStatic<ScheduledDanceModelInstance>,
   danceData: {
     startAt: string;
     endAt: string;
@@ -44,19 +44,19 @@ export async function addScheduledDance(
 
   const parsedDanceId = parseInt(danceId);
 
-  if (parsedDanceId === NaN) {
+  if (Number.isNaN(parsedDanceId)) {
     return { data: [], error: ["Dance ID must be a number"] };
   }
 
   const parsedStudioId = parseInt(studioId);
 
-  if (parsedStudioId === NaN) {
+  if (Number.isNaN(parsedStudioId)) {
     return { data: [], error: ["Studio ID must be a number"] };
   }
 
   const parsedScheduleId = parseInt(studioId);
 
-  if (parsedScheduleId === NaN) {
+  if (Number.isNaN(parsedScheduleId)) {
     return { data: [], error: ["Schedule ID must be a number"] };
   }
 
@@ -87,7 +87,7 @@ export async function addScheduledDance(
 }
 
 export async function deleteScheduledDance(
-  scheduledDanceModel: ModelCtor<ScheduledDanceModelInstance>,
+  scheduledDanceModel: ModelStatic<ScheduledDanceModelInstance>,
   scheduledDanceId: string
 ): Promise<TReturnDto<number>> {
   if (!scheduledDanceId) {
@@ -96,7 +96,7 @@ export async function deleteScheduledDance(
 
   const parsedScheduledDanceId = parseInt(scheduledDanceId);
 
-  if (parsedScheduledDanceId === NaN) {
+  if (Number.isNaN(parsedScheduledDanceId)) {
     return { data: 0, error: ["ID must be a number"] };
   }
 
@@ -119,7 +119,7 @@ export async function deleteScheduledDance(
 }
 
 export async function updateScheduledDance(
-  scheduledDanceModel: ModelCtor<ScheduledDanceModelInstance>,
+  scheduledDanceModel: ModelStatic<ScheduledDanceModelInstance>,
   scheduledDanceId: string,
   options: {
     startAt?: string;
@@ -133,7 +133,7 @@ export async function updateScheduledDance(
 
   const parsedScheduledDanceId = parseInt(scheduledDanceId);
 
-  if (parsedScheduledDanceId === NaN) {
+  if (Number.isNaN(parsedScheduledDanceId)) {
     return { data: 0, error: ["ID must be a number"] };
   }
 

@@ -18,6 +18,8 @@ import { studioRouter } from "./routes/studioRoutes";
 import { scheduledDanceRouter } from "./routes/scheduledDanceRoutes";
 import { scheduleRouter } from "./routes/scheduleRoutes";
 import { authenticationRequired } from "./routes/authentication";
+import { ScheduleWarningModel } from "./models/scheduleWarningModel";
+import { DanceWithConflictModel } from "./models/danceWithConflictModel";
 
 if (process.env.NODE_ENV !== "production") {
   require("dotenv").config();
@@ -60,6 +62,8 @@ async function start() {
   const dance = DanceModel(sequelize);
   const scheduledDance = ScheduledDanceModel(sequelize);
   const schedule = ScheduleModel(sequelize);
+  const scheduleWarning = ScheduleWarningModel(sequelize);
+  const danceWithConflict = DanceWithConflictModel(sequelize);
 
   teacher.hasMany(dance);
   dance.belongsTo(teacher);
@@ -75,6 +79,15 @@ async function start() {
 
   scheduledDance.belongsTo(schedule);
   schedule.hasMany(scheduledDance);
+
+  scheduleWarning.belongsTo(schedule);
+  schedule.hasMany(scheduleWarning);
+
+  danceWithConflict.belongsTo(scheduleWarning);
+  scheduleWarning.hasMany(danceWithConflict);
+
+  danceWithConflict.belongsTo(dance);
+  dance.hasMany(danceWithConflict);
 
   await sequelize.sync({ alter: true });
 

@@ -1,11 +1,11 @@
-import { FindOptions, ModelCtor, ValidationError } from "sequelize/types";
+import { FindOptions, ModelStatic, ValidationError } from "sequelize/types";
 import { DanceModelInstance } from "../models/danceModel";
 import { DancerDancesModelInstance } from "../models/dancerDancesModel";
 import { DancerModelInstance } from "../models/dancerModel";
 import { TReturnDto } from "../types";
 
 export async function getDances(
-  danceModel: ModelCtor<DanceModelInstance>,
+  danceModel: ModelStatic<DanceModelInstance>,
   teacherId?: string
 ): Promise<TReturnDto<DanceModelInstance[]>> {
   const res: TReturnDto<DanceModelInstance[]> = {
@@ -18,7 +18,7 @@ export async function getDances(
   if (teacherId) {
     const parsedId = parseInt(teacherId);
 
-    if (parsedId === NaN) {
+    if (Number.isNaN(parsedId)) {
       return { data: [], error: ["ID must be a number"] };
     }
 
@@ -41,7 +41,7 @@ export async function getDances(
 }
 
 export async function getDance(
-  danceModel: ModelCtor<DanceModelInstance>,
+  danceModel: ModelStatic<DanceModelInstance>,
   danceId: string
 ): Promise<TReturnDto<DanceModelInstance[]>> {
   if (!danceId) {
@@ -50,7 +50,7 @@ export async function getDance(
 
   const parsedId = parseInt(danceId);
 
-  if (parsedId === NaN) {
+  if (Number.isNaN(parsedId)) {
     return { data: [], error: ["ID must be a number"] };
   }
 
@@ -77,8 +77,8 @@ export async function getDance(
 }
 
 export async function getDancersForDance(
-  dancerDancesModel: ModelCtor<DancerDancesModelInstance>,
-  dancerModel: ModelCtor<DancerModelInstance>,
+  dancerDancesModel: ModelStatic<DancerDancesModelInstance>,
+  dancerModel: ModelStatic<DancerModelInstance>,
   danceId: string
 ): Promise<TReturnDto<DancerModelInstance[]>> {
   if (!danceId) {
@@ -87,7 +87,7 @@ export async function getDancersForDance(
 
   const parsedId = parseInt(danceId);
 
-  if (parsedId === NaN) {
+  if (Number.isNaN(parsedId)) {
     return { data: [], error: ["ID must be a number"] };
   }
 
@@ -124,7 +124,7 @@ export async function getDancersForDance(
 }
 
 export async function addDance(
-  danceModel: ModelCtor<DanceModelInstance>,
+  danceModel: ModelStatic<DanceModelInstance>,
   {
     danceName,
     teacherId,
@@ -140,7 +140,7 @@ export async function addDance(
   if (typeof teacherId === "string") {
     const parsedId = parseInt(teacherId);
 
-    if (parsedId === NaN) {
+    if (Number.isNaN(parsedId)) {
       throw "The teacher ID must be a number";
     }
   }
@@ -160,7 +160,7 @@ export async function addDance(
 }
 
 export async function addDances(
-  danceModel: ModelCtor<DanceModelInstance>,
+  danceModel: ModelStatic<DanceModelInstance>,
   dances: { danceName: string; teacherId: string }[]
 ): Promise<TReturnDto<DanceModelInstance[]>> {
   if (dances.length < 1) {
@@ -191,7 +191,7 @@ export async function addDances(
 }
 
 export async function addDancersToDance(
-  dancerDancesModel: ModelCtor<DancerDancesModelInstance>,
+  dancerDancesModel: ModelStatic<DancerDancesModelInstance>,
   {
     danceId,
     dancerIds,
@@ -210,14 +210,14 @@ export async function addDancersToDance(
 
   const parsedDanceId = parseInt(danceId);
 
-  if (parsedDanceId === NaN) {
+  if (Number.isNaN(parsedDanceId)) {
     return { data: 0, error: ["Dance ID must be a number"] };
   }
 
   dancerIds.forEach((dancerId) => {
     const parsedDancerId = parseInt(dancerId);
 
-    if (parsedDancerId === NaN) {
+    if (Number.isNaN(parsedDancerId)) {
       return { data: 0, error: ["Dancer IDs must be numbers"] };
     }
   });
@@ -251,7 +251,7 @@ export async function addDancersToDance(
 }
 
 export async function updateDance(
-  danceModel: ModelCtor<DanceModelInstance>,
+  danceModel: ModelStatic<DanceModelInstance>,
   danceId: string,
   options: {
     newDanceName?: string;
@@ -269,7 +269,7 @@ export async function updateDance(
 
   const parsedDanceId = parseInt(danceId);
 
-  if (parsedDanceId === NaN) {
+  if (Number.isNaN(parsedDanceId)) {
     return {
       data: 0,
       error: ["Must provide a number as the dance ID"],
@@ -294,7 +294,7 @@ export async function updateDance(
   if (newTeacherId) {
     const parsedTeacherId = parseInt(newTeacherId);
 
-    if (parsedTeacherId === NaN) {
+    if (Number.isNaN(parsedTeacherId)) {
       return {
         data: 0,
         error: ["Must provide a number as the teacher ID"],
@@ -326,7 +326,7 @@ export async function updateDance(
 }
 
 export async function deleteDance(
-  danceModel: ModelCtor<DanceModelInstance>,
+  danceModel: ModelStatic<DanceModelInstance>,
   danceId: string
 ): Promise<TReturnDto<number>> {
   if (!danceId) {
@@ -335,7 +335,7 @@ export async function deleteDance(
 
   const parsedId = parseInt(danceId);
 
-  if (parsedId === NaN) {
+  if (Number.isNaN(parsedId)) {
     return { data: 0, error: ["Must provide a dance id number"] };
   }
 
@@ -360,7 +360,7 @@ export async function deleteDance(
 }
 
 export async function removeDancerFromDance(
-  dancerDancesModel: ModelCtor<DancerDancesModelInstance>,
+  dancerDancesModel: ModelStatic<DancerDancesModelInstance>,
   {
     danceId,
     dancerId,
@@ -375,13 +375,13 @@ export async function removeDancerFromDance(
 
   const parsedDanceId = parseInt(danceId);
 
-  if (parsedDanceId === NaN) {
+  if (Number.isNaN(parsedDanceId)) {
     throw "Dance ID must be a number";
   }
 
   const parsedDancer = parseInt(dancerId);
 
-  if (parsedDancer === NaN) {
+  if (Number.isNaN(parsedDancer)) {
     throw "Dancer ID must be a number";
   }
 
@@ -400,7 +400,7 @@ export async function removeDancerFromDance(
 }
 
 export async function removeDancersFromDance(
-  dancerDancesModel: ModelCtor<DancerDancesModelInstance>,
+  dancerDancesModel: ModelStatic<DancerDancesModelInstance>,
   {
     danceId,
     dancerIds,
