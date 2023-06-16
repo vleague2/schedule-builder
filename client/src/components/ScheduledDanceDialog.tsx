@@ -15,11 +15,7 @@ import {
   mapToUpdateScheduledDanceDto,
 } from "../services/mapToDtoService";
 import { useHttpContext } from "../hooks/httpContext";
-import {
-  TScheduleDanceError,
-  isStudioError,
-  isTeacherError,
-} from "../models/TScheduleDanceError";
+import { TScheduleDanceValidation } from "../models/TScheduleDanceValidation";
 
 type TScheduledDanceDialogProps = {
   dance: TDance;
@@ -63,7 +59,7 @@ export function ScheduledDanceDialog(
 
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const [validationWarnings, setValidationWarnings] = useState<
-    TScheduleDanceError[]
+    TScheduleDanceValidation[]
   >([]);
 
   const { httpService } = useHttpContext();
@@ -115,15 +111,11 @@ export function ScheduledDanceDialog(
     );
 
     if (errors.length > 0) {
-      const studioAndTeacherErrors = errors.filter(
-        (error) => isStudioError(error) || isTeacherError(error)
-      );
+      const blockingErrors = errors.filter((error) => error.level === "error");
 
-      if (studioAndTeacherErrors.length > 0) {
+      if (blockingErrors.length > 0) {
         // present only the blocking errors first
-        setValidationErrors(
-          studioAndTeacherErrors.map((error) => error.errorMessage)
-        );
+        setValidationErrors(blockingErrors.map((error) => error.errorMessage));
         return;
         // if we already have validation warnings, that means they're proceeding with saving with warnings.
         // if not, this is our first time calculating them
