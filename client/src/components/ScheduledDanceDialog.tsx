@@ -11,11 +11,12 @@ import { valiateScheduledDance } from "../services/scheduleService";
 import { Dialog } from "./presentational/Dialog/Dialog";
 import { Dropdown } from "./presentational/Dropdown/Dropdown";
 import {
+  mapToAddScheduleWarningsDto,
   mapToAddScheduledDanceDto,
   mapToUpdateScheduledDanceDto,
 } from "../services/mapToDtoService";
 import { useHttpContext } from "../hooks/httpContext";
-import { TScheduleDanceValidation } from "../models/TScheduleDanceValidation";
+import { TScheduleDanceWarning } from "../models/TScheduleDanceValidation";
 
 type TScheduledDanceDialogProps = {
   dance: TDance;
@@ -59,7 +60,7 @@ export function ScheduledDanceDialog(
 
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const [validationWarnings, setValidationWarnings] = useState<
-    TScheduleDanceValidation[]
+    TScheduleDanceWarning[]
   >([]);
 
   const { httpService } = useHttpContext();
@@ -120,7 +121,10 @@ export function ScheduledDanceDialog(
         // if we already have validation warnings, that means they're proceeding with saving with warnings.
         // if not, this is our first time calculating them
       } else if (validationWarnings.length === 0) {
-        setValidationWarnings(errors);
+        const warnings: TScheduleDanceWarning[] = errors.filter(
+          (error) => error.level === "warning"
+        ) as TScheduleDanceWarning[];
+        setValidationWarnings(warnings);
         return;
       }
     }
@@ -152,9 +156,15 @@ export function ScheduledDanceDialog(
             );
           };
 
-    await makeApiCall(getApiCall, () => {
-      onCloseHandler();
-    });
+    await makeApiCall(getApiCall);
+
+    if (validationWarnings.length > 0) {
+      const dto = mapToAddScheduleWarningsDto(validationWarnings);
+
+      await makeApiCall(() => httpService.httpPost("scheduleWarnings", dto));
+    }
+
+    onCloseHandler();
   }
 
   return (

@@ -8,6 +8,7 @@ export type TScheduleDanceError = {
   dancesWithConflict?: TDance['id'][];
   errorMessage: string;
   level: 'error';
+  scheduleId: number;
 }
 
 export type TScheduleDanceWarning = {
@@ -16,4 +17,5 @@ export type TScheduleDanceWarning = {
   dancesWithConflict: TDance['id'][];
   errorMessage: string;
   level: 'warning';
+  scheduleId: number;
 }

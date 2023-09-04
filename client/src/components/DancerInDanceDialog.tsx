@@ -39,6 +39,13 @@ export function DancerInDanceDialog(
   const { apiResponseState, resetApiResponseState, makeApiCall } =
     useErrorHandling();
 
+  useEffect(() => {
+    if (apiResponseState.successes > 0 && apiResponseState.errors.length < 1) {
+      const verb = dialogAction === "add" ? "added" : "removed";
+      onSuccess(`Successfully ${verb} ${apiResponseState.successes} dancers`);
+    }
+  }, [apiResponseState.successes])
+
   function buttonIsDisabled() {
     return selectedDance === 0 || selectedDancers.length === 0;
   }
@@ -60,11 +67,8 @@ export function DancerInDanceDialog(
       });
     }
 
-    await makeApiCall(getApiCallBasedOnDialogType, (count: number) => {
-      const verb = dialogAction === "add" ? "added" : "removed";
-      onSuccess(`Successfully ${verb} ${count} dancers`);
-      onCloseHandler();
-    });
+    await makeApiCall(getApiCallBasedOnDialogType);
+    onCloseHandler();
   }
 
   function onCheckboxChange(

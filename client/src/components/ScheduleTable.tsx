@@ -1,5 +1,5 @@
 import { Typography } from "@material-ui/core";
-import { forwardRef, useState } from "react";
+import { forwardRef, useEffect, useState } from "react";
 import { useHttpContext } from "../hooks/httpContext";
 
 import { TDance } from "../models/TDance";
@@ -13,6 +13,9 @@ import {
 import { DeleteConfirmationDialog } from "./DeleteConfirmationDialog";
 import { ScheduledDanceDialog } from "./ScheduledDanceDialog";
 import { TimeSlotRow } from "./TimeSlotRow";
+import { TScheduleDanceWarning } from "../models/TScheduleDanceValidation";
+import { MessageBox } from "./presentational/MessageBox/MessageBox";
+import { TScheduleWarning } from "../models/TScheduleWarning";
 
 type TScheduleTableProps = {
   studios: TStudio[];
@@ -27,6 +30,19 @@ export const ScheduleTable = forwardRef<HTMLDivElement, TScheduleTableProps>(
   (props, ref) => {
     const { studios, dances, teachers, scheduledDances, refetch, scheduleId } =
       props;
+
+    const [scheduleWarnings, setScheduleWarnings] = useState<
+      TScheduleWarning[] | undefined
+    >(undefined);
+
+    // TODO: set and display schedule warnings; remove warnings when conflict is fixed
+    useEffect(() => {
+      httpService
+        .httpScheduleWarningsGetOrPost("GET", { scheduleId })
+        .then((warnings) => {
+          setScheduleWarnings(warnings.data);
+        });
+    }, []);
 
     const [selectedScheduledDance, setSelectedScheduledDance] = useState<
       TScheduledDance | undefined

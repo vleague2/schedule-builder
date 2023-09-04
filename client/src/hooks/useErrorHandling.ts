@@ -6,6 +6,7 @@ import { TDancer } from "../models/TDancer";
 import { TScheduledDance } from "../models/TScheduledDance";
 import { TStudio } from "../models/TStudio";
 import { TTeacher } from "../models/TTeacher";
+import { TScheduleDanceWarning } from "../models/TScheduleDanceValidation";
 
 type TReturnValue = {
   apiResponseState: {
@@ -17,7 +18,6 @@ type TReturnValue = {
     apiCall: () => Promise<
       TApiResponseDto<TResourceReturnType[] | number> | undefined
     >,
-    onSuccess: (count: number) => void
   ) => Promise<void>;
 };
 
@@ -26,7 +26,8 @@ export type TResourceReturnType =
   | TStudio
   | TDancer
   | TDance
-  | TScheduledDance;
+  | TScheduledDance
+  | TScheduleDanceWarning;
 
 function dataIsNumber(data: number | TResourceReturnType[]): data is number {
   return typeof data === "number";
@@ -46,8 +47,7 @@ export function useErrorHandling(): TReturnValue {
     apiCall: () => Promise<
       TApiResponseDto<TResourceReturnType[] | number> | undefined
     >,
-    onSuccess: (count: number) => void
-  ) {
+  ): Promise<void> {
     resetApiResponseState();
 
     const result = await apiCall();
@@ -66,12 +66,12 @@ export function useErrorHandling(): TReturnValue {
     }
 
     if (dataIsNumber(result.data) && result.data > 0) {
-      onSuccess(result.data);
+      setApiResponseState({ errors: [], successes: result.data })
       return;
     }
 
     if (!dataIsNumber(result.data) && result.data.length > 0) {
-      onSuccess(result.data.length);
+      setApiResponseState({ errors: [], successes: result.data.length })
       return;
     }
   }

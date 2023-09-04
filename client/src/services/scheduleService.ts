@@ -36,7 +36,8 @@ export function savePdf(scheduleName: string): boolean {
   iconButtonsArray.forEach((iconButton) => iconButton.remove());
 
   printMe.print();
-  printMe.close();
+  // TODO for some reason this is causing the printing to fail
+  // printMe.close();
 
   return true;
 }
@@ -256,14 +257,14 @@ function getDancesAtSameTimeInSameStudio(
         danceInSameStudioEndStamp
       )
     ) {
-      errors.push(
-        {
-          conflictObjectId: studioId,
-          errorMessage: "There is already another dance scheduled in this studio during this timeslot. Try a different time.",
-          type: 'studio',
-          level: 'error',
-        }
-      );
+      errors.push({
+        conflictObjectId: studioId,
+        errorMessage:
+          "There is already another dance scheduled in this studio during this timeslot. Try a different time.",
+        type: "studio",
+        level: "error",
+        scheduleId,
+      });
     }
   });
 
@@ -350,12 +351,16 @@ async function getDancersAndTeachersWhoAreDoubleBooked(
 
     if (dancersInBothDances) {
       dancersInBothDances.forEach((dancer) =>
-        errors.push({ 
+        errors.push({
           conflictObjectId: dancer.id,
           errorMessage: `${dancer.name} is in a dance scheduled at the same time`,
-          dancesWithConflict: [newScheduledDance.DanceId, danceAtSameTime.DanceId],
-          level: 'warning',
-          type: 'dancer'
+          dancesWithConflict: [
+            newScheduledDance.DanceId,
+            danceAtSameTime.DanceId,
+          ],
+          level: "warning",
+          type: "dancer",
+          scheduleId,
         })
       );
     }
@@ -368,9 +373,13 @@ async function getDancersAndTeachersWhoAreDoubleBooked(
       errors.push({
         errorMessage: `This teacher is already teaching at this time`,
         conflictObjectId: teacherId,
-        dancesWithConflict: [newScheduledDance.DanceId, danceAtSameTime.DanceId],
-        level: 'error',
-        type: 'teacher',
+        dancesWithConflict: [
+          newScheduledDance.DanceId,
+          danceAtSameTime.DanceId,
+        ],
+        level: "error",
+        type: "teacher",
+        scheduleId,
       });
     }
   }

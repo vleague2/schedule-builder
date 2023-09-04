@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { TDance } from "../models/TDance";
 import { TDancer } from "../models/TDancer";
@@ -27,6 +27,12 @@ export function DeleteDialog(props: TDeleteDialogProps): JSX.Element {
 
   const { apiResponseState, resetApiResponseState, makeApiCall } =
     useErrorHandling();
+
+  useEffect(() => {
+    if (apiResponseState.successes > 0 && apiResponseState.errors.length < 1) {
+      onSuccess(`Successfully deleted ${apiResponseState.successes} ${dialogType}(s)`)
+    }
+  }, [apiResponseState.successes])
 
   function buttonIsDisabled() {
     return !selectValue;
@@ -58,10 +64,8 @@ export function DeleteDialog(props: TDeleteDialogProps): JSX.Element {
       }
     }
 
-    await makeApiCall(getApiCallBasedOnDialogType, (count: number) => {
-      onSuccess(`Successfully deleted ${count} ${dialogType}(s)`);
-      onCloseHandler();
-    });
+    await makeApiCall(getApiCallBasedOnDialogType);
+    onCloseHandler();
   }
 
   return (

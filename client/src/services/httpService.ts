@@ -18,6 +18,9 @@ import { TUpdateScheduledDanceDto } from "../models/TUpdateScheduledDanceDto";
 import { TUpdateScheduleDto } from "../models/TUpdateScheduleDto";
 import { TUpdateStudioDto } from "../models/TUpdateStudioDto";
 import { TUpdateTeacherDto } from "../models/TUpdateTeacherDto";
+import { TScheduleDanceWarning } from "../models/TScheduleDanceValidation";
+import { TAddScheduleWarningDto } from "../models/TAddScheduleWarningDto";
+import { TScheduleWarning } from "../models/TScheduleWarning";
 
 type TPatchBody =
   | TUpdateScheduledDanceDto
@@ -33,7 +36,8 @@ type TPostBody =
   | TAddScheduledDanceDto
   | TAddSchedulesDto
   | TAddStudiosDto
-  | TAddTeachersDto;
+  | TAddTeachersDto
+  | TAddScheduleWarningDto;
 
 type THttpDancersInDanceArgs<T> = T extends "GET"
   ? {
@@ -45,6 +49,12 @@ type THttpDancersInDanceArgs<T> = T extends "GET"
       dancerIds: number[];
     };
 
+type THttpScheduleWarningsWithDancesArgs<T> = T extends "GET"
+  ? { scheduleId: number; warnings?: never }
+  : T extends "POST"
+  ? { scheduleId: number; warnings: TAddScheduleWarningDto }
+  : { scheduleWarningId: number };
+
 const resourceTypeUrlMap = {
   dancers: "/dancers",
   dances: "/dances",
@@ -52,6 +62,7 @@ const resourceTypeUrlMap = {
   schedules: "/schedules",
   studios: "/studios",
   scheduledDances: "/scheduledDances",
+  scheduleWarnings: "/scheduleWarnings",
 };
 
 type TReturnType<T extends keyof typeof resourceTypeUrlMap> =
@@ -65,10 +76,15 @@ type TReturnType<T extends keyof typeof resourceTypeUrlMap> =
     ? TSchedule[]
     : T extends "studios"
     ? TStudio[]
+    : T extends "scheduleWarnings"
+    ? TScheduleDanceWarning[]
     : TScheduledDance[];
 
 type TDancersInDanceReturnType<T extends "GET" | "POST" | "DELETE"> =
   T extends "GET" ? TDancer[] : number;
+
+type TScheduleWarningsReturnType<T extends "GET" | "POST" | "DELETE"> =
+  T extends "GET" ? TScheduleWarning[] : number;
 
 export class HttpService {
   authorizationToken: AccessToken;
@@ -161,6 +177,38 @@ export class HttpService {
     if (requestType !== "GET") {
       requestParams.body = JSON.stringify({ dancerIds: args.dancerIds });
     }
+
+    return (await fetch(url, requestParams)).json();
+  }
+
+  async httpScheduleWarningsGetOrPost<T extends "GET" | "POST">(
+    requestType: T,
+    args: THttpScheduleWarningsWithDancesArgs<T>
+  ): Promise<TApiResponseDto<TScheduleWarningsReturnType<T>>> {
+    const url = `${resourceTypeUrlMap["scheduleWarnings"]}/${args.scheduleId}`;
+
+    const requestParams: RequestInit = {
+      ...this.defaultRequestParams,
+      method: requestType,
+    };
+
+    if (requestType !== "GET") {
+      requestParams.body = JSON.stringify({ scheduleWarnings: args.warnings });
+    }
+
+    return (await fetch(url, requestParams)).json();
+  }
+
+  async httpScheduleWarningsDelete<T extends "DELETE">(
+    requestType: T,
+    args: THttpScheduleWarningsWithDancesArgs<T>
+  ): Promise<TApiResponseDto<TScheduleWarning>> {
+    const url = `${resourceTypeUrlMap["scheduleWarnings"]}/${args.scheduleWarningId}}}`;
+
+    const requestParams: RequestInit = {
+      ...this.defaultRequestParams,
+      method: requestType,
+    };
 
     return (await fetch(url, requestParams)).json();
   }

@@ -40,6 +40,12 @@ export function EditDialog(props: TEditDialogProps): JSX.Element {
   const { apiResponseState, resetApiResponseState, makeApiCall } =
     useErrorHandling();
 
+  useEffect(() => {
+    if (apiResponseState.successes > 0 && apiResponseState.errors.length < 1) {
+      onSuccess(`Successfully edited ${apiResponseState.successes} ${dialogType}(s)`)
+    }
+  }, [apiResponseState.successes])
+
   function buttonIsDisabled() {
     if (dialogType === "dance") {
       return selectValue === 0 || (newValue === "" && selectedTeacher === 0);
@@ -84,10 +90,8 @@ export function EditDialog(props: TEditDialogProps): JSX.Element {
     }
 
     if (dialogType !== undefined) {
-      await makeApiCall(getApiCallBasedOnDialogType, (count: number) => {
-        onSuccess(`Successfully added ${count} ${dialogType}(s)`);
-        onCloseHandler();
-      });
+      await makeApiCall(getApiCallBasedOnDialogType);
+      onCloseHandler();
     }
   }
 

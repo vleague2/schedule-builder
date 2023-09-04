@@ -20,6 +20,7 @@ import { scheduleRouter } from "./routes/scheduleRoutes";
 import { authenticationRequired } from "./routes/authentication";
 import { ScheduleWarningModel } from "./models/scheduleWarningModel";
 import { DanceWithConflictModel } from "./models/danceWithConflictModel";
+import { scheduleWarningRouter } from "./routes/scheduleWarningRoutes";
 
 if (process.env.NODE_ENV !== "production") {
   require("dotenv").config();
@@ -107,6 +108,7 @@ async function start() {
   app.use("/studios", studioRouter(api, authenticationCheck));
   app.use("/scheduledDances", scheduledDanceRouter(api, authenticationCheck));
   app.use("/schedules", scheduleRouter(api, authenticationCheck));
+  app.use("/scheduleWarnings", scheduleWarningRouter(api, authenticationCheck));
 
   app.use(express.static(path.resolve(__dirname, "../client/build")));
 

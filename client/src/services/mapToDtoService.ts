@@ -2,8 +2,10 @@ import { TAddDancersDto } from "../models/TAddDancersDto";
 import { TAddDancesDto } from "../models/TAddDancesDto";
 import { TAddScheduledDanceDto } from "../models/TAddScheduledDanceDto";
 import { TAddSchedulesDto } from "../models/TAddScheduleDto";
+import { TAddScheduleWarningDto } from "../models/TAddScheduleWarningDto";
 import { TAddStudiosDto } from "../models/TAddStudiosDto";
 import { TAddTeachersDto } from "../models/TAddTeachersDto";
+import { TScheduleDanceWarning } from "../models/TScheduleDanceValidation";
 import { TUpdateDanceDto } from "../models/TUpdateDanceDto";
 import { TUpdateDancerDto } from "../models/TUpdateDancerDto";
 import { TUpdateScheduledDanceDto } from "../models/TUpdateScheduledDanceDto";
@@ -123,4 +125,16 @@ export function mapToAddSchedulesDto(value: string): TAddSchedulesDto {
   return {
     schedules: value.split(",").map((value) => value.trim()),
   };
+}
+
+export function mapToAddScheduleWarningsDto(warnings: TScheduleDanceWarning[]): TAddScheduleWarningDto {
+  return {
+    scheduleWarnings: warnings.map((warning) => ({
+      conflictObjectId: warning.conflictObjectId,
+      warningType: warning.type,
+      scheduleId: warning.scheduleId,
+      conflictDanceIds: warning.dancesWithConflict,
+      errorMessage: warning.errorMessage,
+    }))
+  }
 }

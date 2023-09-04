@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { TTeacher } from "../models/TTeacher";
 import { TAdminDialogType } from "../models/TAdminDialogType";
@@ -33,6 +33,12 @@ export function AddDialog(props: TAddDialogProps): JSX.Element {
 
   const { apiResponseState, resetApiResponseState, makeApiCall } =
     useErrorHandling();
+
+  useEffect(() => {
+    if (apiResponseState.successes > 0 && apiResponseState.errors.length < 1) {
+      onSuccess(`Successfully added ${apiResponseState.successes} ${dialogType}(s)`)
+    }
+  }, [apiResponseState.successes])
 
   function buttonIsDisabled() {
     if (dialogType === "dance") {
@@ -78,10 +84,8 @@ export function AddDialog(props: TAddDialogProps): JSX.Element {
     }
 
     if (dialogType !== undefined) {
-      await makeApiCall(getApiCallBasedOnDialogType, (count: number) => {
-        onSuccess(`Successfully added ${count} ${dialogType}(s)`);
-        onCloseHandler();
-      });
+      await makeApiCall(getApiCallBasedOnDialogType);
+      onCloseHandler();
     }
   }
 

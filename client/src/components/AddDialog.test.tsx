@@ -9,6 +9,8 @@ function getMockHttpContextService(props = {}) {
     httpGet: jest.fn(),
     httpPatch: jest.fn(),
     httpDancersInDance: jest.fn(),
+    httpScheduleWarningsGetOrPost: jest.fn(),
+    httpScheduleWarningsDelete: jest.fn(),
     authorizationToken: {
       accessToken: "",
       claims: {
